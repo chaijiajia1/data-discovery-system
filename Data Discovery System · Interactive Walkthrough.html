@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)https://cowork.xiaohongshu.com/f/sr-1fc4f1e3/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta content="width=device-width,initial-scale=1" name="viewport">
+  <title>
+   Data Discovery System · Interactive Walkthrough
+  </title>
+  <style>
+/* ============================================================
+   Data Discovery System — academic restyle
+   Reference: Guixu VLDB Demo (mist-blue glass, 1px low-sat
+   borders, deep navy ink, soft shadows, mono numerals)
+   ============================================================ */
+:root{
+  /* soft academic tints — one hue family per semantic group */
+  --gray:#EDF1F5;          /* neutral cool grey          */
+  --green:#E3F0EA;         /* sage                       */
+  --blue:#E1ECF7;          /* mist blue                  */
+  --yellow:#F5EFDD;        /* parchment                  */
+  --orange:#F3E9DE;        /* sand                       */
+  --purple:#E9E4F4;        /* lavender grey              */
+  --violet:#E4E0F0;        /* heather                    */
+  --lgray:#F4F7FA;
+  --ink:#162534;           /* deep navy text             */
+  --ink-strong:#0F202D;
+  --muted:#4A5E74;
+  --dim:#7A8DA2;
+  --accent:#296DFF;        /* guixu blue, used sparingly */
+  --accent-ink:#1F5FCA;
+  --brand:#184963;         /* deep teal-navy             */
+  --ok:#3F8C6D;            /* desaturated green          */
+  --ok-soft:#EDF5F0;
+  --danger:#B4552D;        /* terracotta                 */
+  --danger-soft:#F7EFE9;
+  --warn:#8A6A1F;          /* dark bronze text           */
+  --border:rgba(145,165,186,.34);
+  --border-strong:rgba(80,112,145,.40);
+  --panel:rgba(255,255,255,.78);
+  --panel-strong:rgba(255,255,255,.96);
+  --panel-muted:#F4F7FA;
+  --shadow-sm:0 6px 16px rgba(15,23,42,.05);
+  --shadow-md:0 14px 30px rgba(15,23,42,.07);
+  --mono:"IBM Plex Mono","SFMono-Regular","Consolas","Menlo",monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--ink);
+  font:13px/1.5 "Aptos","Avenir Next","Helvetica Neue","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background:
+    radial-gradient(circle at top left,rgba(41,109,255,.07),transparent 26%),
+    radial-gradient(circle at top right,rgba(54,191,250,.08),transparent 28%),
+    linear-gradient(180deg,#F8FBFE 0%,#EEF4F8 100%);
+  background-attachment:fixed;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+::selection{background:rgba(41,109,255,.14)}
+
+/* ---------- control bar ---------- */
+.top{
+  position:sticky;top:0;z-index:20;padding:10px 24px 12px;
+  background:var(--panel-strong);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.top-in{max-width:1680px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.brand h1{margin:0;font-size:21px;font-weight:680;letter-spacing:-.02em;color:var(--ink-strong)}
+.brand p{margin:0;color:var(--muted);font-size:12px}
+.ctl{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:18px;align-items:start}
+.field>span{display:block;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.field>span i{font-style:normal;font-weight:500;color:var(--dim);margin-left:6px;text-transform:none;letter-spacing:0}
+.in{
+  width:100%;height:38px;border:1px solid var(--border-strong);border-radius:12px;
+  padding:0 12px;background:rgba(255,255,255,.9);color:var(--ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+.in:hover{border-color:rgba(80,112,145,.55)}
+.in:focus-visible,button:focus-visible,input[type=range]:focus-visible{
+  outline:2px solid rgba(41,109,255,.35);outline-offset:2px;border-color:rgba(41,109,255,.4);
+}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.chip{
+  border:1px solid rgba(80,112,145,.38);background:rgba(255,255,255,.92);border-radius:999px;
+  padding:3px 11px;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--muted);
+  transition:border-color .18s ease,background .18s ease,color .18s ease;
+}
+.chip:hover{border-color:rgba(80,112,145,.45);background:rgba(255,255,255,1);color:var(--ink)}
+.hint{margin:5px 0 0;font-size:11px;color:var(--muted)}
+.btns{display:flex;gap:8px}
+.btn{
+  height:38px;padding:0 22px;border-radius:12px;border:1px solid transparent;
+  background:linear-gradient(180deg,#1B5170,#123A50);color:#EEF8FF;
+  font-weight:700;font-size:12.5px;letter-spacing:.01em;
+  box-shadow:0 10px 22px rgba(24,73,99,.16);
+  transition:box-shadow .18s ease,filter .18s ease;
+}
+.btn:hover{filter:brightness(1.04);box-shadow:0 12px 26px rgba(41,109,255,.2)}
+.btn.sec{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(238,245,252,.92));
+  border-color:var(--border);color:var(--brand);box-shadow:var(--shadow-sm);
+}
+.btn.sec:hover{border-color:rgba(80,112,145,.45)}
+.btn:disabled,.in:disabled{opacity:.5;cursor:not-allowed}
+
+/* ---------- canvas ---------- */
+.wrap{max-width:1680px;margin:0 auto;padding:18px 24px 44px}
+.status{
+  margin:0 0 16px;padding:9px 14px;font-weight:600;font-size:12.5px;color:var(--ink);
+  border-left:3px solid var(--brand);
+  border-radius:0 10px 10px 0;
+  background:linear-gradient(90deg,rgba(228,238,247,.85),rgba(228,238,247,0) 70%);
+}
+.row{display:grid;gap:20px 26px;align-items:stretch}
+.r1{grid-template-columns:66fr 42fr 52fr}
+.r2{grid-template-columns:86fr 39fr 49fr}
+.status:empty{display:none}
+body:not(.viz) .wrap{padding:10px 24px 18px}
+body:not(.viz) .row{row-gap:14px}
+body:not(.viz) .phase{padding:36px 12px 12px;gap:8px}
+body:not(.viz) .node{padding:7px 11px}
+body:not(.viz) .loops,body:not(.viz) .foot,body:not(.viz) .strip{display:none}
+
+/* phase container — quiet dotted frame, guixu workflow-stage feel */
+.phase{
+  position:relative;min-width:0;border:1px dashed var(--border);border-radius:18px;padding:46px 16px 16px;
+  background:rgba(255,255,255,.42);
+  display:flex;flex-direction:column;gap:10px;
+  transition:box-shadow .3s,border-color .3s,background .3s;
+}
+.phase>h2{
+  position:absolute;top:12px;left:17px;right:13px;margin:0;
+  font-size:15.5px;font-weight:680;letter-spacing:-.01em;color:var(--ink-strong);
+  display:flex;gap:8px;align-items:baseline;
+  cursor:pointer;user-select:none;
+}
+.phase>h2 em{
+  font-style:normal;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.1em;color:var(--accent-ink);
+  background:rgba(41,109,255,.08);border:1px solid rgba(41,109,255,.18);
+  border-radius:999px;padding:1px 8px;
+}
+.phase>h2 .ck{display:none;color:var(--ok);font-size:14px}
+.phase>h2::after{content:"▾";margin-left:auto;color:var(--dim);font-size:11px;font-weight:700}
+.phase.collapsed>h2::after{content:"▸"}
+/* collapsed = back to pre-run skeleton: hide dynamic payload, keep static node frames */
+.phase.collapsed .node .dyn{display:none}
+.phase.collapsed .node.has .sub{display:block}
+.phase.collapsed .wfbar,.phase.collapsed .wfscroll,.phase.collapsed .wftool{display:none}
+.phase.active{
+  border-color:rgba(41,109,255,.38);
+  background:rgba(255,255,255,.62);
+  box-shadow:0 0 0 4px rgba(41,109,255,.07),var(--shadow-md);
+}
+.phase.done .ck{display:inline}
+.row>.phase:not(:last-child)::after{
+  content:"\25B6";position:absolute;right:-18px;top:50%;font-size:12px;
+  color:var(--dim);transform:translateY(-50%);
+}
+/* ---------- nodes ---------- */
+.node{
+  background:linear-gradient(180deg,var(--panel-strong),var(--c,#fff));
+  border:1px solid var(--border);border-radius:12px;padding:9px 12px;
+  box-shadow:var(--shadow-sm);
+  transition:opacity .3s,box-shadow .3s,border-color .3s;
+}
+.node>b{display:block;font-size:13px;font-weight:680;color:var(--ink-strong);letter-spacing:-.01em}
+.node .sub{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.node .dyn{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:12px;color:var(--ink)}
+.node.has .dyn{display:block}
+.node.has .sub{display:none}
+.node.has > b{margin-bottom:0}
+body.viz .node{opacity:.55}
+body.viz .node.done,body.viz .node.run{opacity:1}
+body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,.6)}
+.node.run{
+  border-color:rgba(41,109,255,.42);
+  box-shadow:0 0 0 1px rgba(41,109,255,.14),0 10px 24px rgba(41,109,255,.1);
+  animation:pulse 1s ease-in-out infinite;
+}
+@keyframes pulse{50%{box-shadow:0 0 0 5px rgba(41,109,255,.1),0 10px 24px rgba(41,109,255,.08)}}
+.dyn .k{color:var(--muted)}
+.dyn strong{font-weight:700;font-family:var(--mono);font-size:11.5px}
+.dyn ul{margin:2px 0 0;padding:0;list-style:none}
+.dyn li{padding:1px 0}
+.dyn dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.dyn dt{color:var(--muted)}
+.dyn dd{margin:0}
+.src{
+  font-size:10px;font-family:var(--mono);color:var(--warn);
+  background:rgba(245,239,221,.9);border:1px solid rgba(138,106,31,.22);
+  border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap;
+}
+.bar{height:7px;border:0;border-radius:999px;background:rgba(118,136,156,.14);overflow:hidden;margin:5px 0}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#1EA6A0,#36BFFA);transition:width .6s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.stat{border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.85);padding:4px 8px;min-width:0}
+.stat u{display:block;text-decoration:none;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.stat b{font-size:12.5px;font-family:var(--mono);color:var(--ink-strong)}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{
+  flex:1;border:1px solid var(--border);background:rgba(255,255,255,.85);border-radius:9px;
+  padding:5px 8px;font-weight:600;font-size:12px;cursor:pointer;color:var(--muted);
+  transition:all .18s ease;
+}
+.tab:hover{border-color:rgba(80,112,145,.45);color:var(--ink)}
+.tab.on{
+  background:var(--brand);border-color:var(--brand);color:#EEF8FF;
+  box-shadow:0 6px 14px rgba(24,73,99,.16);
+}
+.qq{margin:2px 0 0}
+.askrow{display:flex;gap:8px;margin-top:8px}
+.askrow input{
+  flex:1;min-width:0;height:34px;border:1px solid var(--border-strong);border-radius:10px;
+  padding:0 10px;background:rgba(255,255,255,.9);color:var(--ink);
+}
+.askrow button{
+  height:34px;padding:0 14px;border-radius:10px;border:1px solid transparent;
+  background:linear-gradient(180deg,#1B5170,#123A50);color:#EEF8FF;font-weight:700;font-size:12px;
+}
+.pill{
+  display:inline-block;border:1px solid var(--border);border-radius:999px;
+  padding:1px 9px;margin:2px 4px 2px 0;background:rgba(255,255,255,.9);
+  font-size:11.5px;color:var(--muted);
+}
+.pill.no{text-decoration:line-through;color:var(--dim);border-color:var(--border)}
+.pill.ok{border-color:rgba(63,140,109,.4);background:var(--ok-soft);color:var(--ok)}
+.down{text-align:center;line-height:1;font-size:12px;color:var(--dim)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grow{flex:1}
+
+/* Phase 3 */
+.steps{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0}
+.steps .pill{background:var(--panel-muted)}
+.steps .par{background:var(--violet);border-color:rgba(122,90,248,.24);color:#5A48A8}
+.wv{
+  display:inline-flex;flex-direction:column;align-items:center;min-width:34px;
+  border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.9);
+  margin:2px 4px 2px 0;padding:1px 4px;line-height:1.2;
+}
+.wv u{text-decoration:none;font-size:10px;color:var(--dim)}
+.wv b{font-size:12.5px;font-family:var(--mono);color:var(--ink-strong)}
+.wv.cur{
+  border:1px solid var(--brand);background:var(--brand);color:#EEF8FF;
+  box-shadow:0 6px 14px rgba(24,73,99,.18);
+}
+.wv.cur u{color:rgba(238,248,255,.72)}
+.wv.cur b{color:#EEF8FF}
+
+/* Phase 3 workflow planner */
+.wfpane{
+  border:1px solid var(--border);border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72));
+  box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.wfpane>header{
+  display:flex;align-items:baseline;gap:10px;padding:8px 13px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(228,238,247,.55),rgba(228,238,247,.15));
+  font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--brand);
+}
+.wfpane>header .lg{font-weight:500;color:var(--dim);font-size:10.5px;letter-spacing:0;text-transform:none}
+.wfpane>header .hintR{margin-left:auto;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:0;text-transform:none}
+.wfpane.ok{border-color:rgba(63,140,109,.45);box-shadow:0 0 0 4px rgba(63,140,109,.08),var(--shadow-md)}
+.wfok{color:var(--ok);font-weight:700;letter-spacing:0;text-transform:none}
+.wfbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:10px 11px}
+.wfrole{
+  display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:12px;
+  background:rgba(255,255,255,.92);padding:6px 11px 6px 7px;
+  box-shadow:var(--shadow-sm);
+  transition:box-shadow .15s,opacity .15s,border-color .15s;
+}
+.wfrole b{display:block;font-size:12px;color:var(--ink-strong)}
+.wfrole.edit:not(.on){cursor:pointer}
+.wfrole.edit:not(.on):hover{border-color:rgba(41,109,255,.45);box-shadow:0 8px 18px rgba(41,109,255,.12)}
+.wfrole.on{opacity:.55}
+.wfrole.on::after{content:"✓ added";font-size:10px;font-weight:700;color:var(--ok);white-space:nowrap}
+.wfrole.lock{cursor:default}
+.wfscroll{
+  overflow:auto;
+  background:
+    radial-gradient(circle at 18px 18px,rgba(145,165,186,.14) 1px,transparent 1.5px) 0 0/26px 26px,
+    rgba(248,251,254,.55);
+}
+.wfscroll:has(.wfcanvas:empty){display:none}
+body:not(.viz) .wfscroll{display:none}
+.wfcanvas{display:block;max-width:100%;height:auto}
+.wfcanvas text{user-select:none}
+.wedge{fill:none;stroke:#5B7186;stroke-width:2;pointer-events:none}
+.wedge.par{stroke-dasharray:7 5}
+.wedge.dep{stroke:#8DA0B3}
+.wedge.sel{stroke:var(--accent);stroke-width:3.5}
+.whit{fill:none;stroke:rgba(0,0,0,0);stroke-width:16;pointer-events:stroke;cursor:pointer}
+.wnode.live{cursor:pointer}
+.wnode>circle{transition:stroke .15s}
+.wnode.sel>circle{stroke:var(--accent);stroke-width:3.5}
+.wnode.src>circle{stroke:var(--danger);stroke-width:3.5;stroke-dasharray:5 3}
+.wnl{font-size:11px;font-weight:700;fill:#162534}
+.wlab{font-size:10px;font-weight:700;fill:#4A5E74;stroke:rgba(248,251,254,.85);stroke-width:4;paint-order:stroke;font-family:var(--mono)}
+.wftool{display:flex;gap:7px;align-items:center;padding:9px 11px;border-top:1px solid var(--border);background:rgba(255,255,255,.85);flex-wrap:wrap}
+.wftool[hidden]{display:none}
+.wbtn{
+  height:31px;padding:0 13px;border-radius:9px;border:1px solid var(--border-strong);
+  background:rgba(255,255,255,.95);color:var(--brand);font-weight:700;font-size:12px;cursor:pointer;
+  transition:all .15s;
+}
+.wbtn:hover:not(:disabled):not(.on){border-color:rgba(80,112,145,.55);color:var(--ink)}
+.wbtn.on{background:var(--brand);border-color:var(--brand);color:#EEF8FF}
+.wbtn.go{margin-left:auto;border-color:transparent;background:linear-gradient(180deg,#1B5170,#123A50);color:#EEF8FF;box-shadow:0 8px 18px rgba(24,73,99,.16)}
+.wbtn.go:hover:not(:disabled){filter:brightness(1.05)}
+.wbtn:disabled{opacity:.45;cursor:not-allowed}
+.wfmsg{flex-basis:100%;font-size:11px;color:var(--muted)}
+.wftabs{display:flex;gap:6px;flex-wrap:wrap}
+.wtab{
+  border:1px solid var(--border-strong);background:rgba(255,255,255,.95);border-radius:9px;
+  padding:4px 10px;font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);
+  font-family:var(--mono);transition:all .15s;
+}
+.wtab i{font-style:normal;margin-right:4px;color:var(--brand)}
+.wtab em{font-style:normal;color:var(--warn);margin-left:3px}
+.wtab:hover:not(:disabled):not(.on){border-color:rgba(80,112,145,.55);color:var(--ink)}
+.wtab.on{background:var(--brand);border-color:var(--brand);color:#EEF8FF}
+.wtab.on i{color:rgba(238,248,255,.85)}
+.wtab:disabled{opacity:.55;cursor:default}
+.wfmaxbar{display:flex;align-items:center;padding:7px 13px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(228,238,247,.55),rgba(228,238,247,.15))}
+.wfmaxp{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.wfmaxp input{width:54px;height:29px;border:1px solid var(--border-strong);border-radius:8px;padding:0 6px;background:rgba(255,255,255,.95);color:var(--ink);font-family:var(--mono);font-weight:700}
+
+/* Phase 4 */
+.p4grid{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:stretch}
+.svc{
+  border:1px solid var(--border);border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.82),var(--lgray));
+  padding:9px;display:flex;flex-direction:column;gap:8px;
+}
+.svc>h3,.rolesT{margin:0;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--brand)}
+.svc>small{color:var(--muted);font-size:11px;margin-top:-6px}
+.rolesT{display:block;margin-bottom:6px}
+.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.role .tags{display:flex;gap:4px;margin-top:4px}
+.tag{
+  font-style:normal;font-size:10px;font-weight:700;
+  border:1px solid var(--border);border-radius:5px;padding:0 4px;
+  background:rgba(255,255,255,.9);color:var(--muted);transition:all .2s;
+}
+.tag.flash{background:var(--brand);color:#EEF8FF;border-color:var(--brand)}
+.role .dyn{font-size:11.5px}
+.p4right{display:flex;flex-direction:column;gap:10px}
+
+/* strips and loops */
+.strip{display:flex;align-items:center;gap:12px;margin:12px 0;font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.strip::before,.strip::after{content:"";flex:1;border-top:1px dashed var(--border)}
+.strip span{
+  border:1px solid var(--border);border-radius:999px;padding:2px 14px;
+  background:rgba(255,255,255,.92);color:var(--muted);text-transform:none;letter-spacing:0;font-size:12px;
+  transition:all .3s;
+}
+.strip.on span{
+  background:var(--brand);border-color:var(--brand);color:#EEF8FF;
+  box-shadow:0 6px 14px rgba(24,73,99,.16);
+}
+.loops{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:14px}
+.loop{
+  border:1px dashed var(--border);border-radius:14px;padding:10px 14px;
+  display:flex;gap:10px;align-items:flex-start;opacity:.45;transition:all .3s;
+  background:rgba(255,255,255,.42);
+}
+.loop i{font-style:normal;font-size:18px;line-height:1;color:var(--dim)}
+.loop b{display:block;color:var(--ink-strong)}
+.loop small{color:var(--muted);font-size:11.5px}
+.loop.on{opacity:1;border-color:rgba(63,140,109,.42);background:var(--ok-soft)}
+.loop.on i{color:var(--ok)}
+.loop.fail.on{border-color:rgba(180,85,45,.42);background:var(--danger-soft)}
+.loop.fail.on i{color:var(--danger)}
+.foot{margin:18px 0 0;color:var(--muted);font-size:11.5px}
+
+@media (max-width:1500px){.roles{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:1100px){
+  .ctl{grid-template-columns:1fr}
+  .r1,.r2,.loops{grid-template-columns:1fr}
+  .row>.phase:not(:last-child)::after{display:none}
+  .row{gap:16px}
+  .p4grid{grid-template-columns:1fr}
+  .top{position:static}
+}
+@media (prefers-reduced-motion:reduce){
+  .node.run{animation:none}
+  *{transition:none!important}
+}
+
+  </style>
+ <script src="./Data Discovery System · Interactive Walkthrough_files/uba-script.js"></script><script src="./Data Discovery System · Interactive Walkthrough_files/apm-insight.min.js" async="" crossorigin="anonymous"></script><script src="./Data Discovery System · Interactive Walkthrough_files/104101b831udegmhb2q06chlqrg9000000000018ckkuf4.js"></script></head>
+ <body>
+  <header class="top">
+   <div class="top-in">
+    <div class="brand">
+     <h1>
+      Data Discovery System
+     </h1>
+    </div>
+    <form autocomplete="off" class="ctl" id="ctl">
+     <div class="field">
+      <input aria-describedby="qhint" class="in" id="q" type="text" value="近7天 DAU 和 GMV 按渠道拆分">
+      <div class="chips" id="chips">
+       <button class="chip" data-q="近7天 DAU 和 GMV 按渠道拆分" type="button">
+        近7天 DAU 和 GMV 按渠道拆分
+       </button>
+       <button class="chip" data-q="昨日次日留存率" type="button">
+        昨日次日留存率
+       </button>
+       <button class="chip" data-q="Last 30 days CTR and conversion by platform" type="button">
+        Last 30 days CTR and conversion by platform
+       </button>
+      </div>
+     </div>
+      <div class="btns">
+      <button class="btn" id="run" type="submit">
+       Run
+      </button>
+      <button class="btn sec" id="reset" type="button">
+       Reset
+      </button>
+     </div>
+    </form>
+   </div>
+  </header>
+  <main class="wrap">
+   <p aria-live="polite" class="status" id="status" role="status">
+   </p>
+   <div class="row r1">
+    <section aria-labelledby="h1" class="phase" id="ph1"><h2 id="h1"><em>PHASE 1</em>Knowledge Pre-injection<span class="ck" aria-hidden="true">✓</span></h2><div class="split"><div class="node " id="n-hist" data-ph="1" style="--c:var(--green)"><b>Historical Query—Knowledge/Asset Pairs</b><span class="sub">Similar queries → datasets finally selected + knowledge referenced</span><div class="dyn" id="d-hist"></div></div><div class="node " id="n-kr" data-ph="1" style="--c:var(--blue)"><b>Knowledge Retrieval</b><span class="sub">Metric definitions · asset metadata · business terms</span><div class="dyn" id="d-kr"></div></div></div><div class="down">▼</div><div class="node " id="n-sel" data-ph="1" style="--c:var(--yellow)"><b>Token-budgeted Knowledge Selection</b><span class="sub">Independent contribution + interaction effects: synergy, redundancy, conflict</span><div class="dyn" id="d-sel"></div></div></section>
+    <section aria-labelledby="h2" class="phase" id="ph2"><h2 id="h2"><em>PHASE 2</em>Task Contract<span class="ck" aria-hidden="true">✓</span></h2><div class="tabs"><button type="button" class="tab on" id="tabAsk">Ask the user</button><button type="button" class="tab" id="tabDft">Fill with default rules</button></div><div id="paneAsk"><div class="node " id="n-ask" data-ph="2" style="--c:var(--orange)"><b>Ask the user</b><span class="sub">Only if a gap would change metric, asset or result</span><div class="dyn" id="d-ask"></div></div></div><div id="paneDft" hidden=""><div class="node " id="n-dft" data-ph="2" style="--c:var(--green)"><b>Fill with default rules</b><span class="sub">Record the default source</span><div class="dyn" id="d-dft"></div></div></div><div class="down">▼</div><div class="node " id="n-contract" data-ph="2" style="--c:var(--purple)"><b>Executable Task Contract</b><span class="sub"></span><div class="dyn" id="d-contract"></div></div></section>
+    <section aria-labelledby="h3" class="phase" id="ph3"><h2 id="h3"><em>PHASE 3</em>Collaborative Workflow Planning<span class="ck" aria-hidden="true">✓</span></h2><div class="wfpane" id="wfRolePane"><header>Available Roles <span class="lg">from task contract + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div><div class="wfpane" id="wfRecPane"><header>Recommended Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="hintR" id="wfRecHint"></span></header><div class="wfscroll"><svg class="wfcanvas" id="wfRecSvg" role="img" aria-label="Recommended workflow graph"></svg></div></div><div class="wfpane" id="wfEditPane"><header>Final Workflow <span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Editable workflow graph"></svg></div><div class="wftool" id="wfTool"><button type="button" class="wbtn" id="wfBtnLink" disabled>↔ Link arrow</button><button type="button" class="wbtn" id="wfBtnDel" disabled>✕ Delete selected</button><button type="button" class="wbtn" id="wfBtnReset" disabled>↺ Restore recommended</button><button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit final workflow</button><span class="wfmsg" id="wfMsg"></span></div></div></section>
+   </div>
+   <div class="strip" id="dispatch">
+    <span>
+     ▼ Dispatch: activate roles / parallel branches
+    </span>
+   </div>
+   <div class="row r2">
+    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4"><em>PHASE 4</em>Data Discovery<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div class="p4right"><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(by metric / business domain / candidate asset)</span></b><div class="roles"><div class="node role" id="n-role0" data-ph="4" style="--c:var(--violet)"><b>Metric Lookup</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role0-bi">BI</i><i class="tag" id="t-role0-kh">KH</i></div><div class="dyn" id="d-role0"></div></div><div class="node role" id="n-role1" data-ph="4" style="--c:var(--violet)"><b>BI Asset Discovery</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role1-bi">BI</i><i class="tag" id="t-role1-kh">KH</i></div><div class="dyn" id="d-role1"></div></div><div class="node role" id="n-role2" data-ph="4" style="--c:var(--violet)"><b>Table/Field Lineage Discovery</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role2-bi">BI</i><i class="tag" id="t-role2-kh">KH</i></div><div class="dyn" id="d-role2"></div></div><div class="node role" id="n-role3" data-ph="4" style="--c:var(--violet)"><b>Permission &amp; Partition Precheck</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role3-bi">BI</i><i class="tag" id="t-role3-kh">KH</i></div><div class="dyn" id="d-role3"></div></div></div></div><div class="node " id="n-bb" data-ph="4" style="--c:var(--purple)"><b>Task-level Shared Blackboard</b><span class="sub">Data reuse; prevents duplicate queries</span><div class="dyn" id="d-bb"></div></div></div></div><div class="node " id="n-merge" data-ph="4" style="--c:var(--orange)"><b>Merge Agent: deterministic-first evidence organizer</b><span class="sub">Entity alignment · candidate dedup · conflict detection · evidence compression · status summary</span><div class="dyn" id="d-merge"></div></div></section>
+    <section aria-labelledby="h5" class="phase" id="ph5"><h2 id="h5"><em>PHASE 5</em>Asset Selection<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-hard" data-ph="5" style="--c:var(--lgray)"><b>① Hard Filter</b><span class="sub">Permission, grain and partition rules</span><div class="dyn" id="d-hard"></div></div><div class="node " id="n-soft" data-ph="5" style="--c:var(--yellow)"><b>② Soft Ranking</b><span class="sub">Evidence strength · granularity fit · dimension coverage · freshness</span><div class="dyn" id="d-soft"></div></div><div class="node " id="n-out" data-ph="5" style="--c:var(--blue)"><b>Selection Result: primary + supporting assets</b><span class="sub">Passed rules · rationale · rejected candidates · risk flags</span><div class="dyn" id="d-out"></div></div></section>
+    <section aria-labelledby="h6" class="phase" id="ph6"><h2 id="h6"><em>PHASE 6</em>Execute, Verify &amp; Feedback<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-exec" data-ph="6" style="--c:var(--blue)"><b>Task Execution</b><span class="sub">Confirmed asset, caliber, filters and available partitions</span><div class="dyn" id="d-exec"></div></div><div class="node " id="n-ver" data-ph="6" style="--c:var(--yellow)"><b>Result Verification</b><span class="sub">Execution success ≠ correct result</span><div class="dyn" id="d-ver"></div></div><div class="split"><div class="node " id="n-fail" data-ph="6" style="--c:var(--orange)"><b>Failure Attribution</b><span class="sub">Structured attribution, forming failure report</span><div class="dyn" id="d-fail"></div></div><div class="node " id="n-back" data-ph="6" style="--c:var(--green)"><b>Feedback</b><span class="sub">Stored as learning sample; failures only as routing/risk negatives</span><div class="dyn" id="d-back"></div></div></div></section>
+   </div>
+   <div class="loops">
+    <div class="loop fail" id="loopFail">
+     <i>
+      ↩
+     </i>
+     <div>
+      <b>
+       FailureReport → Router Agent
+      </b>
+      <small id="loopFailT">
+       Not triggered in this run — verification passed.
+      </small>
+     </div>
+    </div>
+    <div class="loop on" id="loopTrust">
+     <i>
+      ⟲
+     </i>
+     <div>
+      <b>
+       Trust Loop → Phase 1
+      </b>
+      <small id="loopTrustT">
+       Verified pair written back to the historical source in Phase 1.
+      </small>
+     </div>
+    </div>
+   </div>
+   <p class="foot">
+    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements.
+   </p>
+  </main>
+  <script>
+   (function(){
+'use strict';
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sleep=ms=>new Promise(r=>setTimeout(r,RM?Math.min(ms,60):ms));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ================= static structure ================= */
+const NODE=(ph,id,c,t,s,x)=>`<div class="node ${x||''}" id="n-${id}" data-ph="${ph}" style="--c:var(--${c})"><b>${t}</b><span class="sub">${s||''}</span><div class="dyn" id="d-${id}"></div></div>`;
+const H=(n,name)=>`<h2 id="h${n}"><em>PHASE ${n}</em>${name}<span class="ck" aria-hidden="true">✓</span></h2>`;
+
+const ROLES=[
+  {id:'role0',name:'Metric Lookup'},
+  {id:'role1',name:'BI Asset Discovery'},
+  {id:'role2',name:'Table/Field Lineage Discovery'},
+  {id:'role3',name:'Permission &amp; Partition Precheck'}
+];
+
+$('#ph1').innerHTML=H(1,'Knowledge Pre-injection')+
+  `<div class="split">${NODE(1,'hist','green','Historical Query—Knowledge/Asset Pairs','Similar queries → datasets finally selected + knowledge referenced')}`+
+  `${NODE(1,'kr','blue','Knowledge Retrieval','Metric definitions · asset metadata · business terms')}</div>`+
+  `<div class="down">▼</div>`+
+  NODE(1,'sel','yellow','Token-budgeted Knowledge Selection','Independent contribution + interaction effects: synergy, redundancy, conflict');
+
+$('#ph2').innerHTML=H(2,'Task Contract')+
+  `<div class="tabs"><button type="button" class="tab on" id="tabAsk">Ask the user</button><button type="button" class="tab" id="tabDft">Fill with default rules</button></div>`+
+  `<div id="paneAsk">${NODE(2,'ask','orange','Ask the user','Only if a gap would change metric, asset or result')}</div>`+
+  `<div id="paneDft" hidden>${NODE(2,'dft','green','Fill with default rules','Record the default source')}</div>`+
+  `<div class="down">▼</div>`+
+  NODE(2,'contract','purple','Executable Task Contract','');
+
+$('#ph3').innerHTML=H(3,'Collaborative Workflow Planning')+
+  `<div class="wfpane" id="wfRolePane" hidden><header>Available Roles <span class="lg">from task contract + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div>`+
+  `<div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel agents <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div>`+
+  `<div class="wftool" id="wfTool" hidden>`+
+    `<button type="button" class="wbtn" id="wfBtnLink" hidden disabled>↔ Link arrow</button>`+
+    `<button type="button" class="wbtn" id="wfBtnDel" hidden disabled>✕ Delete selected</button>`+
+    `<button type="button" class="wbtn" id="wfBtnReset" hidden disabled>↺ Restore recommended</button>`+
+    `<button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit workflow</button>`+
+    `<span class="wfmsg" id="wfMsg"></span>`+
+  `</div></div>`;
+
+$('#ph4').innerHTML=H(4,'Data Discovery')+
+  `<div class="p4grid">`+
+    `<div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small>`+
+      NODE(4,'bi','blue','BI Asset Retrieval','Returns base fact assets')+
+      NODE(4,'kh','green','Knowledge Hybrid Retrieval','Vector + graph dual channel; covers naming mismatch')+
+    `</div>`+
+    `<div class="p4right">`+
+      `<div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(by metric / business domain / candidate asset)</span></b>`+
+      `<div class="roles">`+ROLES.map(r=>`<div class="node role" id="n-${r.id}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub"></span><div class="tags"><i class="tag" id="t-${r.id}-bi">BI</i><i class="tag" id="t-${r.id}-kh">KH</i></div><div class="dyn" id="d-${r.id}"></div></div>`).join('')+`</div></div>`+
+      NODE(4,'bb','purple','Task-level Shared Blackboard','Data reuse; prevents duplicate queries')+
+    `</div>`+
+  `</div>`+
+  NODE(4,'merge','orange','Merge Agent: deterministic-first evidence organizer','Entity alignment · candidate dedup · conflict detection · evidence compression · status summary');
+
+$('#ph5').innerHTML=H(5,'Asset Selection')+
+  NODE(5,'hard','lgray','① Hard Filter','Permission, grain and partition rules')+
+  NODE(5,'soft','yellow','② Soft Ranking','Evidence strength · granularity fit · dimension coverage · freshness')+
+  NODE(5,'out','blue','Selection Result: primary + supporting assets','Passed rules · rationale · rejected candidates · risk flags');
+
+$('#ph6').innerHTML=H(6,'Execute, Verify &amp; Feedback')+
+  NODE(6,'exec','blue','Task Execution','Confirmed asset, caliber, filters and available partitions')+
+  NODE(6,'ver','yellow','Result Verification','Execution success ≠ correct result')+
+  `<div class="split">${NODE(6,'fail','orange','Failure Attribution','Structured attribution, forming failure report')}${NODE(6,'back','green','Feedback','Stored as learning sample; failures only as routing/risk negatives')}</div>`;
+
+const PH_NODES={};
+$$('.node[data-ph]').forEach(n=>{const p=+n.dataset.ph;(PH_NODES[p]=PH_NODES[p]||[]).push(n);});
+
+/* ================= domain tables ================= */
+const METRICS=[
+  {re:/留存|retention/i,name:'Next-day retention',ds:'Retention Certified Dataset',bi:'User Retention Dashboard',tbl:'dws_user_retention_di'},
+  {re:/DAU|日活|活跃/i,name:'DAU',ds:'User Activity Certified Dataset',bi:'Core Activity Dashboard',tbl:'dws_user_active_di'},
+  {re:/GMV|成交|交易额/i,name:'GMV',ds:'Trade Certified Dataset',bi:'Trade Overview Dashboard',tbl:'dws_trade_order_di'},
+  {re:/曝光|impression/i,name:'Impressions',ds:'Exposure Certified Dataset',bi:'Content Exposure Dashboard',tbl:'dws_feed_expo_di'},
+  {re:/点击率|CTR/i,name:'CTR',ds:'Click Funnel Certified Dataset',bi:'Click Funnel Dashboard',tbl:'dws_feed_click_di'},
+  {re:/转化|conversion/i,name:'Conversion rate',ds:'Conversion Certified Dataset',bi:'Conversion Dashboard',tbl:'dws_conv_funnel_di'},
+  {re:/收入|营收|revenue/i,name:'Revenue',ds:'Revenue Certified Dataset',bi:'Revenue Dashboard',tbl:'dws_revenue_di'}
+];
+const DIMS=[
+  [/渠道|channel/i,'Channel'],[/城市|city/i,'City'],[/品类|category/i,'Category'],
+  [/平台|platform/i,'Platform'],[/地区|region/i,'Region'],[/性别|gender/i,'Gender']
+];
+const KT=[
+  {short:'Definition',u:9,tok0:260,tokR:200},
+  {short:'Metadata',u:8,tok0:380,tokR:220},
+  {short:'Lineage',u:6,tok0:480,tokR:300},
+  {short:'Dashboard doc',u:7,tok0:560,tokR:340},
+  {short:'Terms',u:5,tok0:240,tokR:200}
+];
+const IX={'01':4,'13':-8,'04':2,'12':3};   // pairwise interaction utility between knowledge types (same metric)
+const CHECKS=['Result schema','Null / magnitude','Time coverage','Aggregation consistency','Key caliber check'];
+
+function parseTime(q){
+  let m;
+  if((m=q.match(/近\s*(\d+)\s*[天日]/)))return 'Last '+m[1]+' days';
+  if((m=q.match(/last\s*(\d+)\s*days/i)))return 'Last '+m[1]+' days';
+  if(/昨[天日]|yesterday/i.test(q))return 'Yesterday';
+  if(/上周|last week/i.test(q))return 'Last week';
+  if(/本周|this week/i.test(q))return 'This week';
+  if(/上月|last month/i.test(q))return 'Last month';
+  if(/本月|this month/i.test(q))return 'This month';
+  if((m=q.match(/(\d{4})[-年\/](\d{1,2})/)))return m[1]+'-'+String(m[2]).padStart(2,'0');
+  return null;
+}
+
+/* ================= deterministic simulation model ================= */
+function analyze(q){
+  const rng=mulberry32(hash(q));
+  const metrics=METRICS.filter(m=>m.re.test(q)).slice(0,3);
+  const time=parseTime(q);
+  const dims=DIMS.filter(d=>d[0].test(q)).map(d=>d[1]);
+  const ctx={q,metrics,time,dims,ok:metrics.length>0&&q.length>=2};
+
+  // --- Phase 1: history pairs
+  const pairs=[];
+  if(ctx.ok){
+    const m=metrics[0], cnt=2+Math.floor(rng()*2);
+    const tpl=[`${time||'Last 30 days'} ${m.name} trend`,`${m.name} by ${dims[0]||'channel'}`,`${m.name} weekly report`];
+    const tgt=[m.ds,m.ds,m.bi];
+    for(let i=0;i<cnt;i++)pairs.push({q:tpl[i],ds:tgt[i],sim:Math.max(.62,.96-i*.07-rng()*.04),tok:420+Math.round(rng()*260)});
+  }
+  ctx.pairs=pairs;
+
+  // --- Phase 1: knowledge candidates + greedy selection under token budget
+  const cands=[];
+  metrics.forEach((m,mi)=>KT.forEach((t,ti)=>cands.push({mi,ti,label:t.short+' · '+m.name,u:t.u+Math.round(rng()*2),tok:t.tok0+Math.round(rng()*t.tokR)})));
+  const B=1600+900*metrics.length;
+  const inter=(a,b)=>a.mi!==b.mi?0:(IX[[a.ti,b.ti].sort().join('')]||0);
+  const sel=[];let used=0,acc=0;
+  for(;;){
+    let best=null;
+    for(const c of cands){
+      if(sel.includes(c)||used+c.tok>B)continue;
+      const gain=c.u+sel.reduce((s,x)=>s+inter(c,x),0);
+      if(gain<=0)continue;
+      const ratio=gain/c.tok;
+      if(!best||ratio>best.ratio)best={c,ratio,gain};
+    }
+    if(!best)break;
+    sel.push(best.c);used+=best.c.tok;acc+=best.gain;
+  }
+  const dropped=cands.filter(c=>!sel.includes(c)).map(c=>({c,why:sel.some(x=>inter(c,x)<0)?'redundant':'over budget'}));
+  ctx.know={cands,sel,dropped,B,used,utility:acc};
+
+  // --- Phase 2: contract
+  const defaults=[];
+  if(!time)defaults.push('time range');
+  defaults.push('granularity');
+  if(!dims.length)defaults.push('dimension');
+  ctx.defaults=defaults;
+
+  // --- Phase 3/4: tasks (independent of agent cap)
+  const tasks=[];
+  metrics.forEach((m,mi)=>ROLES.forEach((r,ri)=>tasks.push({m:mi,r:ri,key:mi+'-'+ri,bi:1+Math.floor(rng()*2),kh:1+Math.floor(rng()*2)})));
+  ctx.tasks=tasks;
+  const raw=tasks.length*2+Math.floor(rng()*3);
+  const unique=metrics.length*(3+Math.floor(rng()*2));
+  ctx.merge={raw,unique,dupes:raw-unique,conflicts:metrics.length>1?1:(rng()<.4?1:0)};
+
+  // --- Phase 5
+  let passed=unique-2*metrics.length,stale=0;
+  if(passed-1>=metrics.length&&rng()<.5){stale=1;passed--;}
+  ctx.filter={perm:metrics.length,grain:metrics.length,stale,passed,total:unique};
+  const s0=.9+rng()*.06,s1=s0-.08-rng()*.05,s2=s1-.1-rng()*.1;
+  ctx.rank=metrics.length?[
+    {n:metrics[0].ds,s:s0,why:'certified · reused by dashboards'},
+    {n:metrics[0].bi,s:s1,why:'dashboard source'},
+    {n:metrics[0].tbl,s:s2,why:'detail layer → supporting only'}
+  ]:[];
+  return ctx;
+}
+
+/* ================= UI state ================= */
+let ctx=null,running=false,done3=false;
+const statusEl=$('#status');
+const say=t=>{statusEl.textContent=t;};
+const node=id=>$('#n-'+id), dyn=id=>$('#d-'+id);
+
+function resetNodes(from){
+  for(let p=from;p<=6;p++){
+    (PH_NODES[p]||[]).forEach(n=>{n.classList.remove('run','done','skip','has');const d=n.querySelector('.dyn');if(d)d.innerHTML='';});
+    const ph=$('#ph'+p);ph.classList.remove('active','done');
+  }
+  $$('.tag').forEach(t=>t.classList.remove('flash'));
+  if(from<=3)$('#dispatch').classList.remove('on');
+  $('#loopFail').classList.remove('on');$('#loopTrust').classList.remove('on');
+  $('#loopFailT').textContent='Rerun only the latest suspicious step and the steps after it; keep verified upstream evidence.';
+  $('#loopTrustT').textContent='Only verified, permission-safe, versioned Query—knowledge/asset pairs flow back as history candidates.';
+  if(from<=3)resetWFUI();
+}
+function resetAll(){
+  if(running&&wfSubmitResolve){wfAbort=true;const r=wfSubmitResolve;wfSubmitResolve=null;r();}
+  resetNodes(1);
+  document.body.classList.remove('viz');
+  ctx=null;done3=false;
+  say('Ready — enter a question, then press Run.');
+}
+function phaseOn(n,msg){
+  $$('.phase').forEach(p=>p.classList.remove('active'));
+  const ph=$('#ph'+n);
+  ph.classList.remove('collapsed');
+  ph.classList.add('active');
+  if(msg)say(msg);
+}
+function phaseDone(n){const p=$('#ph'+n);p.classList.remove('active');p.classList.add('done');}
+async function act(id,html,ms){
+  const n=node(id);n.classList.add('run');
+  await sleep(ms==null?650:ms);
+  n.classList.remove('run');n.classList.add('done','has');
+  dyn(id).innerHTML=html;
+}
+function skip(id,html){const n=node(id);n.classList.add('skip','has');dyn(id).innerHTML=html;}
+const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
+function lock(v){
+  running=v;
+  $('#run').disabled=v;$('#q').disabled=v;$('#reset').disabled=v;
+  $('#run').textContent=v?'Running…':'Run';
+}
+function setTab(w){
+  $('#tabAsk').classList.toggle('on',w==='ask');
+  $('#tabDft').classList.toggle('on',w==='dft');
+  $('#paneAsk').hidden=w!=='ask';
+  $('#paneDft').hidden=w!=='dft';
+}
+
+/* ================= phase 3 · workflow planner ================= */
+const WF_ROLES={
+  ml:{name:'Metric Lookup',l1:'Metric',l2:'Lookup',c:'violet',desc:'resolve metric definitions from knowledge'},
+  bad:{name:'BI Asset Discovery',l1:'BI Asset',l2:'Discovery',c:'blue',desc:'surface candidate BI assets & dashboards'},
+  tfld:{name:'Table/Field Lineage Discovery',l1:'Lineage',l2:'Discovery',c:'green',desc:'trace tables and field lineage'},
+  ppp:{name:'Permission & Partition Precheck',l1:'Permission',l2:'Precheck',c:'orange',desc:'verify access, grain & partitions'},
+  merge:{name:'Merge Agent',l1:'Merge',l2:'Agent',c:'purple',desc:'align & compress evidence'},
+  sel:{name:'Asset Selector',l1:'Asset',l2:'Selector',c:'yellow',desc:'rank & pick primary + supporting assets'},
+  exec:{name:'Query Executor',l1:'Query',l2:'Executor',c:'gray',desc:'run the confirmed query & collect results'}
+};
+const WF_KEYS=['ml','bad','tfld','ppp','merge','sel','exec'];
+const WF2ROLE=['ml','bad','tfld','ppp'];
+const WF_ICONS={
+  ml:'<circle cx="10" cy="10" r="6.5" fill="none" stroke="#111" stroke-width="2.2"/><line x1="15" y1="15" x2="20.5" y2="20.5" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>',
+  bad:'<rect x="4" y="12" width="4.5" height="8.5" rx="1" fill="#111"/><rect x="9.75" y="8" width="4.5" height="12.5" rx="1" fill="#111"/><rect x="15.5" y="3.5" width="4.5" height="17" rx="1" fill="#111"/>',
+  tfld:'<circle cx="12" cy="4.5" r="2.7" fill="#111"/><circle cx="5" cy="19" r="2.7" fill="#111"/><circle cx="19" cy="19" r="2.7" fill="#111"/><path d="M12 7.2v4.3M12 11.5H5v5M12 11.5h7v5" fill="none" stroke="#111" stroke-width="2"/>',
+  ppp:'<path d="M12 2.5l8 3v6.2c0 4.8-3.4 8.6-8 10.8-4.6-2.2-8-6-8-10.8V5.5z" fill="none" stroke="#111" stroke-width="2.2" stroke-linejoin="round"/><path d="M8.2 11.8l2.7 2.7 5-5.2" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  merge:'<path d="M4 5.5c0 4.5 4 6.5 8.5 6.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M4 18.5c0-4.5 4-6.5 8.5-6.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M12.5 12H19" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M15.5 8.5L19 12l-3.5 3.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  sel:'<path d="M3.5 4.5h17l-6.5 7.6v5.4l-4 2.5v-7.9z" fill="none" stroke="#111" stroke-width="2" stroke-linejoin="round"/>',
+  exec:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="2"/><path d="M10 8.5l6 3.5-6 3.5z" fill="#111"/>'
+};
+let wfEditing=false,wfSubmitted=false,wfSel=null,wfLinkSrc=null,wfLinkMode=false,wfRec=null,wfEdit=null,wfSubmitResolve=null,wfEid=0,wfNid=0,wfAbort=false;
+let wfCands=null,wfScores=null,wfBest=0,wfCand=0,wfMode='cand',wfBuilt=false;
+const WF_CIRC=['①','②','③'];
+
+const roleCardHTML=k=>{const r=WF_ROLES[k];
+  return `<div class="wfrole" data-role="${k}" title="${r.desc}">`+
+    `<svg viewBox="0 0 28 28" width="30" height="30" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.2"/><g transform="translate(4,4) scale(0.8333)">${WF_ICONS[k]}</g></svg>`+
+    `<span><b>${r.name}</b></span></div>`;};
+
+function wfLayout(wf){
+  const depth={},live={};
+  wf.nodes.forEach(n=>live[n.id]=true);
+  const calc=(id,vis)=>{
+    if(depth[id]!=null)return depth[id];
+    if(vis.has(id)||!live[id])return 0;
+    vis.add(id);
+    const ps=wf.edges.filter(e=>e.b===id&&live[e.a]).map(e=>e.a);
+    const d=ps.length?Math.max(...ps.map(p=>calc(p,vis)))+1:0;
+    vis.delete(id);depth[id]=d;return d;
+  };
+  wf.nodes.forEach(n=>calc(n.id,new Set()));
+  const cols={};
+  wf.nodes.forEach(n=>{(cols[depth[n.id]]=cols[depth[n.id]]||[]).push(n.id);});
+  const maxD=Math.max(0,...Object.keys(cols).map(Number));
+  const maxCnt=Math.max(1,...Object.values(cols).map(a=>a.length));
+  const colW=150,rowH=92,padX=60,padY=46;
+  const W=padX*2+(maxD+1)*colW,H=padY*2+maxCnt*rowH;
+  const pos={};
+  for(let d=0;d<=maxD;d++){
+    const arr=cols[d]||[];
+    arr.forEach((id,i)=>{pos[id]={x:padX+d*colW,y:Math.round(H/2+(i-(arr.length-1)/2)*rowH)};});
+  }
+  return{pos,W,H};
+}
+
+function renderWF(svg,wf,mode,pfx,sel,srcId){
+  if(!svg)return;
+  if(!wf){svg.innerHTML='';return;}
+  const{pos,W,H}=wfLayout(wf);
+  let s=`<defs><marker id="arw-${pfx}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5B7186"/></marker></defs>`;
+  wf.edges.forEach((ed,i)=>{
+    const A=pos[ed.a],B=pos[ed.b];if(!A||!B)return;
+    const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1;
+    const sx=A.x+dx/L*28,sy=A.y+dy/L*28,ex=B.x-dx/L*30,ey=B.y-dy/L*30;
+    const c1x=sx+dx*.4,c1y=sy+dy*.12,c2x=ex-dx*.4,c2y=ey-dy*.12;
+    const dPath=`M${sx.toFixed(1)} ${sy.toFixed(1)} C${c1x.toFixed(1)} ${c1y.toFixed(1)},${c2x.toFixed(1)} ${c2y.toFixed(1)},${ex.toFixed(1)} ${ey.toFixed(1)}`;
+    s+=`<path class="wedge ${ed.t}${sel&&sel.k==='e'&&sel.i===i?' sel':''}" d="${dPath}" marker-end="url(#arw-${pfx})"/>`;
+    s+=`<text class="wlab" x="${((sx+ex)/2).toFixed(1)}" y="${((sy+ey)/2-7).toFixed(1)}" text-anchor="middle">${ed.t==='par'?'∥ parallel':ed.t==='dep'?'dep':'then'}</text>`;
+    if(mode==='edit')s+=`<path class="whit" data-i="${i}" d="${dPath}"/>`;
+  });
+  wf.nodes.forEach(n=>{
+    const r=WF_ROLES[n.role],p=pos[n.id];if(!r||!p)return;
+    const cls='wnode'+(mode==='edit'?' live':'')+(sel&&sel.k==='n'&&sel.id===n.id?' sel':'')+(srcId===n.id?' src':'');
+    s+=`<g class="${cls}" data-id="${n.id}" transform="translate(${p.x},${p.y})">`+
+       `<circle r="26" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.6"/>`+
+       `<g transform="translate(-15,-15) scale(1.25)">${WF_ICONS[n.role]}</g>`+
+       `<text class="wnl" y="41" text-anchor="middle">${r.l1}</text>`+
+       `<text class="wnl" y="53" text-anchor="middle">${r.l2}</text></g>`;
+  });
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('width',W);svg.setAttribute('height',H);
+  svg.innerHTML=s;
+}
+
+function renderEdit(){renderWF($('#wfEditSvg'),wfEdit,'edit','e',wfSel,wfLinkSrc);}
+function renderRoleBar(){
+  $$('#wfRoles .wfrole').forEach(card=>{
+    const k=card.dataset.role;
+    card.classList.toggle('on',!!wfEdit&&wfEdit.nodes.some(n=>n.id===k));
+  });
+}
+function syncTool(){
+  const custom=wfMode==='custom'&&wfEditing;
+  $('#wfTool').hidden=!wfBuilt;
+  $('#wfBtnCustom').disabled=!wfBuilt||wfSubmitted;
+  $('#wfBtnCustom').hidden=!wfBuilt;
+  $('#wfBtnCustom').classList.toggle('on',wfMode==='custom');
+  $('#wfMaxP').disabled=wfSubmitted;
+  $('#wfBtnLink').hidden=!custom;$('#wfBtnDel').hidden=!custom;$('#wfBtnReset').hidden=!custom;
+  $('#wfBtnLink').disabled=!custom;$('#wfBtnDel').disabled=!custom||!wfSel;$('#wfBtnReset').disabled=!custom;
+  $('#wfBtnLink').classList.toggle('on',wfLinkMode);
+  $('#wfBtnGo').disabled=!wfBuilt||wfSubmitted;
+  if(wfBuilt&&!wfSubmitted){
+    $('#wfMsg').textContent=custom
+      ?(wfLinkSrc?'Link arrow: now click the target role.':(wfLinkMode?'Link arrow: click the source role first.':'Click a role card above to add it · click a selected arrow again to switch then / dep / ∥.'))
+      :'Pick a candidate ①②③ (★ = highest P_cov) or click ✎ Custom graph to edit · then Submit.';
+  }
+}
+function wfMsg(t){$('#wfMsg').textContent=t;}
+
+function addEdge(a,b){
+  if(wfEdit.edges.some(e=>e.a===a&&e.b===b)){wfMsg('That arrow already exists — click a different target.');return;}
+  wfEdit.edges.push({a,b,t:'seq'});
+  wfSel={k:'e',i:wfEdit.edges.length-1};
+  wfMsg('Arrow added (then). Click it again to switch dep / ∥ parallel.');
+}
+function addRoleNode(k){
+  if(wfEdit.nodes.some(n=>n.id===k)){wfMsg('That role is already on the canvas — select it and press ✕ Delete to remove it first.');return;}
+  wfEdit.nodes.push({id:k,role:k});
+  wfSel={k:'n',id:k};
+  renderEdit();renderRoleBar();syncTool();
+  wfMsg(`Added ${WF_ROLES[k].name} — use ↔ Link arrow to connect it.`);
+}
+
+/* 3.3.1/3.3.3 — K candidate AOV graphs generated from the task contract,
+   layer width capped by the user's max-parallel-agents value W */
+function buildCands(W){
+  const mk=nodes=>nodes.map(k=>({id:k,role:k}));
+  const chain=arr=>arr.slice(1).map((k,i)=>({a:arr[i],b:k,t:'seq'}));
+  const w=Math.max(1,Math.min(3,Math.round(W)||1));
+  const seq={name:'Sequential',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:chain(['ml','bad','tfld','ppp','merge'])};
+  const bal=w>=2
+    ?{name:'Balanced',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:[
+      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
+      {a:'bad',b:'ppp',t:'dep'},{a:'tfld',b:'ppp',t:'dep'},{a:'ppp',b:'merge',t:'seq'}]}
+    :{name:'Balanced',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:chain(['ml','bad','tfld','ppp','merge'])};
+  const order=['bad','ppp','tfld'];
+  const fan=order.slice(0,w),rest=order.slice(w);
+  const pe=[...fan.map(k=>({a:'ml',b:k,t:'par'}))];
+  if(rest.length){
+    fan.forEach(f=>pe.push({a:f,b:rest[0],t:'dep'}));
+    pe.push(...chain(rest));
+    pe.push({a:rest[rest.length-1],b:'merge',t:'seq'});
+  }else{
+    fan.forEach(f=>pe.push({a:f,b:'merge',t:'dep'}));
+  }
+  const par={name:'Parallel-first',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:pe};
+  return [bal,par,seq];
+}
+
+/* 3.3.2 — P_cov(G) = (1/T)·Σ_t [ |ΔC(S_t)| + |S_t \ B| ] : topological layers as steps,
+   ΔC = new metric×role combos covered by recall branches, non-recall subtasks count 1 each */
+function wfScore(wf){
+  const M=Math.max(1,ctx.metrics.length);
+  const live={},depth={};
+  wf.nodes.forEach(n=>live[n.id]=true);
+  const calc=(id,vis)=>{
+    if(depth[id]!=null)return depth[id];
+    if(vis.has(id)||!live[id])return 0;
+    vis.add(id);
+    const ps=wf.edges.filter(e=>e.b===id&&live[e.a]).map(e=>e.a);
+    const d=ps.length?Math.max(...ps.map(p=>calc(p,vis)))+1:0;
+    vis.delete(id);depth[id]=d;return d;
+  };
+  wf.nodes.forEach(n=>calc(n.id,new Set()));
+  const T=Math.max(1,...wf.nodes.map(n=>depth[n.id]+1));
+  const RECALL={ml:1,bad:1,tfld:1,ppp:1};
+  const seen=new Set();let sum=0;
+  for(let t=0;t<T;t++){
+    const S=wf.nodes.filter(n=>depth[n.id]===t).map(n=>n.id);
+    const combos=new Set();
+    S.forEach(id=>{if(RECALL[id])for(let m=0;m<M;m++)combos.add(m+'·'+id);});
+    let dc=0;combos.forEach(k=>{if(!seen.has(k)){seen.add(k);dc++;}});
+    sum+=dc+S.filter(id=>!RECALL[id]).length;
+  }
+  return sum/T;
+}
+
+function renderTabs(){
+  const el=$('#wfTabs');el.innerHTML='';
+  wfCands.forEach((g,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='wtab'+(wfMode==='cand'&&i===wfCand?' on':'')+(i===wfBest?' best':'');
+    b.disabled=wfSubmitted||!wfBuilt;
+    b.title=`${g.name} — P_cov(G) = ${wfScores[i].toFixed(2)}`;
+    b.innerHTML=`<i>${WF_CIRC[i]||i+1}</i>${wfScores[i].toFixed(2)}${i===wfBest?'<em>★</em>':''}`;
+    b.addEventListener('click',()=>selectCand(i));
+    el.appendChild(b);
+  });
+}
+
+function selectCand(i){
+  if(wfSubmitted||!wfCands)return;
+  wfCand=i;wfMode='cand';wfEditing=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;
+  renderWF($('#wfEditSvg'),wfCands[i],'view','e');
+  renderTabs();
+  $('#wfRolePane').hidden=true;
+  $('#wfEditHint').innerHTML=`<strong>P_cov = ${wfScores[i].toFixed(2)}</strong> · ${wfCands[i].name}${i===wfBest?' · ★ best':''} — switch ①②③ or ✎ Custom graph`;
+  syncTool();
+}
+
+function enterCustom(){
+  wfMode='custom';wfEditing=true;wfSel=null;wfLinkSrc=null;wfLinkMode=false;
+  if(!wfEdit)wfEdit=JSON.parse(JSON.stringify(wfCands[wfCand]));
+  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
+  renderEdit();renderRoleBar();
+  $('#wfRolePane').hidden=false;
+  $('#wfRoleHint').textContent='editing: click a card to add its role';
+  $$('#wfRoles .wfrole').forEach(el=>el.classList.add('edit'));
+  $('#wfEditHint').innerHTML=`custom graph — starts from your ①②③ selection · add roles & arrows, then submit`;
+  syncTool();
+}
+
+function buildP3(){
+  wfEditing=false;wfSubmitted=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;wfEdit=null;wfSubmitResolve=null;wfAbort=false;
+  wfBuilt=true;wfMode='cand';wfCand=0;
+  const c=ctx,T=c.tasks.length;
+  c.workers=Math.max(1,T);c.waves=1;
+  const bar=$('#wfRoles');bar.innerHTML='';
+  WF_KEYS.forEach(k=>bar.insertAdjacentHTML('beforeend',roleCardHTML(k)));
+  const W=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
+  wfCands=buildCands(W);
+  wfScores=wfCands.map(wfScore);
+  wfBest=wfScores.indexOf(Math.max(...wfScores));
+  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
+  renderTabs();
+  selectCand(wfBest);
+  say(`Phase 3 · ${wfCands.length} candidate AOV workflows generated under max ${W} parallel agents, scored by P_cov — best is ${WF_CIRC[wfBest]} (${wfScores[wfBest].toFixed(2)}). Pick one or click ✎ Custom graph, then Submit.`);
+  $('#reset').disabled=false;
+  syncTool();
+}
+
+function waitSubmit(){return new Promise(res=>{wfSubmitResolve=res;});}
+function resetWFUI(){
+  wfEditing=false;wfSubmitted=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;wfRec=null;wfEdit=null;wfSubmitResolve=null;wfAbort=false;
+  wfCands=null;wfScores=null;wfBest=0;wfCand=0;wfMode='cand';wfBuilt=false;
+  const bar=$('#wfRoles');if(bar)bar.innerHTML='';
+  const es=$('#wfEditSvg');if(es)es.innerHTML='';
+  const tabs=$('#wfTabs');if(tabs)tabs.innerHTML='';
+  const rp=$('#wfRolePane');if(rp)rp.hidden=true;
+  const cu=$('#wfBtnCustom');if(cu){cu.disabled=true;cu.hidden=true;cu.classList.remove('on');}
+  const bl2=$('#wfBtnLink');if(bl2)bl2.hidden=true;
+  const bd2=$('#wfBtnDel');if(bd2)bd2.hidden=true;
+  const br2=$('#wfBtnReset');if(br2)br2.hidden=true;
+  const eh=$('#wfEditHint');if(eh){eh.innerHTML='';eh.hidden=false;}
+  const ok=$('#wfOk');if(ok)ok.hidden=true;
+  const wt=$('#wfTool');if(wt)wt.hidden=true;
+  const ep=$('#wfEditPane');if(ep)ep.classList.remove('ok');
+  const msg=$('#wfMsg');if(msg)msg.textContent='';
+  const st=$('#dispatch span');if(st)st.textContent='▼ Dispatch: activate roles / parallel branches';
+}
+
+/* workflow planner events (bound once — svg containers persist) */
+$('#wfRoles').addEventListener('click',e=>{
+  const card=e.target.closest('.wfrole');if(!card||!wfEditing)return;
+  addRoleNode(card.dataset.role);
+});
+$('#wfBtnCustom').addEventListener('click',()=>{
+  if(!wfBuilt||wfSubmitted||!wfCands)return;
+  if(wfMode==='custom')selectCand(wfCand);else enterCustom();
+});
+$('#wfMaxP').addEventListener('change',()=>{
+  if(!wfBuilt||wfSubmitted||!wfCands)return;
+  const W=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
+  wfCands=buildCands(W);
+  wfScores=wfCands.map(wfScore);
+  wfBest=wfScores.indexOf(Math.max(...wfScores));
+  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
+  wfCand=Math.min(wfCand,wfCands.length-1);
+  renderTabs();
+  if(wfMode==='cand')selectCand(wfCand);
+  say(`Phase 3 · candidates regenerated under max ${W} parallel agents — best is ${WF_CIRC[wfBest]} (${wfScores[wfBest].toFixed(2)}).`);
+});
+$('#wfEditSvg').addEventListener('click',e=>{
+  if(!wfEditing)return;
+  const ng=e.target.closest('.wnode');
+  const eh=e.target.closest('.whit');
+  if(ng){
+    const id=ng.dataset.id;
+    if(wfLinkMode&&!wfLinkSrc){wfLinkSrc=id;syncTool();renderEdit();return;}
+    if(wfLinkSrc){
+      if(id===wfLinkSrc){wfLinkSrc=null;wfLinkMode=false;syncTool();renderEdit();return;}
+      addEdge(wfLinkSrc,id);
+      wfLinkSrc=null;wfLinkMode=false;syncTool();renderEdit();return;
+    }
+    wfSel={k:'n',id};syncTool();renderEdit();return;
+  }
+  if(eh){
+    const i=+eh.dataset.i;
+    if(wfSel&&wfSel.k==='e'&&wfSel.i===i){
+      const order=['seq','dep','par'];
+      wfEdit.edges[i].t=order[(order.indexOf(wfEdit.edges[i].t)+1)%3];
+    }else{wfSel={k:'e',i};}
+    syncTool();renderEdit();return;
+  }
+  wfSel=null;wfLinkSrc=null;syncTool();renderEdit();
+});
+$('#wfBtnLink').addEventListener('click',()=>{if(!wfEditing)return;wfLinkMode=!wfLinkMode;wfLinkSrc=null;syncTool();renderEdit();});
+$('#wfBtnDel').addEventListener('click',()=>{
+  if(!wfEditing||!wfSel||!wfEdit)return;
+  if(wfSel.k==='n'){
+    wfEdit.edges=wfEdit.edges.filter(ed=>ed.a!==wfSel.id&&ed.b!==wfSel.id);
+    wfEdit.nodes=wfEdit.nodes.filter(n=>n.id!==wfSel.id);
+  }else{
+    wfEdit.edges.splice(wfSel.i,1);
+  }
+  wfSel=null;renderEdit();renderRoleBar();syncTool();
+});
+$('#wfBtnReset').addEventListener('click',()=>{
+  if(!wfEditing||!wfRec)return;
+  wfEdit=JSON.parse(JSON.stringify(wfRec));wfSel=null;wfLinkMode=false;wfLinkSrc=null;
+  renderEdit();renderRoleBar();syncTool();
+  wfMsg('Restored the recommended workflow.');
+});
+$('#wfBtnGo').addEventListener('click',()=>{
+  if(!wfBuilt||wfSubmitted||!wfCands)return;
+  const custom=wfMode==='custom';
+  const g=custom?wfEdit:wfCands[wfCand];
+  if(!g)return;
+  if(custom&&(g.nodes.length<2||g.edges.length<1)){wfMsg('The custom graph needs at least 2 roles and 1 arrow — or pick a candidate ①②③.');return;}
+  wfEditing=false;wfSubmitted=true;wfBuilt=false;wfSel=null;wfLinkMode=false;wfLinkSrc=null;
+  syncTool();wfMsg('');renderTabs();
+  renderWF($('#wfEditSvg'),g,'final','e');
+  $('#wfEditPane').classList.add('ok');
+  $('#wfEditHint').innerHTML=(custom?'custom graph':`<strong>P_cov = ${wfScores[wfCand].toFixed(2)}</strong> · ${wfCands[wfCand].name}`)+' confirmed';
+  $('#wfEditHint').hidden=false;$('#wfOk').hidden=false;
+  $('#wfRolePane').hidden=true;
+  $$('#wfRoles .wfrole').forEach(el=>{el.classList.remove('edit');el.classList.add('lock');});
+  $('#wfRoleHint').textContent='';
+  ctx.wf=JSON.parse(JSON.stringify(g));
+  const Wmax=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
+  const T2=Math.max(1,ctx.tasks.filter(t=>ctx.wf.nodes.some(n=>n.id===WF2ROLE[t.r])).length);
+  ctx.workers=Math.max(1,Math.min(Wmax,T2));ctx.waves=Math.ceil(T2/ctx.workers);
+  const st=$('#dispatch span');if(st)st.textContent='▼ Dispatch: run the confirmed workflow';
+  say(`Workflow confirmed — ${ctx.wf.nodes.length} roles, ${ctx.wf.edges.length} arrows · max ${ctx.workers} agents/wave · ${ctx.waves} wave${ctx.waves>1?'s':''}. Dispatching to Phase 4…`);
+  if(wfSubmitResolve){const r=wfSubmitResolve;wfSubmitResolve=null;r();}
+});
+document.addEventListener('keydown',e=>{
+  if(!wfEditing)return;
+  const t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+  if((e.key==='Delete'||e.key==='Backspace')&&wfSel){e.preventDefault();$('#wfBtnDel').click();}
+  else if(e.key==='Escape'){wfLinkMode=false;wfLinkSrc=null;wfSel=null;syncTool();renderEdit();}
+});
+
+/* ================= phases ================= */
+async function p1(){
+  phaseOn(1,'Phase 1 · parsing the query and pre-injecting knowledge…');
+  const c=ctx;
+  // two sources in parallel
+  node('hist').classList.add('run');node('kr').classList.add('run');
+  await sleep(750);
+  node('hist').classList.remove('run');node('kr').classList.remove('run');
+  node('hist').classList.add('done','has');node('kr').classList.add('done','has');
+  const hpTok=c.pairs.reduce((s,p)=>s+p.tok,0);
+  dyn('hist').innerHTML=c.pairs.length
+    ?`<div class="stats"><div class="stat"><u>Recalled</u><b>${c.pairs.length}</b></div><div class="stat"><u>Total len</u><b>${hpTok}</b></div><div class="stat"><u>Top sim</u><b>${c.pairs[0].sim.toFixed(2)}</b></div></div>`+
+      c.pairs.map(p=>`<li><strong>${p.sim.toFixed(2)}</strong> ${esc(p.q)} → ${esc(p.ds)} <span class="k">(${p.tok} tok)</span></li>`).join('')
+    :`<div class="stats"><div class="stat"><u>Recalled</u><b>0</b></div><div class="stat"><u>Total len</u><b>0</b></div></div>No pair above the similarity threshold`;
+  const kc=c.know.cands,kSum=kc.reduce((s,x)=>s+x.tok,0);
+  dyn('kr').innerHTML=kc.length
+    ?`<div class="stats"><div class="stat"><u>Recalled</u><b>${kc.length}</b></div><div class="stat"><u>Total len</u><b>${kSum}</b></div><div class="stat"><u>Types</u><b>${KT.length}</b></div></div>`+
+      `<span class="k">${KT.map(t=>t.short).join(' · ')}</span>`
+    :`<div class="stats"><div class="stat"><u>Recalled</u><b>0</b></div><div class="stat"><u>Total len</u><b>0</b></div></div>`;
+  const k=c.know;
+  const util=k.sel.reduce((s,x)=>s+x.u,0);
+  await act('sel', k.cands.length?
+    `<div class="stats">`+
+    `<div class="stat"><u>Budget</u><b>${k.B} tok</b></div>`+
+    `<div class="stat"><u>Goal</u><b>max total utility</b></div>`+
+    `<div class="stat"><u>Selected</u><b>${k.sel.length} / ${k.cands.length}</b></div>`+
+    `<div class="stat"><u>Tokens used</u><b>${k.used} / ${k.B}</b></div>`+
+    `<div class="stat"><u>Total utility</u><b>${util}</b></div>`+
+    `<div class="stat"><u>Dropped</u><b>${k.dropped.length}</b></div></div>`+
+    `<div class="bar"><i style="width:0" data-w="${Math.round(k.used/k.B*100)}"></i></div>`+
+    k.sel.slice(0,6).map(x=>pill(esc(x.label),'ok')).join('')+(k.sel.length>6?pill('+'+(k.sel.length-6)):'')+
+    (k.dropped.length?`<br><span class="k">dropped:</span> `+k.dropped.slice(0,2).map(d=>pill(esc(d.c.label)+' · '+d.why,'no')).join('')+(k.dropped.length>2?pill('+'+(k.dropped.length-2)):''):'')
+    :`<div class="stats"><div class="stat"><u>Budget</u><b>${k.B} tok</b></div><div class="stat"><u>Goal</u><b>max total utility</b></div><div class="stat"><u>Selected</u><b>0 / 0</b></div></div>Nothing to select`,700);
+  const bar=dyn('sel').querySelector('.bar i');if(bar){requestAnimationFrame(()=>{bar.style.width=bar.dataset.w+'%';});}
+  phaseDone(1);
+}
+
+async function p2(){
+  phaseOn(2,'Phase 2 · converging the query into a task contract…');
+  const c=ctx;
+  setTab(c.ok?'dft':'ask');
+  if(!c.ok){
+    await act('ask',
+      `<p class="qq"><strong>Q:</strong> Which metric do you mean? (e.g. DAU, GMV, next-day retention, CTR)</p>`+
+      `<div class="askrow"><input id="askIn" type="text" placeholder="Type your answer, e.g. DAU" aria-label="Answer to coordinator question"><button type="button" id="askGo">Submit</button></div>`+
+      `<p class="k" style="margin:6px 0 0">Demo tip: try a query that names a metric, e.g. “Yesterday GMV by category”.</p>`,450);
+    const go=()=>{const v=($('#askIn').value||'DAU').trim();$('#q').value=v+' by category';run(1);};
+    $('#askGo').addEventListener('click',go);
+    $('#askIn').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+    $('#askIn').focus();
+    skip('dft','Not applicable');
+    skip('contract','Waiting for the user');
+    say('Paused at Phase 2 — answer the Coordinator question below, or edit the query and press Run.');
+    return false;
+  }
+  skip('ask','Not needed — the gap does not change metric or asset');
+  await act('dft',
+    `<ul>`+c.defaults.map(d=>`<li>${esc(d)} → ${d==='time range'?'Last 7 days':d==='granularity'?'Daily':'overall'}<span class="src">default</span></li>`).join('')+`</ul>`,650);
+  await act('contract',
+    `<ul>`+
+    `<li><span class="k">intent</span> → retrieve <strong>${esc(c.metrics.map(m=>m.name).join(' + '))}</strong></li>`+
+    `<li><span class="k">metrics</span> → ${c.metrics.map(m=>`<strong>${esc(m.name)}</strong>`).join(', ')}</li>`+
+    `<li><span class="k">time_range</span> → ${esc(c.time||'Last 7 days')}${c.time?'':'<span class="src">default</span>'}</li>`+
+    `<li><span class="k">granularity</span> → daily<span class="src">default</span></li>`+
+    `<li><span class="k">dimensions</span> → ${c.dims.length?esc(c.dims.join(', ')):'overall'}${c.dims.length?'':'<span class="src">default</span>'}</li>`+
+     `<li><span class="k">filters</span> → none</li>`+
+     `<li><span class="k">knowledge_ctx</span> → ${ctx.know.sel.length} chunks / ${ctx.know.used} tok</li>`+
+    `</ul>`,750);
+  phaseDone(2);
+  return true;
+}
+
+async function p3(){
+  phaseOn(3,'Phase 3 · generating K candidate AOV workflows and scoring parallel gain P_cov…');
+  buildP3();
+  await waitSubmit();
+  $('#reset').disabled=true;
+  if(wfAbort)return false;
+  phaseDone(3);
+  $('#dispatch').classList.add('on');
+  return true;
+}
+
+async function p4(){
+  phaseOn(4,'Phase 4 · running the confirmed workflow — active roles call both retrieval services in parallel…');
+  const c=ctx,tasks=c.tasks,W=c.workers,waves=c.waves;
+  const excl=ctx.wf?ROLES.map((r,i)=>!ctx.wf.nodes.some(n=>n.id===WF2ROLE[i])):ROLES.map(()=>false);
+  const atasks=tasks.filter(t=>!excl[t.r]);
+  const st={bi:0,kh:0,pub:0,reuse:0,dedup:0};
+  const rDone=ROLES.map(()=>0),rBI=ROLES.map(()=>0),rKH=ROLES.map(()=>0),rTot=ROLES.map((r,i)=>atasks.filter(t=>t.r===i).length);
+  const finished=new Set();
+  const waveMs=waves<=4?950:Math.max(260,Math.round(3800/waves));
+  ['bi','kh','bb'].forEach(id=>node(id).classList.add('has','done'));
+   ROLES.forEach((r,i)=>{if(excl[i]){node(r.id).classList.add('skip','has');dyn(r.id).innerHTML='<span class="k">not in workflow — skipped</span>';}});
+  const upd=()=>{
+    dyn('bi').innerHTML=`<strong>${st.bi}</strong> calls`;
+    dyn('kh').innerHTML=`<strong>${st.kh}</strong> calls`;
+    dyn('bb').innerHTML=`published <strong>${st.pub}</strong> · reused <strong>${st.reuse}</strong> · in-flight dedup <strong>${st.dedup}</strong>`;
+    ROLES.forEach((r,i)=>{if(!excl[i]&&rBI[i]+rKH[i]>0){const n=node(r.id);n.classList.add('has');dyn(r.id).innerHTML=`<strong>${rDone[i]}/${rTot[i]}</strong> tasks<br>BI×${rBI[i]} · KH×${rKH[i]}`;}});
+  };
+  const flash=(rid,k)=>{const t=$('#t-'+rid+'-'+k);t.classList.add('flash');setTimeout(()=>t.classList.remove('flash'),RM?0:450);};
+  upd();
+  for(let w=0;w<waves;w++){
+    const batch=atasks.slice(w*W,(w+1)*W);
+    if(!batch.length)continue;
+    const inWave=new Set(batch.map(t=>t.key));
+    say(`Phase 4 · wave ${w+1}/${waves} — ${batch.length} agent${batch.length>1?'s':''} working in parallel…`);
+    batch.forEach(t=>{
+      node(ROLES[t.r].id).classList.add('run');
+      st.pub++;st.bi+=t.bi;st.kh+=t.kh;rBI[t.r]+=t.bi;rKH[t.r]+=t.kh;
+      if(t.r>0){const lead=t.m+'-0';if(finished.has(lead))st.reuse++;else if(inWave.has(lead))st.dedup++;}
+      flash(ROLES[t.r].id,'bi');flash(ROLES[t.r].id,'kh');
+    });
+    upd();
+    await sleep(waveMs);
+    batch.forEach(t=>{finished.add(t.key);rDone[t.r]++;});
+    ROLES.forEach((r,i)=>{if(excl[i])return;const n=node(r.id);n.classList.remove('run');if(rDone[i]===rTot[i]&&rTot[i]>0)n.classList.add('done');else if(rBI[i]>0)n.classList.add('done');});
+    upd();
+  }
+  ROLES.forEach((r,i)=>{if(!excl[i])node(r.id).classList.add('done');});
+  const m=c.merge;
+  await act('merge',
+    `<strong>${m.raw}</strong> raw candidates → <strong>${m.unique}</strong> unique <span class="k">(${m.dupes} duplicates removed)</span><br>`+
+    `Conflicts kept for review: <strong>${m.conflicts}</strong> → <strong>EvidenceBundle</strong>`,750);
+  phaseDone(4);
+}
+
+async function p5(){
+  phaseOn(5,'Phase 5 · hard filter first, then soft ranking…');
+  const c=ctx,f=c.filter;
+  await act('hard',
+    `<strong>${f.passed}</strong>/${f.total} candidates pass<br>`+
+    pill(`permission −${f.perm}`,'no')+pill(`grain mismatch −${f.grain}`,'no')+(f.stale?pill(`stale partition −${f.stale}`,'no'):''),650);
+  await act('soft',
+    `<ul>`+c.rank.map(r=>`<li>${esc(r.n)} <span class="k">· ${esc(r.why)}</span><div class="bar"><i style="width:${Math.round(r.s*100)}%"></i></div></li>`).join('')+`</ul>`+
+    (c.metrics.length>1?`<span class="k">top-3 shown for ${esc(c.metrics[0].name)}; other metrics ranked the same way</span>`:''),750);
+  await act('out',
+    `<ul>`+c.metrics.map(m=>`<li><strong>${esc(m.name)}</strong>: primary ${esc(m.ds)}<br><span class="k">supporting:</span> ${esc(m.tbl)}</li>`).join('')+`</ul>`+
+    `<span class="k">Risk flags:</span> ${c.merge.conflicts?'1 evidence conflict kept for review':'none'}`,750);
+  phaseDone(5);
+}
+
+async function p6(){
+  phaseOn(6,'Phase 6 · executing on the confirmed asset, then verifying the result…');
+  const c=ctx;
+  await act('exec',
+    `Run on <strong>${esc(c.metrics[0].ds)}</strong>${c.metrics.length>1?` +${c.metrics.length-1} more`:''}<br>`+
+    `<span class="k">time:</span> ${esc(c.time||'Last 7 days')} · latest available partition`,700);
+  const v=node('ver');v.classList.add('run');
+  const dv=dyn('ver');v.classList.add('has');dv.innerHTML='';
+  const items=[];
+  for(const ck of CHECKS){
+    await sleep(380);
+    items.push(pill('✓ '+ck,'ok'));
+    dv.innerHTML=items.join('');
+  }
+  await sleep(250);
+  v.classList.remove('run');v.classList.add('done');
+  dv.innerHTML=items.join('')+`<br><strong>Passed</strong> — all ${CHECKS.length} checks`;
+  skip('fail','Not triggered in this run');
+  await act('back',`Query—asset pair → history candidates<br><span class="k">versioned, with expiry; no permission spill</span>`,650);
+  $('#loopTrust').classList.add('on');
+  $('#loopTrustT').textContent='Verified pair written back to the historical source in Phase 1.';
+  $('#loopFailT').textContent='Not triggered in this run — verification passed.';
+  phaseDone(6);
+}
+
+/* ================= orchestration ================= */
+async function run(from){
+  if(running)return;
+  const q=$('#q').value.trim();
+  lock(true);
+  document.body.classList.add('viz');
+  try{
+    if(from===1){
+      resetNodes(1);
+      ctx=analyze(q);done3=false;
+      await p1();
+      const ok=await p2();
+      if(!ok){$$('.phase').forEach(p=>p.classList.remove('active'));return;}
+    }else{
+      resetNodes(3);
+    }
+    const ok3=await p3();
+    if(ok3===false){$$('.phase').forEach(p=>p.classList.remove('active'));return;}
+    await p4();
+    await p5();
+    await p6();
+    done3=true;
+    const c=ctx;
+    $$('.phase').forEach(p=>p.classList.remove('active'));
+    say(`Done · workflow: ${ctx.wf?ctx.wf.nodes.length+' roles / '+ctx.wf.edges.length+' arrows · ':''}${c.metrics.length} metric(s) · ${c.tasks.length} discovery tasks in parallel. Click any phase header to collapse or expand it.`);
+  }finally{
+    lock(false);
+  }
+}
+
+/* ================= events ================= */
+$('#tabAsk').addEventListener('click',()=>setTab('ask'));
+$('#tabDft').addEventListener('click',()=>setTab('dft'));
+$('#ctl').addEventListener('submit',e=>{e.preventDefault();run(1);});
+$('#reset').addEventListener('click',resetAll);
+$$('.phase').forEach(p=>{
+  const h=p.querySelector('h2');
+  h.setAttribute('role','button');h.setAttribute('tabindex','0');
+  h.setAttribute('aria-expanded','true');
+  const tog=()=>{const c=p.classList.toggle('collapsed');h.setAttribute('aria-expanded',c?'false':'true');};
+  h.addEventListener('click',tog);
+  h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
+});
+$('#chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b||running)return;
+  $('#q').value=b.dataset.q;$('#q').focus();
+});
+})();
+  </script>
+ 
+
+</body></html>
