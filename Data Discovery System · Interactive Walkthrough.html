@@ -351,7 +351,34 @@ body:not(.viz) .wfscroll{display:none}
 }
 .tag.flash{background:var(--brand);color:#EEF8FF;border-color:var(--brand)}
 .role .dyn{font-size:11.5px}
+.node.role.has .sub{display:block}
 .p4right{display:flex;flex-direction:column;gap:10px}
+
+/* Phase 4 · communication swimlane (dual-channel asking) */
+.csvg{display:block;max-width:100%;height:auto}
+.csvg text{user-select:none}
+.chd{font-size:9.5px;font-weight:700;fill:#162534}
+.clife{stroke:rgba(145,165,186,.55);stroke-width:1.4;stroke-dasharray:4 4}
+.clab{font-size:9px;font-weight:700;fill:#4A5E74;stroke:rgba(248,251,254,.92);stroke-width:3.5;paint-order:stroke}
+.cregt{font-size:9.5px;font-weight:700;fill:#4A5E74}
+.cregt2{font-size:8.5px;font-weight:500;fill:#7A8DA2}
+.cregn{font-size:10px;font-weight:700;fill:#162534}
+.cregc{font-size:8.5px;fill:#7A8DA2}
+.cregv{font-size:9.5px;font-weight:700;fill:#4A5E74;font-family:var(--mono);transition:fill .25s}
+.cregv.bump{fill:#296DFF}
+.cev{transition:opacity .5s ease}
+.cev.pend{opacity:0}
+.clegend{display:flex;gap:5px 16px;flex-wrap:wrap;padding:8px 13px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);align-items:center}
+.clegend i{display:inline-block;width:24px;border-top:2px solid;margin-right:5px;vertical-align:middle}
+.clegend i.dash{border-top-style:dashed}
+.clegend i.dot{border-top-style:dotted}
+.wfscroll:has(.csvg:empty){display:none}
+.commPane{margin-top:2px}
+.commPane>header{cursor:pointer}
+.commPane>header::after{content:"▾";margin-left:8px;color:var(--dim);font-size:11px;font-weight:700}
+.commPane.collapsed>header::after{content:"▸"}
+.commPane.collapsed .wfscroll,.commPane.collapsed .clegend{display:none}
+.phase.collapsed .clegend{display:none}
 
 /* strips and loops */
 .strip{display:flex;align-items:center;gap:12px;margin:12px 0;font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
@@ -444,7 +471,7 @@ body:not(.viz) .wfscroll{display:none}
     </span>
    </div>
    <div class="row r2">
-    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4"><em>PHASE 4</em>Data Discovery<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div class="p4right"><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(by metric / business domain / candidate asset)</span></b><div class="roles"><div class="node role" id="n-role0" data-ph="4" style="--c:var(--violet)"><b>Metric Lookup</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role0-bi">BI</i><i class="tag" id="t-role0-kh">KH</i></div><div class="dyn" id="d-role0"></div></div><div class="node role" id="n-role1" data-ph="4" style="--c:var(--violet)"><b>BI Asset Discovery</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role1-bi">BI</i><i class="tag" id="t-role1-kh">KH</i></div><div class="dyn" id="d-role1"></div></div><div class="node role" id="n-role2" data-ph="4" style="--c:var(--violet)"><b>Table/Field Lineage Discovery</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role2-bi">BI</i><i class="tag" id="t-role2-kh">KH</i></div><div class="dyn" id="d-role2"></div></div><div class="node role" id="n-role3" data-ph="4" style="--c:var(--violet)"><b>Permission &amp; Partition Precheck</b><span class="sub"></span><div class="tags"><i class="tag" id="t-role3-bi">BI</i><i class="tag" id="t-role3-kh">KH</i></div><div class="dyn" id="d-role3"></div></div></div></div><div class="node " id="n-bb" data-ph="4" style="--c:var(--purple)"><b>Task-level Shared Blackboard</b><span class="sub">Data reuse; prevents duplicate queries</span><div class="dyn" id="d-bb"></div></div></div></div><div class="node " id="n-merge" data-ph="4" style="--c:var(--orange)"><b>Merge Agent: deterministic-first evidence organizer</b><span class="sub">Entity alignment · candidate dedup · conflict detection · evidence compression · status summary</span><div class="dyn" id="d-merge"></div></div></section>
+    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4"><em>PHASE 4</em>Data Discovery<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b><div class="roles" id="p4Roles"></div></div></div><div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header><div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div><div class="clegend" id="commLegend" hidden><span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span><span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span><span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span><span><i style="border-color:#3F8C6D"></i>volunteer / answer</span><span><i class="dot" style="border-color:#7A8DA2"></i>profile self-update</span></div></div></section>
     <section aria-labelledby="h5" class="phase" id="ph5"><h2 id="h5"><em>PHASE 5</em>Asset Selection<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-hard" data-ph="5" style="--c:var(--lgray)"><b>① Hard Filter</b><span class="sub">Permission, grain and partition rules</span><div class="dyn" id="d-hard"></div></div><div class="node " id="n-soft" data-ph="5" style="--c:var(--yellow)"><b>② Soft Ranking</b><span class="sub">Evidence strength · granularity fit · dimension coverage · freshness</span><div class="dyn" id="d-soft"></div></div><div class="node " id="n-out" data-ph="5" style="--c:var(--blue)"><b>Selection Result: primary + supporting assets</b><span class="sub">Passed rules · rationale · rejected candidates · risk flags</span><div class="dyn" id="d-out"></div></div></section>
     <section aria-labelledby="h6" class="phase" id="ph6"><h2 id="h6"><em>PHASE 6</em>Execute, Verify &amp; Feedback<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-exec" data-ph="6" style="--c:var(--blue)"><b>Task Execution</b><span class="sub">Confirmed asset, caliber, filters and available partitions</span><div class="dyn" id="d-exec"></div></div><div class="node " id="n-ver" data-ph="6" style="--c:var(--yellow)"><b>Result Verification</b><span class="sub">Execution success ≠ correct result</span><div class="dyn" id="d-ver"></div></div><div class="split"><div class="node " id="n-fail" data-ph="6" style="--c:var(--orange)"><b>Failure Attribution</b><span class="sub">Structured attribution, forming failure report</span><div class="dyn" id="d-fail"></div></div><div class="node " id="n-back" data-ph="6" style="--c:var(--green)"><b>Feedback</b><span class="sub">Stored as learning sample; failures only as routing/risk negatives</span><div class="dyn" id="d-back"></div></div></div></section>
    </div>
@@ -477,7 +504,7 @@ body:not(.viz) .wfscroll{display:none}
     </div>
    </div>
    <p class="foot">
-    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements.
+    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements. Phase 4 swimlane: lanes = roles planned in Phase 3; solid = directed ask, dashed = decline; registry counters = adopted / ignored / declined.
    </p>
   </main>
   <script>
@@ -534,13 +561,19 @@ $('#ph4').innerHTML=H(4,'Data Discovery')+
       NODE(4,'bi','blue','BI Asset Retrieval','Returns base fact assets')+
       NODE(4,'kh','green','Knowledge Hybrid Retrieval','Vector + graph dual channel; covers naming mismatch')+
     `</div>`+
-    `<div class="p4right">`+
-      `<div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(by metric / business domain / candidate asset)</span></b>`+
-      `<div class="roles">`+ROLES.map(r=>`<div class="node role" id="n-${r.id}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub"></span><div class="tags"><i class="tag" id="t-${r.id}-bi">BI</i><i class="tag" id="t-${r.id}-kh">KH</i></div><div class="dyn" id="d-${r.id}"></div></div>`).join('')+`</div></div>`+
-      NODE(4,'bb','purple','Task-level Shared Blackboard','Data reuse; prevents duplicate queries')+
-    `</div>`+
+    `<div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b>`+
+    `<div class="roles" id="p4Roles"></div></div>`+
   `</div>`+
-  NODE(4,'merge','orange','Merge Agent: deterministic-first evidence organizer','Entity alignment · candidate dedup · conflict detection · evidence compression · status summary');
+  `<div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header>`+
+    `<div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div>`+
+    `<div class="clegend" id="commLegend" hidden>`+
+      `<span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span>`+
+      `<span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span>`+
+      `<span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span>`+
+      `<span><i style="border-color:#3F8C6D"></i>volunteer / answer</span>`+
+      `<span><i class="dot" style="border-color:#7A8DA2"></i>profile self-update</span>`+
+    `</div>`+
+  `</div>`;
 
 $('#ph5').innerHTML=H(5,'Asset Selection')+
   NODE(5,'hard','lgray','① Hard Filter','Permission, grain and partition rules')+
@@ -670,7 +703,13 @@ function resetNodes(from){
     (PH_NODES[p]||[]).forEach(n=>{n.classList.remove('run','done','skip','has');const d=n.querySelector('.dyn');if(d)d.innerHTML='';});
     const ph=$('#ph'+p);ph.classList.remove('active','done');
   }
-  $$('.tag').forEach(t=>t.classList.remove('flash'));
+  if(from<=4){
+    const pr=$('#p4Roles');if(pr)pr.innerHTML='';
+    const cs=$('#commSvg');if(cs)cs.innerHTML='';
+    const cl=$('#commLegend');if(cl)cl.hidden=true;
+    const ch=$('#commHint');if(ch)ch.textContent='';
+    const cpane=$('#commPane');if(cpane)cpane.classList.add('collapsed');
+  }
   if(from<=3)$('#dispatch').classList.remove('on');
   $('#loopFail').classList.remove('on');$('#loopTrust').classList.remove('on');
   $('#loopFailT').textContent='Rerun only the latest suspicious step and the steps after it; keep verified upstream evidence.';
@@ -1142,47 +1181,170 @@ async function p3(){
   return true;
 }
 
+/* ---- Phase 4 · communication model (dual-channel asking + capability registry) ---- */
+const COVER={ml:'metric defs · calibers',bad:'BI assets · dashboards',tfld:'tables · field lineage',ppp:'permissions · partitions'};
+function genComms(c){
+  const L=c.lanes,reg={};
+  L.forEach(k=>reg[k]={a:0,i:0,d:0});
+  const evs=[];
+  const has=k=>L.includes(k);
+  const vol=not=>['bad','tfld','ml','ppp'].find(k=>L.includes(k)&&!not.includes(k));
+  const m0=c.metrics[0]?c.metrics[0].name:'metric';
+  const d0=c.metrics[0]?c.metrics[0].ds:'dataset';
+  if(has('bad')&&has('ml')){
+    evs.push({k:'ask',a:'bad',b:'ml',note:'metric caliber · '+m0,sub:'route: high conf → hit Metric Lookup profile'});
+    evs.push({k:'reply',a:'ml',b:'bad',note:'definition + caliber',sub:'adopted',reg:['ml','a']});
+  }
+  if(has('tfld')&&has('ppp')){
+    evs.push({k:'ask',a:'tfld',b:'ppp',note:'partition precheck · '+d0,sub:'route: high conf → hit Precheck profile'});
+    evs.push({k:'decline',a:'ppp',b:'tfld',note:'declined — queue saturated',sub:'autonomy preserved',reg:['ppp','d']});
+    evs.push({k:'bc',a:'tfld',note:'downgraded to board broadcast',sub:'fallback keeps voluntary bidding'});
+    const v=vol(['tfld','ppp']);
+    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted',reg:[v,'a']});
+  }else if(has('tfld')&&L.length>1){
+    evs.push({k:'bc',a:'tfld',note:'partition precheck — no profile hit',sub:'low conf → board broadcast'});
+    const v=vol(['tfld']);
+    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted',reg:[v,'a']});
+  }
+  if(has('bad')&&L.length>1){
+    evs.push({k:'bc',a:'bad',note:'cross-domain naming variant',sub:'low conf · profile uncovered → broadcast'});
+    const v=vol(['bad']);
+    if(v)evs.push({k:'pick',a:v,b:'bad',note:'volunteered',sub:'adopted',reg:[v,'a']});
+  }
+  if(has('ml')&&has('bad')){
+    evs.push({k:'ask',a:'ml',b:'bad',note:'dashboards reusing '+d0,sub:'route: high conf → hit BI Asset profile'});
+    evs.push({k:'reply',a:'bad',b:'ml',note:'2 dashboards',sub:'ignored — already resolved via KH',reg:['bad','i']});
+  }
+  c.comms=evs;c.reg=reg;
+}
+function buildP4Roles(L){
+  const wrap=$('#p4Roles');if(!wrap)return;
+  wrap.innerHTML=L.map(k=>{const r=WF_ROLES[k];
+    return `<div class="node role" id="n-${k}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub">${esc(r.desc)}</span><div class="dyn" id="d-${k}"></div></div>`;}).join('');
+}
+function buildComm(){
+  const svg=$('#commSvg'),c=ctx,L=c.lanes;
+  if(!svg)return;
+  if(!L.length){svg.innerHTML='';$('#commHint').textContent='no discovery roles in this workflow';return;}
+  const laneW=132,padX=16,hTop=4,hH=34,gapY=18,rowH=38;
+  const need=padX*2+L.length*laneW;
+  const W=Math.max(need,470),off=(W-need)/2;
+  const xs={};L.forEach((k,i)=>xs[k]=off+padX+laneW*i+laneW/2);
+  const topY=hTop+hH+gapY,nE=c.comms.length;
+  const regY=topY+(nE?nE*rowH:26)+6,regH=72;
+  const H=regY+regH+12;
+  const col={ask:'#296DFF',ok:'#3F8C6D',dan:'#B4552D',warn:'#8A6A1F'};
+  const mk=(id,f)=>`<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${f}"/></marker>`;
+  let s=`<defs>${mk('cm-acc',col.ask)}${mk('cm-ok',col.ok)}${mk('cm-dan',col.dan)}${mk('cm-warn',col.warn)}</defs>`;
+  L.forEach(k=>{
+    const r=WF_ROLES[k],x=xs[k];
+    s+=`<rect x="${(x-laneW/2+6).toFixed(1)}" y="${hTop}" width="${laneW-12}" height="${hH}" rx="10" fill="var(--${r.c})" stroke="rgba(22,37,52,.5)" stroke-width="1.2"/>`;
+    s+=`<text class="chd" x="${x}" y="${hTop+14}" text-anchor="middle">${r.l1}</text>`;
+    s+=`<text class="chd" x="${x}" y="${hTop+26}" text-anchor="middle">${r.l2}</text>`;
+    s+=`<line class="clife" x1="${x}" y1="${hTop+hH+3}" x2="${x}" y2="${regY-2}"/>`;
+  });
+  if(!nE)s+=`<text class="clab" x="${W/2}" y="${topY+14}" text-anchor="middle">no cross-role help needed — each lane worked independently</text>`;
+  c.comms.forEach((e,i)=>{
+    const y=topY+i*rowH;
+    let g=`<g class="cev pend" id="cev-${i}">`;
+    const dot=(x,f)=>`<circle cx="${x}" cy="${y}" r="3" fill="${f}"/>`;
+    const lab=(x,txt,cls,dy)=>`<text class="${cls}" x="${x}" y="${y+dy}" text-anchor="middle">${esc(txt)}</text>`;
+    if(e.k==='ask'){
+      const A=xs[e.a],B=xs[e.b];
+      g+=dot(A,col.ask)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.ask}" stroke-width="2" marker-end="url(#cm-acc)"/>`;
+      g+=lab((A+B)/2,e.note,'clab',-6);
+    }else if(e.k==='reply'||e.k==='pick'){
+      const A=xs[e.a],B=xs[e.b];
+      g+=dot(A,col.ok)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.ok}" stroke-width="2" marker-end="url(#cm-ok)"/>`;
+      g+=lab((A+B)/2,e.note,'clab',-6);
+    }else if(e.k==='decline'){
+      const A=xs[e.a],B=xs[e.b];
+      g+=dot(A,col.dan)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.dan}" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#cm-dan)"/>`;
+      g+=lab((A+B)/2,e.note,'clab',-6);
+    }else if(e.k==='bc'){
+      const os=L.filter(k=>k!==e.a);
+      const x0=Math.min(xs[e.a],...os.map(k=>xs[k])),x1=Math.max(xs[e.a],...os.map(k=>xs[k]));
+      g+=dot(xs[e.a],col.warn)+`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${col.warn}" stroke-width="2"/>`;
+      os.forEach(k=>{g+=`<line x1="${xs[k]}" y1="${y}" x2="${xs[k]}" y2="${y+13}" stroke="${col.warn}" stroke-width="1.6" marker-end="url(#cm-warn)"/>`;});
+      g+=lab(xs[e.a],e.note,'clab',-6);
+    }
+    if(e.reg)g+=`<line x1="${xs[e.reg[0]]}" y1="${y+16}" x2="${xs[e.reg[0]]}" y2="${regY-2}" stroke="#7A8DA2" stroke-width="1.3" stroke-dasharray="2 3" opacity=".65"/>`;
+    g+=`</g>`;
+    s+=g;
+  });
+  s+=`<rect x="5" y="${regY}" width="${W-10}" height="${regH}" rx="11" fill="rgba(244,247,250,.85)" stroke="rgba(145,165,186,.55)" stroke-dasharray="5 3"/>`;
+  s+=`<text class="cregt" x="${W/2}" y="${regY+14}" text-anchor="middle">Capability Registry — offline layer · lightweight profiles (coverage · asset types · response quality)</text>`;
+  s+=`<text class="cregt2" x="${W/2}" y="${regY+26}" text-anchor="middle">each outcome — ✓ adopted · ○ ignored · ✕ declined — self-updates the profile, so routing improves with use</text>`;
+  L.forEach(k=>{
+    const r=WF_ROLES[k],x=xs[k];
+    s+=`<text class="cregn" x="${x}" y="${regY+42}" text-anchor="middle">${r.l1} ${r.l2}</text>`;
+    s+=`<text class="cregc" x="${x}" y="${regY+53}" text-anchor="middle">${COVER[k]}</text>`;
+    s+=`<text class="cregv" id="crv-${k}" x="${x}" y="${regY+65}" text-anchor="middle">✓0 · ○0 · ✕0<title>adopted / ignored / declined</title></text>`;
+  });
+  svg.innerHTML=s;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('width',W);svg.setAttribute('height',H);
+  $('#commHint').textContent=`${nE} interaction${nE===1?'':'s'} · solid = ask · dashed = decline`;
+}
+function bumpReg(key,f){
+  const r=ctx.reg&&ctx.reg[key];if(!r)return;
+  r[f]++;
+  const el=$('#crv-'+key);if(!el)return;
+  el.textContent=`✓${r.a} · ○${r.i} · ✕${r.d}`;
+  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),RM?0:650);
+}
+function revealComm(i){
+  const c=ctx,e=c.comms[i];if(!e)return;
+  const g=$('#cev-'+i);if(g)g.classList.remove('pend');
+  if(e.reg)bumpReg(e.reg[0],e.reg[1]);
+}
 async function p4(){
-  phaseOn(4,'Phase 4 · running the confirmed workflow — active roles call both retrieval services in parallel…');
-  const c=ctx,tasks=c.tasks,W=c.workers,waves=c.waves;
-  const excl=ctx.wf?ROLES.map((r,i)=>!ctx.wf.nodes.some(n=>n.id===WF2ROLE[i])):ROLES.map(()=>false);
-  const atasks=tasks.filter(t=>!excl[t.r]);
-  const st={bi:0,kh:0,pub:0,reuse:0,dedup:0};
-  const rDone=ROLES.map(()=>0),rBI=ROLES.map(()=>0),rKH=ROLES.map(()=>0),rTot=ROLES.map((r,i)=>atasks.filter(t=>t.r===i).length);
-  const finished=new Set();
-  const waveMs=waves<=4?950:Math.max(260,Math.round(3800/waves));
-  ['bi','kh','bb'].forEach(id=>node(id).classList.add('has','done'));
-   ROLES.forEach((r,i)=>{if(excl[i]){node(r.id).classList.add('skip','has');dyn(r.id).innerHTML='<span class="k">not in workflow — skipped</span>';}});
+  const c=ctx;
+  const L=c.lanes=WF2ROLE.filter(k=>c.wf&&c.wf.nodes.some(n=>n.id===k));
+  genComms(c);
+  buildP4Roles(L);
+  buildComm();
+  const cl=$('#commLegend');if(cl)cl.hidden=false;
+  const cp=$('#commPane');if(cp)cp.classList.remove('collapsed');
+  phaseOn(4,'Phase 4 · capability profiles loaded from the registry — roles run the planned workflow, asking via directed hit or board broadcast…');
+  const tasks=c.tasks,W=c.workers,waves=c.waves;
+  const atasks=tasks.filter(t=>L.includes(WF2ROLE[t.r]));
+  const st={bi:0,kh:0};
+  const rDone={},rBI={},rKH={},rTot={};
+  L.forEach(k=>{rDone[k]=0;rBI[k]=0;rKH[k]=0;rTot[k]=atasks.filter(t=>WF2ROLE[t.r]===k).length;});
+  node('bi').classList.add('has','done');node('kh').classList.add('has','done');
   const upd=()=>{
     dyn('bi').innerHTML=`<strong>${st.bi}</strong> calls`;
     dyn('kh').innerHTML=`<strong>${st.kh}</strong> calls`;
-    dyn('bb').innerHTML=`published <strong>${st.pub}</strong> · reused <strong>${st.reuse}</strong> · in-flight dedup <strong>${st.dedup}</strong>`;
-    ROLES.forEach((r,i)=>{if(!excl[i]&&rBI[i]+rKH[i]>0){const n=node(r.id);n.classList.add('has');dyn(r.id).innerHTML=`<strong>${rDone[i]}/${rTot[i]}</strong> tasks<br>BI×${rBI[i]} · KH×${rKH[i]}`;}});
+    L.forEach(k=>{if(rBI[k]+rKH[k]>0){const n=$('#n-'+k);if(n){n.classList.add('has');$('#d-'+k).innerHTML=`BI×<strong>${rBI[k]}</strong> · KH×<strong>${rKH[k]}</strong>`;}}});
   };
-  const flash=(rid,k)=>{const t=$('#t-'+rid+'-'+k);t.classList.add('flash');setTimeout(()=>t.classList.remove('flash'),RM?0:450);};
   upd();
+  const per=Math.max(1,Math.ceil(c.comms.length/Math.max(1,waves)));
+  let ei=0;
+  const waveMs=waves<=4?950:Math.max(260,Math.round(3800/waves));
   for(let w=0;w<waves;w++){
     const batch=atasks.slice(w*W,(w+1)*W);
-    if(!batch.length)continue;
-    const inWave=new Set(batch.map(t=>t.key));
-    say(`Phase 4 · wave ${w+1}/${waves} — ${batch.length} agent${batch.length>1?'s':''} working in parallel…`);
-    batch.forEach(t=>{
-      node(ROLES[t.r].id).classList.add('run');
-      st.pub++;st.bi+=t.bi;st.kh+=t.kh;rBI[t.r]+=t.bi;rKH[t.r]+=t.kh;
-      if(t.r>0){const lead=t.m+'-0';if(finished.has(lead))st.reuse++;else if(inWave.has(lead))st.dedup++;}
-      flash(ROLES[t.r].id,'bi');flash(ROLES[t.r].id,'kh');
-    });
-    upd();
-    await sleep(waveMs);
-    batch.forEach(t=>{finished.add(t.key);rDone[t.r]++;});
-    ROLES.forEach((r,i)=>{if(excl[i])return;const n=node(r.id);n.classList.remove('run');if(rDone[i]===rTot[i]&&rTot[i]>0)n.classList.add('done');else if(rBI[i]>0)n.classList.add('done');});
+    if(batch.length){
+      say(`Phase 4 · wave ${w+1}/${waves} — ${batch.length} agent${batch.length>1?'s':''} in parallel · dual-channel asking active…`);
+      batch.forEach(t=>{
+        const k=WF2ROLE[t.r];const n=$('#n-'+k);if(n)n.classList.add('run');
+        st.bi+=t.bi;st.kh+=t.kh;rBI[k]+=t.bi;rKH[k]+=t.kh;
+      });
+      upd();
+      await sleep(waveMs);
+      batch.forEach(t=>{
+        const k=WF2ROLE[t.r];rDone[k]++;const n=$('#n-'+k);
+        if(n){n.classList.remove('run');if((rDone[k]===rTot[k]&&rTot[k]>0)||rBI[k]>0)n.classList.add('done');}
+      });
+    }else{
+      await sleep(120);
+    }
+    for(let n=0;n<per&&ei<c.comms.length;n++,ei++)revealComm(ei);
     upd();
   }
-  ROLES.forEach((r,i)=>{if(!excl[i])node(r.id).classList.add('done');});
-  const m=c.merge;
-  await act('merge',
-    `<strong>${m.raw}</strong> raw candidates → <strong>${m.unique}</strong> unique <span class="k">(${m.dupes} duplicates removed)</span><br>`+
-    `Conflicts kept for review: <strong>${m.conflicts}</strong> → <strong>EvidenceBundle</strong>`,750);
+  while(ei<c.comms.length)revealComm(ei++);
+  if(c.comms.length)await sleep(500);
+  L.forEach(k=>{const n=$('#n-'+k);if(n)n.classList.add('done');});
   phaseDone(4);
 }
 
@@ -1269,6 +1431,7 @@ $$('.phase').forEach(p=>{
   h.addEventListener('click',tog);
   h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
 });
+const cpH=$('#commPane>header');if(cpH)cpH.addEventListener('click',()=>$('#commPane').classList.toggle('collapsed'));
 $('#chips').addEventListener('click',e=>{
   const b=e.target.closest('.chip');if(!b||running)return;
   $('#q').value=b.dataset.q;$('#q').focus();
