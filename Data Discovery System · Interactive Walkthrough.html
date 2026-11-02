@@ -117,8 +117,8 @@ button{cursor:pointer}
   background:linear-gradient(90deg,rgba(228,238,247,.85),rgba(228,238,247,0) 70%);
 }
 .row{display:grid;gap:20px 26px;align-items:stretch}
-.r1{grid-template-columns:66fr 42fr 52fr}
-.r2{grid-template-columns:86fr 39fr 49fr}
+.r1{grid-template-columns:48fr 70fr}
+.r2{grid-template-columns:86fr 49fr}
 .status:empty{display:none}
 body:not(.viz) .wrap{padding:10px 24px 18px}
 body:not(.viz) .row{row-gap:14px}
@@ -139,19 +139,13 @@ body:not(.viz) .loops,body:not(.viz) .foot,body:not(.viz) .strip{display:none}
   display:flex;gap:8px;align-items:baseline;
   cursor:pointer;user-select:none;
 }
-.phase>h2 em{
-  font-style:normal;font-family:var(--mono);font-size:10px;font-weight:700;
-  letter-spacing:.1em;color:var(--accent-ink);
-  background:rgba(41,109,255,.08);border:1px solid rgba(41,109,255,.18);
-  border-radius:999px;padding:1px 8px;
-}
 .phase>h2 .ck{display:none;color:var(--ok);font-size:14px}
 .phase>h2::after{content:"▾";margin-left:auto;color:var(--dim);font-size:11px;font-weight:700}
 .phase.collapsed>h2::after{content:"▸"}
 /* collapsed = back to pre-run skeleton: hide dynamic payload, keep static node frames */
 .phase.collapsed .node .dyn{display:none}
 .phase.collapsed .node.has .sub{display:block}
-.phase.collapsed .wfbar,.phase.collapsed .wfscroll,.phase.collapsed .wftool{display:none}
+.phase.collapsed .wfpane,.phase.collapsed .wfmaxbar,.phase.collapsed .wfbar,.phase.collapsed .wfscroll,.phase.collapsed .wftool{display:none}
 .phase.active{
   border-color:rgba(41,109,255,.38);
   background:rgba(255,255,255,.62);
@@ -230,6 +224,19 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 }
 .pill.no{text-decoration:line-through;color:var(--dim);border-color:var(--border)}
 .pill.ok{border-color:rgba(63,140,109,.4);background:var(--ok-soft);color:var(--ok)}
+.dyn .pick{
+  display:flex;align-items:center;gap:10px;margin:6px 0;
+  border:1px solid rgba(63,140,109,.5);border-radius:11px;
+  background:linear-gradient(180deg,var(--ok-soft),rgba(255,255,255,.92));
+  padding:8px 12px;box-shadow:0 6px 14px rgba(63,140,109,.1);
+}
+.dyn .pick b{display:block;font-size:15px;font-weight:720;color:var(--ink-strong);letter-spacing:-.01em;line-height:1.25}
+.dyn .pick .k{font-size:11px}
+.pickTag{
+  flex:none;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--ok);
+  border:1px solid rgba(63,140,109,.45);background:rgba(255,255,255,.9);
+  border-radius:999px;padding:3px 9px;
+}
 .down{text-align:center;line-height:1;font-size:12px;color:var(--dim)}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grow{flex:1}
@@ -269,7 +276,9 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .wfpane>header .hintR{margin-left:auto;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:0;text-transform:none}
 .wfpane.ok{border-color:rgba(63,140,109,.45);box-shadow:0 0 0 4px rgba(63,140,109,.08),var(--shadow-md)}
 .wfok{color:var(--ok);font-weight:700;letter-spacing:0;text-transform:none}
-.wfbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:10px 11px}
+.wfcols{display:grid;grid-template-columns:minmax(225px,27fr) 73fr;gap:10px;align-items:stretch;min-width:0}
+.wfcols .wfpane{min-width:0}
+.wfbar{display:grid;grid-template-columns:1fr;gap:8px;padding:10px 11px}
 .wfrole{
   display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:12px;
   background:rgba(255,255,255,.92);padding:6px 11px 6px 7px;
@@ -288,8 +297,8 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
     radial-gradient(circle at 18px 18px,rgba(145,165,186,.14) 1px,transparent 1.5px) 0 0/26px 26px,
     rgba(248,251,254,.55);
 }
-.wfscroll:has(.wfcanvas:empty){display:none}
-body:not(.viz) .wfscroll{display:none}
+.wfscroll:has(.wfcanvas:empty){min-height:120px;display:grid;place-items:center}
+.wfscroll:has(.wfcanvas:empty)::after{content:"Workflow graph will appear here after Run";color:var(--dim);font-size:11.5px}
 .wfcanvas{display:block;max-width:100%;height:auto}
 .wfcanvas text{user-select:none}
 .wedge{fill:none;stroke:#5B7186;stroke-width:2;pointer-events:none}
@@ -360,12 +369,6 @@ body:not(.viz) .wfscroll{display:none}
 .chd{font-size:9.5px;font-weight:700;fill:#162534}
 .clife{stroke:rgba(145,165,186,.55);stroke-width:1.4;stroke-dasharray:4 4}
 .clab{font-size:9px;font-weight:700;fill:#4A5E74;stroke:rgba(248,251,254,.92);stroke-width:3.5;paint-order:stroke}
-.cregt{font-size:9.5px;font-weight:700;fill:#4A5E74}
-.cregt2{font-size:8.5px;font-weight:500;fill:#7A8DA2}
-.cregn{font-size:10px;font-weight:700;fill:#162534}
-.cregc{font-size:8.5px;fill:#7A8DA2}
-.cregv{font-size:9.5px;font-weight:700;fill:#4A5E74;font-family:var(--mono);transition:fill .25s}
-.cregv.bump{fill:#296DFF}
 .cev{transition:opacity .5s ease}
 .cev.pend{opacity:0}
 .clegend{display:flex;gap:5px 16px;flex-wrap:wrap;padding:8px 13px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);align-items:center}
@@ -410,10 +413,11 @@ body:not(.viz) .wfscroll{display:none}
 @media (max-width:1500px){.roles{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:1100px){
   .ctl{grid-template-columns:1fr}
-  .r1,.r2,.loops{grid-template-columns:1fr}
+  .r1,.r2{grid-template-columns:1fr}
   .row>.phase:not(:last-child)::after{display:none}
   .row{gap:16px}
   .p4grid{grid-template-columns:1fr}
+  .wfcols{grid-template-columns:1fr}
   .top{position:static}
 }
 @media (prefers-reduced-motion:reduce){
@@ -433,13 +437,13 @@ body:not(.viz) .wfscroll{display:none}
     </div>
     <form autocomplete="off" class="ctl" id="ctl">
      <div class="field">
-      <input aria-describedby="qhint" class="in" id="q" type="text" value="近7天 DAU 和 GMV 按渠道拆分">
+      <input aria-describedby="qhint" class="in" id="q" type="text" value="Last 7 days DAU and GMV by channel">
       <div class="chips" id="chips">
-       <button class="chip" data-q="近7天 DAU 和 GMV 按渠道拆分" type="button">
-        近7天 DAU 和 GMV 按渠道拆分
+       <button class="chip" data-q="Last 7 days DAU and GMV by channel" type="button">
+        Last 7 days DAU and GMV by channel
        </button>
-       <button class="chip" data-q="昨日次日留存率" type="button">
-        昨日次日留存率
+       <button class="chip" data-q="Yesterday next-day retention" type="button">
+        Yesterday next-day retention
        </button>
        <button class="chip" data-q="Last 30 days CTR and conversion by platform" type="button">
         Last 30 days CTR and conversion by platform
@@ -461,9 +465,8 @@ body:not(.viz) .wfscroll{display:none}
    <p aria-live="polite" class="status" id="status" role="status">
    </p>
    <div class="row r1">
-    <section aria-labelledby="h1" class="phase" id="ph1"><h2 id="h1"><em>PHASE 1</em>Knowledge Pre-injection<span class="ck" aria-hidden="true">✓</span></h2><div class="split"><div class="node " id="n-hist" data-ph="1" style="--c:var(--green)"><b>Historical Query—Knowledge/Asset Pairs</b><span class="sub">Similar queries → datasets finally selected + knowledge referenced</span><div class="dyn" id="d-hist"></div></div><div class="node " id="n-kr" data-ph="1" style="--c:var(--blue)"><b>Knowledge Retrieval</b><span class="sub">Metric definitions · asset metadata · business terms</span><div class="dyn" id="d-kr"></div></div></div><div class="down">▼</div><div class="node " id="n-sel" data-ph="1" style="--c:var(--yellow)"><b>Token-budgeted Knowledge Selection</b><span class="sub">Independent contribution + interaction effects: synergy, redundancy, conflict</span><div class="dyn" id="d-sel"></div></div></section>
-    <section aria-labelledby="h2" class="phase" id="ph2"><h2 id="h2"><em>PHASE 2</em>Task Contract<span class="ck" aria-hidden="true">✓</span></h2><div class="tabs"><button type="button" class="tab on" id="tabAsk">Ask the user</button><button type="button" class="tab" id="tabDft">Fill with default rules</button></div><div id="paneAsk"><div class="node " id="n-ask" data-ph="2" style="--c:var(--orange)"><b>Ask the user</b><span class="sub">Only if a gap would change metric, asset or result</span><div class="dyn" id="d-ask"></div></div></div><div id="paneDft" hidden=""><div class="node " id="n-dft" data-ph="2" style="--c:var(--green)"><b>Fill with default rules</b><span class="sub">Record the default source</span><div class="dyn" id="d-dft"></div></div></div><div class="down">▼</div><div class="node " id="n-contract" data-ph="2" style="--c:var(--purple)"><b>Executable Task Contract</b><span class="sub"></span><div class="dyn" id="d-contract"></div></div></section>
-    <section aria-labelledby="h3" class="phase" id="ph3"><h2 id="h3"><em>PHASE 3</em>Collaborative Workflow Planning<span class="ck" aria-hidden="true">✓</span></h2><div class="wfpane" id="wfRolePane"><header>Available Roles <span class="lg">from task contract + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div><div class="wfpane" id="wfRecPane"><header>Recommended Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="hintR" id="wfRecHint"></span></header><div class="wfscroll"><svg class="wfcanvas" id="wfRecSvg" role="img" aria-label="Recommended workflow graph"></svg></div></div><div class="wfpane" id="wfEditPane"><header>Final Workflow <span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Editable workflow graph"></svg></div><div class="wftool" id="wfTool"><button type="button" class="wbtn" id="wfBtnLink" disabled>↔ Link arrow</button><button type="button" class="wbtn" id="wfBtnDel" disabled>✕ Delete selected</button><button type="button" class="wbtn" id="wfBtnReset" disabled>↺ Restore recommended</button><button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit final workflow</button><span class="wfmsg" id="wfMsg"></span></div></div></section>
+    <section aria-labelledby="h1" class="phase" id="ph1"><h2 id="h1">Knowledge Pre-injection<span class="ck" aria-hidden="true">✓</span></h2><div class="split"><div class="node " id="n-hist" data-ph="1" style="--c:var(--green)"><b>Historical Query—Knowledge/Asset Pairs</b><span class="sub">Similar queries → datasets finally selected + knowledge referenced</span><div class="dyn" id="d-hist"></div></div><div class="node " id="n-kr" data-ph="1" style="--c:var(--blue)"><b>Knowledge Retrieval</b><span class="sub">Metric definitions · asset metadata · business terms</span><div class="dyn" id="d-kr"></div></div></div><div class="down">▼</div><div class="node " id="n-sel" data-ph="1" style="--c:var(--yellow)"><b>Token-budgeted Knowledge Selection</b><span class="sub">Independent contribution + interaction effects: synergy, redundancy, conflict</span><div class="dyn" id="d-sel"></div></div></section>
+    <section aria-labelledby="h3" class="phase" id="ph3"><h2 id="h3">Adaptive Workflow Planning<span class="ck" aria-hidden="true">✓</span></h2><div class="wfcols"><div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">from the query + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div><div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel agents <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div><div class="wftool" id="wfTool"><button type="button" class="wbtn" id="wfBtnLink" disabled>↔ Link arrow</button><button type="button" class="wbtn" id="wfBtnDel" disabled>✕ Delete selected</button><button type="button" class="wbtn" id="wfBtnReset" disabled>↺ Restore recommended</button><button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit workflow</button><span class="wfmsg" id="wfMsg"></span></div></div></div></section>
    </div>
    <div class="strip" id="dispatch">
     <span>
@@ -471,40 +474,11 @@ body:not(.viz) .wfscroll{display:none}
     </span>
    </div>
    <div class="row r2">
-    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4"><em>PHASE 4</em>Data Discovery<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b><div class="roles" id="p4Roles"></div></div></div><div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header><div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div><div class="clegend" id="commLegend" hidden><span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span><span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span><span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span><span><i style="border-color:#3F8C6D"></i>volunteer / answer</span><span><i class="dot" style="border-color:#7A8DA2"></i>profile self-update</span></div></div></section>
-    <section aria-labelledby="h5" class="phase" id="ph5"><h2 id="h5"><em>PHASE 5</em>Asset Selection<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-hard" data-ph="5" style="--c:var(--lgray)"><b>① Hard Filter</b><span class="sub">Permission, grain and partition rules</span><div class="dyn" id="d-hard"></div></div><div class="node " id="n-soft" data-ph="5" style="--c:var(--yellow)"><b>② Soft Ranking</b><span class="sub">Evidence strength · granularity fit · dimension coverage · freshness</span><div class="dyn" id="d-soft"></div></div><div class="node " id="n-out" data-ph="5" style="--c:var(--blue)"><b>Selection Result: primary + supporting assets</b><span class="sub">Passed rules · rationale · rejected candidates · risk flags</span><div class="dyn" id="d-out"></div></div></section>
-    <section aria-labelledby="h6" class="phase" id="ph6"><h2 id="h6"><em>PHASE 6</em>Execute, Verify &amp; Feedback<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-exec" data-ph="6" style="--c:var(--blue)"><b>Task Execution</b><span class="sub">Confirmed asset, caliber, filters and available partitions</span><div class="dyn" id="d-exec"></div></div><div class="node " id="n-ver" data-ph="6" style="--c:var(--yellow)"><b>Result Verification</b><span class="sub">Execution success ≠ correct result</span><div class="dyn" id="d-ver"></div></div><div class="split"><div class="node " id="n-fail" data-ph="6" style="--c:var(--orange)"><b>Failure Attribution</b><span class="sub">Structured attribution, forming failure report</span><div class="dyn" id="d-fail"></div></div><div class="node " id="n-back" data-ph="6" style="--c:var(--green)"><b>Feedback</b><span class="sub">Stored as learning sample; failures only as routing/risk negatives</span><div class="dyn" id="d-back"></div></div></div></section>
-   </div>
-   <div class="loops">
-    <div class="loop fail" id="loopFail">
-     <i>
-      ↩
-     </i>
-     <div>
-      <b>
-       FailureReport → Router Agent
-      </b>
-      <small id="loopFailT">
-       Not triggered in this run — verification passed.
-      </small>
-     </div>
-    </div>
-    <div class="loop on" id="loopTrust">
-     <i>
-      ⟲
-     </i>
-     <div>
-      <b>
-       Trust Loop → Phase 1
-      </b>
-      <small id="loopTrustT">
-       Verified pair written back to the historical source in Phase 1.
-      </small>
-     </div>
-    </div>
+    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4">Data Retrieval<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b><div class="roles" id="p4Roles"></div></div></div><div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header><div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div><div class="clegend" id="commLegend" hidden><span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span><span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span><span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span><span><i style="border-color:#3F8C6D"></i>volunteer / answer</span></div></div></section>
+    <section aria-labelledby="h5" class="phase" id="ph5"><h2 id="h5">Asset Selection<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-hard" data-ph="5" style="--c:var(--lgray)"><b>① Hard Filter</b><span class="sub">Permission, grain and partition rules</span><div class="dyn" id="d-hard"></div></div><div class="node " id="n-soft" data-ph="5" style="--c:var(--yellow)"><b>② Soft Ranking</b><span class="sub">Evidence strength · granularity fit · dimension coverage · freshness</span><div class="dyn" id="d-soft"></div></div><div class="node " id="n-out" data-ph="5" style="--c:var(--blue)"><b>Selection Result: primary + supporting assets</b><span class="sub">Passed rules · rationale · rejected candidates · risk flags</span><div class="dyn" id="d-out"></div></div></section>
    </div>
    <p class="foot">
-    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements. Phase 4 swimlane: lanes = roles planned in Phase 3; solid = directed ask, dashed = decline; registry counters = adopted / ignored / declined.
+    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements. Phase 4 swimlane: lanes = roles planned in Phase 3; solid = directed ask, dashed = decline.
    </p>
   </main>
   <script>
@@ -522,7 +496,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 
 /* ================= static structure ================= */
 const NODE=(ph,id,c,t,s,x)=>`<div class="node ${x||''}" id="n-${id}" data-ph="${ph}" style="--c:var(--${c})"><b>${t}</b><span class="sub">${s||''}</span><div class="dyn" id="d-${id}"></div></div>`;
-const H=(n,name)=>`<h2 id="h${n}"><em>PHASE ${n}</em>${name}<span class="ck" aria-hidden="true">✓</span></h2>`;
+const H=(n,name)=>`<h2 id="h${n}">${name}<span class="ck" aria-hidden="true">✓</span></h2>`;
 
 const ROLES=[
   {id:'role0',name:'Metric Lookup'},
@@ -537,15 +511,9 @@ $('#ph1').innerHTML=H(1,'Knowledge Pre-injection')+
   `<div class="down">▼</div>`+
   NODE(1,'sel','yellow','Token-budgeted Knowledge Selection','Independent contribution + interaction effects: synergy, redundancy, conflict');
 
-$('#ph2').innerHTML=H(2,'Task Contract')+
-  `<div class="tabs"><button type="button" class="tab on" id="tabAsk">Ask the user</button><button type="button" class="tab" id="tabDft">Fill with default rules</button></div>`+
-  `<div id="paneAsk">${NODE(2,'ask','orange','Ask the user','Only if a gap would change metric, asset or result')}</div>`+
-  `<div id="paneDft" hidden>${NODE(2,'dft','green','Fill with default rules','Record the default source')}</div>`+
-  `<div class="down">▼</div>`+
-  NODE(2,'contract','purple','Executable Task Contract','');
-
-$('#ph3').innerHTML=H(3,'Collaborative Workflow Planning')+
-  `<div class="wfpane" id="wfRolePane" hidden><header>Available Roles <span class="lg">from task contract + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div>`+
+$('#ph3').innerHTML=H(3,'Adaptive Workflow Planning')+
+  `<div class="wfcols">`+
+  `<div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">from the query + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div>`+
   `<div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel agents <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div>`+
   `<div class="wftool" id="wfTool" hidden>`+
     `<button type="button" class="wbtn" id="wfBtnLink" hidden disabled>↔ Link arrow</button>`+
@@ -553,9 +521,10 @@ $('#ph3').innerHTML=H(3,'Collaborative Workflow Planning')+
     `<button type="button" class="wbtn" id="wfBtnReset" hidden disabled>↺ Restore recommended</button>`+
     `<button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit workflow</button>`+
     `<span class="wfmsg" id="wfMsg"></span>`+
-  `</div></div>`;
+  `</div></div>`+
+  `</div>`;
 
-$('#ph4').innerHTML=H(4,'Data Discovery')+
+$('#ph4').innerHTML=H(4,'Data Retrieval')+
   `<div class="p4grid">`+
     `<div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small>`+
       NODE(4,'bi','blue','BI Asset Retrieval','Returns base fact assets')+
@@ -571,7 +540,6 @@ $('#ph4').innerHTML=H(4,'Data Discovery')+
       `<span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span>`+
       `<span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span>`+
       `<span><i style="border-color:#3F8C6D"></i>volunteer / answer</span>`+
-      `<span><i class="dot" style="border-color:#7A8DA2"></i>profile self-update</span>`+
     `</div>`+
   `</div>`;
 
@@ -579,11 +547,6 @@ $('#ph5').innerHTML=H(5,'Asset Selection')+
   NODE(5,'hard','lgray','① Hard Filter','Permission, grain and partition rules')+
   NODE(5,'soft','yellow','② Soft Ranking','Evidence strength · granularity fit · dimension coverage · freshness')+
   NODE(5,'out','blue','Selection Result: primary + supporting assets','Passed rules · rationale · rejected candidates · risk flags');
-
-$('#ph6').innerHTML=H(6,'Execute, Verify &amp; Feedback')+
-  NODE(6,'exec','blue','Task Execution','Confirmed asset, caliber, filters and available partitions')+
-  NODE(6,'ver','yellow','Result Verification','Execution success ≠ correct result')+
-  `<div class="split">${NODE(6,'fail','orange','Failure Attribution','Structured attribution, forming failure report')}${NODE(6,'back','green','Feedback','Stored as learning sample; failures only as routing/risk negatives')}</div>`;
 
 const PH_NODES={};
 $$('.node[data-ph]').forEach(n=>{const p=+n.dataset.ph;(PH_NODES[p]=PH_NODES[p]||[]).push(n);});
@@ -610,7 +573,6 @@ const KT=[
   {short:'Terms',u:5,tok0:240,tokR:200}
 ];
 const IX={'01':4,'13':-8,'04':2,'12':3};   // pairwise interaction utility between knowledge types (same metric)
-const CHECKS=['Result schema','Null / magnitude','Time coverage','Aggregation consistency','Key caliber check'];
 
 function parseTime(q){
   let m;
@@ -664,13 +626,6 @@ function analyze(q){
   const dropped=cands.filter(c=>!sel.includes(c)).map(c=>({c,why:sel.some(x=>inter(c,x)<0)?'redundant':'over budget'}));
   ctx.know={cands,sel,dropped,B,used,utility:acc};
 
-  // --- Phase 2: contract
-  const defaults=[];
-  if(!time)defaults.push('time range');
-  defaults.push('granularity');
-  if(!dims.length)defaults.push('dimension');
-  ctx.defaults=defaults;
-
   // --- Phase 3/4: tasks (independent of agent cap)
   const tasks=[];
   metrics.forEach((m,mi)=>ROLES.forEach((r,ri)=>tasks.push({m:mi,r:ri,key:mi+'-'+ri,bi:1+Math.floor(rng()*2),kh:1+Math.floor(rng()*2)})));
@@ -701,19 +656,16 @@ const node=id=>$('#n-'+id), dyn=id=>$('#d-'+id);
 function resetNodes(from){
   for(let p=from;p<=6;p++){
     (PH_NODES[p]||[]).forEach(n=>{n.classList.remove('run','done','skip','has');const d=n.querySelector('.dyn');if(d)d.innerHTML='';});
-    const ph=$('#ph'+p);ph.classList.remove('active','done');
+    const ph=$('#ph'+p);if(ph)ph.classList.remove('active','done');
   }
   if(from<=4){
-    const pr=$('#p4Roles');if(pr)pr.innerHTML='';
+    renderStaticP4();
     const cs=$('#commSvg');if(cs)cs.innerHTML='';
     const cl=$('#commLegend');if(cl)cl.hidden=true;
     const ch=$('#commHint');if(ch)ch.textContent='';
     const cpane=$('#commPane');if(cpane)cpane.classList.add('collapsed');
   }
   if(from<=3)$('#dispatch').classList.remove('on');
-  $('#loopFail').classList.remove('on');$('#loopTrust').classList.remove('on');
-  $('#loopFailT').textContent='Rerun only the latest suspicious step and the steps after it; keep verified upstream evidence.';
-  $('#loopTrustT').textContent='Only verified, permission-safe, versioned Query—knowledge/asset pairs flow back as history candidates.';
   if(from<=3)resetWFUI();
 }
 function resetAll(){
@@ -721,6 +673,7 @@ function resetAll(){
   resetNodes(1);
   document.body.classList.remove('viz');
   ctx=null;done3=false;
+  $$('.phase').forEach(p=>{p.classList.add('collapsed');const h=p.querySelector('h2');if(h)h.setAttribute('aria-expanded','false');});
   say('Ready — enter a question, then press Run.');
 }
 function phaseOn(n,msg){
@@ -744,33 +697,24 @@ function lock(v){
   $('#run').disabled=v;$('#q').disabled=v;$('#reset').disabled=v;
   $('#run').textContent=v?'Running…':'Run';
 }
-function setTab(w){
-  $('#tabAsk').classList.toggle('on',w==='ask');
-  $('#tabDft').classList.toggle('on',w==='dft');
-  $('#paneAsk').hidden=w!=='ask';
-  $('#paneDft').hidden=w!=='dft';
-}
-
 /* ================= phase 3 · workflow planner ================= */
 const WF_ROLES={
-  ml:{name:'Metric Lookup',l1:'Metric',l2:'Lookup',c:'violet',desc:'resolve metric definitions from knowledge'},
   bad:{name:'BI Asset Discovery',l1:'BI Asset',l2:'Discovery',c:'blue',desc:'surface candidate BI assets & dashboards'},
-  tfld:{name:'Table/Field Lineage Discovery',l1:'Lineage',l2:'Discovery',c:'green',desc:'trace tables and field lineage'},
-  ppp:{name:'Permission & Partition Precheck',l1:'Permission',l2:'Precheck',c:'orange',desc:'verify access, grain & partitions'},
-  merge:{name:'Merge Agent',l1:'Merge',l2:'Agent',c:'purple',desc:'align & compress evidence'},
-  sel:{name:'Asset Selector',l1:'Asset',l2:'Selector',c:'yellow',desc:'rank & pick primary + supporting assets'},
-  exec:{name:'Query Executor',l1:'Query',l2:'Executor',c:'gray',desc:'run the confirmed query & collect results'}
+  tfld:{name:'Lineage Discovery',l1:'Lineage',l2:'Discovery',c:'green',desc:'trace tables and field lineage'},
+  ml:{name:'Definition Lookup',l1:'Definition',l2:'Lookup',c:'violet',desc:'resolve metric definitions from knowledge'},
+  des:{name:'Definition Evidence Selection',l1:'Definition',l2:'Evidence Selection',c:'purple',desc:'pick the authoritative definition evidence'},
+  gs:{name:'Granularity Selection',l1:'Granularity',l2:'Selection',c:'orange',desc:'choose the aggregation grain that fits the question'},
+  fas:{name:'Freshness &amp; Availability Selection',l1:'Freshness &amp;',l2:'Availability',c:'yellow',desc:'check data freshness & partition availability'}
 };
-const WF_KEYS=['ml','bad','tfld','ppp','merge','sel','exec'];
-const WF2ROLE=['ml','bad','tfld','ppp'];
+const WF_KEYS=['bad','tfld','ml','des','gs','fas'];
+const WF2ROLE=['ml','bad','tfld'];
 const WF_ICONS={
   ml:'<circle cx="10" cy="10" r="6.5" fill="none" stroke="#111" stroke-width="2.2"/><line x1="15" y1="15" x2="20.5" y2="20.5" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>',
   bad:'<rect x="4" y="12" width="4.5" height="8.5" rx="1" fill="#111"/><rect x="9.75" y="8" width="4.5" height="12.5" rx="1" fill="#111"/><rect x="15.5" y="3.5" width="4.5" height="17" rx="1" fill="#111"/>',
   tfld:'<circle cx="12" cy="4.5" r="2.7" fill="#111"/><circle cx="5" cy="19" r="2.7" fill="#111"/><circle cx="19" cy="19" r="2.7" fill="#111"/><path d="M12 7.2v4.3M12 11.5H5v5M12 11.5h7v5" fill="none" stroke="#111" stroke-width="2"/>',
-  ppp:'<path d="M12 2.5l8 3v6.2c0 4.8-3.4 8.6-8 10.8-4.6-2.2-8-6-8-10.8V5.5z" fill="none" stroke="#111" stroke-width="2.2" stroke-linejoin="round"/><path d="M8.2 11.8l2.7 2.7 5-5.2" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-  merge:'<path d="M4 5.5c0 4.5 4 6.5 8.5 6.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M4 18.5c0-4.5 4-6.5 8.5-6.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M12.5 12H19" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M15.5 8.5L19 12l-3.5 3.5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-  sel:'<path d="M3.5 4.5h17l-6.5 7.6v5.4l-4 2.5v-7.9z" fill="none" stroke="#111" stroke-width="2" stroke-linejoin="round"/>',
-  exec:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="2"/><path d="M10 8.5l6 3.5-6 3.5z" fill="#111"/>'
+  des:'<rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#111" stroke-width="2"/><path d="M9 12.5l2.4 2.4 4.6-5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  gs:'<line x1="4" y1="7" x2="20" y2="7" stroke="#111" stroke-width="2"/><circle cx="15" cy="7" r="2.6" fill="#111"/><line x1="4" y1="12" x2="20" y2="12" stroke="#111" stroke-width="2"/><circle cx="9" cy="12" r="2.6" fill="#111"/><line x1="4" y1="17" x2="20" y2="17" stroke="#111" stroke-width="2"/><circle cx="13" cy="17" r="2.6" fill="#111"/>',
+  fas:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="2"/><path d="M12 7.5V12l3.5 2" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>'
 };
 let wfEditing=false,wfSubmitted=false,wfSel=null,wfLinkSrc=null,wfLinkMode=false,wfRec=null,wfEdit=null,wfSubmitResolve=null,wfEid=0,wfNid=0,wfAbort=false;
 let wfCands=null,wfScores=null,wfBest=0,wfCand=0,wfMode='cand',wfBuilt=false;
@@ -797,7 +741,7 @@ function wfLayout(wf){
   wf.nodes.forEach(n=>{(cols[depth[n.id]]=cols[depth[n.id]]||[]).push(n.id);});
   const maxD=Math.max(0,...Object.keys(cols).map(Number));
   const maxCnt=Math.max(1,...Object.values(cols).map(a=>a.length));
-  const colW=150,rowH=92,padX=60,padY=46;
+  const colW=150,rowH=72,padX=60,padY=30;
   const W=padX*2+(maxD+1)*colW,H=padY*2+maxCnt*rowH;
   const pos={};
   for(let d=0;d<=maxD;d++){
@@ -815,7 +759,7 @@ function renderWF(svg,wf,mode,pfx,sel,srcId){
   wf.edges.forEach((ed,i)=>{
     const A=pos[ed.a],B=pos[ed.b];if(!A||!B)return;
     const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1;
-    const sx=A.x+dx/L*28,sy=A.y+dy/L*28,ex=B.x-dx/L*30,ey=B.y-dy/L*30;
+    const sx=A.x+dx/L*24,sy=A.y+dy/L*24,ex=B.x-dx/L*26,ey=B.y-dy/L*26;
     const c1x=sx+dx*.4,c1y=sy+dy*.12,c2x=ex-dx*.4,c2y=ey-dy*.12;
     const dPath=`M${sx.toFixed(1)} ${sy.toFixed(1)} C${c1x.toFixed(1)} ${c1y.toFixed(1)},${c2x.toFixed(1)} ${c2y.toFixed(1)},${ex.toFixed(1)} ${ey.toFixed(1)}`;
     s+=`<path class="wedge ${ed.t}${sel&&sel.k==='e'&&sel.i===i?' sel':''}" d="${dPath}" marker-end="url(#arw-${pfx})"/>`;
@@ -826,10 +770,10 @@ function renderWF(svg,wf,mode,pfx,sel,srcId){
     const r=WF_ROLES[n.role],p=pos[n.id];if(!r||!p)return;
     const cls='wnode'+(mode==='edit'?' live':'')+(sel&&sel.k==='n'&&sel.id===n.id?' sel':'')+(srcId===n.id?' src':'');
     s+=`<g class="${cls}" data-id="${n.id}" transform="translate(${p.x},${p.y})">`+
-       `<circle r="26" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.6"/>`+
-       `<g transform="translate(-15,-15) scale(1.25)">${WF_ICONS[n.role]}</g>`+
-       `<text class="wnl" y="41" text-anchor="middle">${r.l1}</text>`+
-       `<text class="wnl" y="53" text-anchor="middle">${r.l2}</text></g>`;
+       `<circle r="22" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.6"/>`+
+       `<g transform="translate(-13,-13) scale(1.05)">${WF_ICONS[n.role]}</g>`+
+       `<text class="wnl" y="36" text-anchor="middle">${r.l1}</text>`+
+       `<text class="wnl" y="48" text-anchor="middle">${r.l2}</text></g>`;
   });
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.setAttribute('width',W);svg.setAttribute('height',H);
@@ -876,29 +820,32 @@ function addRoleNode(k){
   wfMsg(`Added ${WF_ROLES[k].name} — use ↔ Link arrow to connect it.`);
 }
 
-/* 3.3.1/3.3.3 — K candidate AOV graphs generated from the task contract,
+/* K candidate AOV graphs over the six adaptive roles,
    layer width capped by the user's max-parallel-agents value W */
 function buildCands(W){
   const mk=nodes=>nodes.map(k=>({id:k,role:k}));
   const chain=arr=>arr.slice(1).map((k,i)=>({a:arr[i],b:k,t:'seq'}));
   const w=Math.max(1,Math.min(3,Math.round(W)||1));
-  const seq={name:'Sequential',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:chain(['ml','bad','tfld','ppp','merge'])};
-  const bal=w>=2
-    ?{name:'Balanced',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:[
+  const all=['ml','bad','tfld','des','gs','fas'];
+  const seq={name:'Sequential',nodes:mk(all),edges:chain(all)};
+  const bal= w>=2
+    ?{name:'Balanced',nodes:mk(all),edges:[
       {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
-      {a:'bad',b:'ppp',t:'dep'},{a:'tfld',b:'ppp',t:'dep'},{a:'ppp',b:'merge',t:'seq'}]}
-    :{name:'Balanced',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:chain(['ml','bad','tfld','ppp','merge'])};
-  const order=['bad','ppp','tfld'];
-  const fan=order.slice(0,w),rest=order.slice(w);
-  const pe=[...fan.map(k=>({a:'ml',b:k,t:'par'}))];
-  if(rest.length){
-    fan.forEach(f=>pe.push({a:f,b:rest[0],t:'dep'}));
-    pe.push(...chain(rest));
-    pe.push({a:rest[rest.length-1],b:'merge',t:'seq'});
-  }else{
-    fan.forEach(f=>pe.push({a:f,b:'merge',t:'dep'}));
-  }
-  const par={name:'Parallel-first',nodes:mk(['ml','bad','tfld','ppp','merge']),edges:pe};
+      {a:'bad',b:'des',t:'dep'},{a:'tfld',b:'des',t:'dep'},
+      ...chain(['des','gs','fas'])]}
+    :{name:'Balanced',nodes:mk(all),edges:chain(all)};
+  const par= w>=3
+    ?{name:'Parallel-first',nodes:mk(all),edges:[
+      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
+      {a:'ml',b:'des',t:'dep'},
+      {a:'bad',b:'gs',t:'dep'},{a:'tfld',b:'gs',t:'dep'},
+      {a:'bad',b:'fas',t:'dep'},{a:'tfld',b:'fas',t:'dep'}]}
+    : w===2
+    ?{name:'Parallel-first',nodes:mk(all),edges:[
+      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
+      {a:'bad',b:'des',t:'dep'},{a:'tfld',b:'des',t:'dep'},
+      {a:'des',b:'gs',t:'par'},{a:'des',b:'fas',t:'par'}]}
+    :{name:'Parallel-first',nodes:mk(all),edges:chain(all)};
   return [bal,par,seq];
 }
 
@@ -918,7 +865,7 @@ function wfScore(wf){
   };
   wf.nodes.forEach(n=>calc(n.id,new Set()));
   const T=Math.max(1,...wf.nodes.map(n=>depth[n.id]+1));
-  const RECALL={ml:1,bad:1,tfld:1,ppp:1};
+  const RECALL={ml:1,bad:1,tfld:1};
   const seen=new Set();let sum=0;
   for(let t=0;t<T;t++){
     const S=wf.nodes.filter(n=>depth[n.id]===t).map(n=>n.id);
@@ -949,7 +896,6 @@ function selectCand(i){
   wfCand=i;wfMode='cand';wfEditing=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;
   renderWF($('#wfEditSvg'),wfCands[i],'view','e');
   renderTabs();
-  $('#wfRolePane').hidden=true;
   $('#wfEditHint').innerHTML=`<strong>P_cov = ${wfScores[i].toFixed(2)}</strong> · ${wfCands[i].name}${i===wfBest?' · ★ best':''} — switch ①②③ or ✎ Custom graph`;
   syncTool();
 }
@@ -992,17 +938,20 @@ function resetWFUI(){
   const bar=$('#wfRoles');if(bar)bar.innerHTML='';
   const es=$('#wfEditSvg');if(es)es.innerHTML='';
   const tabs=$('#wfTabs');if(tabs)tabs.innerHTML='';
-  const rp=$('#wfRolePane');if(rp)rp.hidden=true;
+  const rp=$('#wfRolePane');if(rp)rp.hidden=false;
   const cu=$('#wfBtnCustom');if(cu){cu.disabled=true;cu.hidden=true;cu.classList.remove('on');}
   const bl2=$('#wfBtnLink');if(bl2)bl2.hidden=true;
   const bd2=$('#wfBtnDel');if(bd2)bd2.hidden=true;
   const br2=$('#wfBtnReset');if(br2)br2.hidden=true;
+  const mx=$('#wfMaxP');if(mx)mx.disabled=false;
+  const bg=$('#wfBtnGo');if(bg)bg.disabled=true;
   const eh=$('#wfEditHint');if(eh){eh.innerHTML='';eh.hidden=false;}
   const ok=$('#wfOk');if(ok)ok.hidden=true;
   const wt=$('#wfTool');if(wt)wt.hidden=true;
   const ep=$('#wfEditPane');if(ep)ep.classList.remove('ok');
   const msg=$('#wfMsg');if(msg)msg.textContent='';
   const st=$('#dispatch span');if(st)st.textContent='▼ Dispatch: activate roles / parallel branches';
+  renderStaticRoles();
 }
 
 /* workflow planner events (bound once — svg containers persist) */
@@ -1079,7 +1028,6 @@ $('#wfBtnGo').addEventListener('click',()=>{
   $('#wfEditPane').classList.add('ok');
   $('#wfEditHint').innerHTML=(custom?'custom graph':`<strong>P_cov = ${wfScores[wfCand].toFixed(2)}</strong> · ${wfCands[wfCand].name}`)+' confirmed';
   $('#wfEditHint').hidden=false;$('#wfOk').hidden=false;
-  $('#wfRolePane').hidden=true;
   $$('#wfRoles .wfrole').forEach(el=>{el.classList.remove('edit');el.classList.add('lock');});
   $('#wfRoleHint').textContent='';
   ctx.wf=JSON.parse(JSON.stringify(g));
@@ -1108,10 +1056,11 @@ async function p1(){
   node('hist').classList.remove('run');node('kr').classList.remove('run');
   node('hist').classList.add('done','has');node('kr').classList.add('done','has');
   const hpTok=c.pairs.reduce((s,p)=>s+p.tok,0);
-  dyn('hist').innerHTML=c.pairs.length
-    ?`<div class="stats"><div class="stat"><u>Recalled</u><b>${c.pairs.length}</b></div><div class="stat"><u>Total len</u><b>${hpTok}</b></div><div class="stat"><u>Top sim</u><b>${c.pairs[0].sim.toFixed(2)}</b></div></div>`+
-      c.pairs.map(p=>`<li><strong>${p.sim.toFixed(2)}</strong> ${esc(p.q)} → ${esc(p.ds)} <span class="k">(${p.tok} tok)</span></li>`).join('')
-    :`<div class="stats"><div class="stat"><u>Recalled</u><b>0</b></div><div class="stat"><u>Total len</u><b>0</b></div></div>No pair above the similarity threshold`;
+  dyn('hist').innerHTML=
+    `<div class="stats"><div class="stat"><u>Recalled</u><b>${c.pairs.length}</b></div><div class="stat"><u>Total len</u><b>${hpTok}</b></div><div class="stat"><u>Top sim</u><b>${c.pairs.length?c.pairs[0].sim.toFixed(2):'0'}</b></div></div>`+
+    (c.pairs.length
+      ?`<span class="k">Similar queries matched — their dataset & knowledge choices are reused as candidates.</span>`
+      :`No pair above the similarity threshold`);
   const kc=c.know.cands,kSum=kc.reduce((s,x)=>s+x.tok,0);
   dyn('kr').innerHTML=kc.length
     ?`<div class="stats"><div class="stat"><u>Recalled</u><b>${kc.length}</b></div><div class="stat"><u>Total len</u><b>${kSum}</b></div><div class="stat"><u>Types</u><b>${KT.length}</b></div></div>`+
@@ -1126,48 +1075,12 @@ async function p1(){
     `<div class="stat"><u>Selected</u><b>${k.sel.length} / ${k.cands.length}</b></div>`+
     `<div class="stat"><u>Tokens used</u><b>${k.used} / ${k.B}</b></div>`+
     `<div class="stat"><u>Total utility</u><b>${util}</b></div>`+
-    `<div class="stat"><u>Dropped</u><b>${k.dropped.length}</b></div></div>`+
+    `</div>`+
     `<div class="bar"><i style="width:0" data-w="${Math.round(k.used/k.B*100)}"></i></div>`+
-    k.sel.slice(0,6).map(x=>pill(esc(x.label),'ok')).join('')+(k.sel.length>6?pill('+'+(k.sel.length-6)):'')+
-    (k.dropped.length?`<br><span class="k">dropped:</span> `+k.dropped.slice(0,2).map(d=>pill(esc(d.c.label)+' · '+d.why,'no')).join('')+(k.dropped.length>2?pill('+'+(k.dropped.length-2)):''):'')
+    k.sel.slice(0,6).map(x=>pill(esc(x.label),'ok')).join('')+(k.sel.length>6?pill('+'+(k.sel.length-6)):'')
     :`<div class="stats"><div class="stat"><u>Budget</u><b>${k.B} tok</b></div><div class="stat"><u>Goal</u><b>max total utility</b></div><div class="stat"><u>Selected</u><b>0 / 0</b></div></div>Nothing to select`,700);
   const bar=dyn('sel').querySelector('.bar i');if(bar){requestAnimationFrame(()=>{bar.style.width=bar.dataset.w+'%';});}
   phaseDone(1);
-}
-
-async function p2(){
-  phaseOn(2,'Phase 2 · converging the query into a task contract…');
-  const c=ctx;
-  setTab(c.ok?'dft':'ask');
-  if(!c.ok){
-    await act('ask',
-      `<p class="qq"><strong>Q:</strong> Which metric do you mean? (e.g. DAU, GMV, next-day retention, CTR)</p>`+
-      `<div class="askrow"><input id="askIn" type="text" placeholder="Type your answer, e.g. DAU" aria-label="Answer to coordinator question"><button type="button" id="askGo">Submit</button></div>`+
-      `<p class="k" style="margin:6px 0 0">Demo tip: try a query that names a metric, e.g. “Yesterday GMV by category”.</p>`,450);
-    const go=()=>{const v=($('#askIn').value||'DAU').trim();$('#q').value=v+' by category';run(1);};
-    $('#askGo').addEventListener('click',go);
-    $('#askIn').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
-    $('#askIn').focus();
-    skip('dft','Not applicable');
-    skip('contract','Waiting for the user');
-    say('Paused at Phase 2 — answer the Coordinator question below, or edit the query and press Run.');
-    return false;
-  }
-  skip('ask','Not needed — the gap does not change metric or asset');
-  await act('dft',
-    `<ul>`+c.defaults.map(d=>`<li>${esc(d)} → ${d==='time range'?'Last 7 days':d==='granularity'?'Daily':'overall'}<span class="src">default</span></li>`).join('')+`</ul>`,650);
-  await act('contract',
-    `<ul>`+
-    `<li><span class="k">intent</span> → retrieve <strong>${esc(c.metrics.map(m=>m.name).join(' + '))}</strong></li>`+
-    `<li><span class="k">metrics</span> → ${c.metrics.map(m=>`<strong>${esc(m.name)}</strong>`).join(', ')}</li>`+
-    `<li><span class="k">time_range</span> → ${esc(c.time||'Last 7 days')}${c.time?'':'<span class="src">default</span>'}</li>`+
-    `<li><span class="k">granularity</span> → daily<span class="src">default</span></li>`+
-    `<li><span class="k">dimensions</span> → ${c.dims.length?esc(c.dims.join(', ')):'overall'}${c.dims.length?'':'<span class="src">default</span>'}</li>`+
-     `<li><span class="k">filters</span> → none</li>`+
-     `<li><span class="k">knowledge_ctx</span> → ${ctx.know.sel.length} chunks / ${ctx.know.used} tok</li>`+
-    `</ul>`,750);
-  phaseDone(2);
-  return true;
 }
 
 async function p3(){
@@ -1181,45 +1094,55 @@ async function p3(){
   return true;
 }
 
-/* ---- Phase 4 · communication model (dual-channel asking + capability registry) ---- */
-const COVER={ml:'metric defs · calibers',bad:'BI assets · dashboards',tfld:'tables · field lineage',ppp:'permissions · partitions'};
+/* ---- Phase 4 · communication model (dual-channel asking) ---- */
 function genComms(c){
-  const L=c.lanes,reg={};
-  L.forEach(k=>reg[k]={a:0,i:0,d:0});
+  const L=c.lanes;
   const evs=[];
   const has=k=>L.includes(k);
   const vol=not=>['bad','tfld','ml','ppp'].find(k=>L.includes(k)&&!not.includes(k));
   const m0=c.metrics[0]?c.metrics[0].name:'metric';
   const d0=c.metrics[0]?c.metrics[0].ds:'dataset';
   if(has('bad')&&has('ml')){
-    evs.push({k:'ask',a:'bad',b:'ml',note:'metric caliber · '+m0,sub:'route: high conf → hit Metric Lookup profile'});
-    evs.push({k:'reply',a:'ml',b:'bad',note:'definition + caliber',sub:'adopted',reg:['ml','a']});
+    evs.push({k:'ask',a:'bad',b:'ml',note:'metric caliber · '+m0,sub:'route: high conf → hit Definition Lookup profile'});
+    evs.push({k:'reply',a:'ml',b:'bad',note:'definition + caliber',sub:'adopted'});
   }
   if(has('tfld')&&has('ppp')){
     evs.push({k:'ask',a:'tfld',b:'ppp',note:'partition precheck · '+d0,sub:'route: high conf → hit Precheck profile'});
-    evs.push({k:'decline',a:'ppp',b:'tfld',note:'declined — queue saturated',sub:'autonomy preserved',reg:['ppp','d']});
+    evs.push({k:'decline',a:'ppp',b:'tfld',note:'declined — queue saturated',sub:'autonomy preserved'});
     evs.push({k:'bc',a:'tfld',note:'downgraded to board broadcast',sub:'fallback keeps voluntary bidding'});
     const v=vol(['tfld','ppp']);
-    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted',reg:[v,'a']});
+    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted'});
   }else if(has('tfld')&&L.length>1){
     evs.push({k:'bc',a:'tfld',note:'partition precheck — no profile hit',sub:'low conf → board broadcast'});
     const v=vol(['tfld']);
-    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted',reg:[v,'a']});
+    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted'});
   }
   if(has('bad')&&L.length>1){
     evs.push({k:'bc',a:'bad',note:'cross-domain naming variant',sub:'low conf · profile uncovered → broadcast'});
     const v=vol(['bad']);
-    if(v)evs.push({k:'pick',a:v,b:'bad',note:'volunteered',sub:'adopted',reg:[v,'a']});
+    if(v)evs.push({k:'pick',a:v,b:'bad',note:'volunteered',sub:'adopted'});
   }
   if(has('ml')&&has('bad')){
     evs.push({k:'ask',a:'ml',b:'bad',note:'dashboards reusing '+d0,sub:'route: high conf → hit BI Asset profile'});
-    evs.push({k:'reply',a:'bad',b:'ml',note:'2 dashboards',sub:'ignored — already resolved via KH',reg:['bad','i']});
+    evs.push({k:'reply',a:'bad',b:'ml',note:'2 dashboards',sub:'ignored — already resolved via KH'});
   }
-  c.comms=evs;c.reg=reg;
+  c.comms=evs;
 }
 function buildP4Roles(L){
   const wrap=$('#p4Roles');if(!wrap)return;
   wrap.innerHTML=L.map(k=>{const r=WF_ROLES[k];
+    return `<div class="node role" id="n-${k}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub">${esc(r.desc)}</span><div class="dyn" id="d-${k}"></div></div>`;}).join('');
+}
+/* pre-run static preview: role cards shown before Run so the page is filled out */
+function renderStaticRoles(){
+  const bar=$('#wfRoles');if(!bar)return;
+  bar.innerHTML='';
+  WF_KEYS.forEach(k=>bar.insertAdjacentHTML('beforeend',roleCardHTML(k)));
+  const rp=$('#wfRolePane');if(rp)rp.hidden=false;
+}
+function renderStaticP4(){
+  const wrap=$('#p4Roles');if(!wrap)return;
+  wrap.innerHTML=WF2ROLE.map(k=>{const r=WF_ROLES[k];
     return `<div class="node role" id="n-${k}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub">${esc(r.desc)}</span><div class="dyn" id="d-${k}"></div></div>`;}).join('');
 }
 function buildComm(){
@@ -1231,8 +1154,7 @@ function buildComm(){
   const W=Math.max(need,470),off=(W-need)/2;
   const xs={};L.forEach((k,i)=>xs[k]=off+padX+laneW*i+laneW/2);
   const topY=hTop+hH+gapY,nE=c.comms.length;
-  const regY=topY+(nE?nE*rowH:26)+6,regH=72;
-  const H=regY+regH+12;
+  const H=topY+(nE?nE*rowH:26)+10;
   const col={ask:'#296DFF',ok:'#3F8C6D',dan:'#B4552D',warn:'#8A6A1F'};
   const mk=(id,f)=>`<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${f}"/></marker>`;
   let s=`<defs>${mk('cm-acc',col.ask)}${mk('cm-ok',col.ok)}${mk('cm-dan',col.dan)}${mk('cm-warn',col.warn)}</defs>`;
@@ -1241,7 +1163,7 @@ function buildComm(){
     s+=`<rect x="${(x-laneW/2+6).toFixed(1)}" y="${hTop}" width="${laneW-12}" height="${hH}" rx="10" fill="var(--${r.c})" stroke="rgba(22,37,52,.5)" stroke-width="1.2"/>`;
     s+=`<text class="chd" x="${x}" y="${hTop+14}" text-anchor="middle">${r.l1}</text>`;
     s+=`<text class="chd" x="${x}" y="${hTop+26}" text-anchor="middle">${r.l2}</text>`;
-    s+=`<line class="clife" x1="${x}" y1="${hTop+hH+3}" x2="${x}" y2="${regY-2}"/>`;
+    s+=`<line class="clife" x1="${x}" y1="${hTop+hH+3}" x2="${x}" y2="${H-6}"/>`;
   });
   if(!nE)s+=`<text class="clab" x="${W/2}" y="${topY+14}" text-anchor="middle">no cross-role help needed — each lane worked independently</text>`;
   c.comms.forEach((e,i)=>{
@@ -1268,35 +1190,17 @@ function buildComm(){
       os.forEach(k=>{g+=`<line x1="${xs[k]}" y1="${y}" x2="${xs[k]}" y2="${y+13}" stroke="${col.warn}" stroke-width="1.6" marker-end="url(#cm-warn)"/>`;});
       g+=lab(xs[e.a],e.note,'clab',-6);
     }
-    if(e.reg)g+=`<line x1="${xs[e.reg[0]]}" y1="${y+16}" x2="${xs[e.reg[0]]}" y2="${regY-2}" stroke="#7A8DA2" stroke-width="1.3" stroke-dasharray="2 3" opacity=".65"/>`;
     g+=`</g>`;
     s+=g;
-  });
-  s+=`<rect x="5" y="${regY}" width="${W-10}" height="${regH}" rx="11" fill="rgba(244,247,250,.85)" stroke="rgba(145,165,186,.55)" stroke-dasharray="5 3"/>`;
-  s+=`<text class="cregt" x="${W/2}" y="${regY+14}" text-anchor="middle">Capability Registry — offline layer · lightweight profiles (coverage · asset types · response quality)</text>`;
-  s+=`<text class="cregt2" x="${W/2}" y="${regY+26}" text-anchor="middle">each outcome — ✓ adopted · ○ ignored · ✕ declined — self-updates the profile, so routing improves with use</text>`;
-  L.forEach(k=>{
-    const r=WF_ROLES[k],x=xs[k];
-    s+=`<text class="cregn" x="${x}" y="${regY+42}" text-anchor="middle">${r.l1} ${r.l2}</text>`;
-    s+=`<text class="cregc" x="${x}" y="${regY+53}" text-anchor="middle">${COVER[k]}</text>`;
-    s+=`<text class="cregv" id="crv-${k}" x="${x}" y="${regY+65}" text-anchor="middle">✓0 · ○0 · ✕0<title>adopted / ignored / declined</title></text>`;
   });
   svg.innerHTML=s;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.setAttribute('width',W);svg.setAttribute('height',H);
   $('#commHint').textContent=`${nE} interaction${nE===1?'':'s'} · solid = ask · dashed = decline`;
 }
-function bumpReg(key,f){
-  const r=ctx.reg&&ctx.reg[key];if(!r)return;
-  r[f]++;
-  const el=$('#crv-'+key);if(!el)return;
-  el.textContent=`✓${r.a} · ○${r.i} · ✕${r.d}`;
-  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),RM?0:650);
-}
 function revealComm(i){
   const c=ctx,e=c.comms[i];if(!e)return;
   const g=$('#cev-'+i);if(g)g.classList.remove('pend');
-  if(e.reg)bumpReg(e.reg[0],e.reg[1]);
 }
 async function p4(){
   const c=ctx;
@@ -1306,7 +1210,7 @@ async function p4(){
   buildComm();
   const cl=$('#commLegend');if(cl)cl.hidden=false;
   const cp=$('#commPane');if(cp)cp.classList.remove('collapsed');
-  phaseOn(4,'Phase 4 · capability profiles loaded from the registry — roles run the planned workflow, asking via directed hit or board broadcast…');
+  phaseOn(4,'Data Retrieval · roles run the planned workflow, asking via directed hit or board broadcast…');
   const tasks=c.tasks,W=c.workers,waves=c.waves;
   const atasks=tasks.filter(t=>L.includes(WF2ROLE[t.r]));
   const st={bi:0,kh:0};
@@ -1358,34 +1262,11 @@ async function p5(){
     `<ul>`+c.rank.map(r=>`<li>${esc(r.n)} <span class="k">· ${esc(r.why)}</span><div class="bar"><i style="width:${Math.round(r.s*100)}%"></i></div></li>`).join('')+`</ul>`+
     (c.metrics.length>1?`<span class="k">top-3 shown for ${esc(c.metrics[0].name)}; other metrics ranked the same way</span>`:''),750);
   await act('out',
-    `<ul>`+c.metrics.map(m=>`<li><strong>${esc(m.name)}</strong>: primary ${esc(m.ds)}<br><span class="k">supporting:</span> ${esc(m.tbl)}</li>`).join('')+`</ul>`+
+    c.metrics.map(m=>
+      `<div class="pick"><span class="pickTag">✓ SELECTED</span><div><b>${esc(m.ds)}</b><span class="k">primary asset for ${esc(m.name)} · supporting: ${esc(m.tbl)}</span></div></div>`
+    ).join('')+
     `<span class="k">Risk flags:</span> ${c.merge.conflicts?'1 evidence conflict kept for review':'none'}`,750);
   phaseDone(5);
-}
-
-async function p6(){
-  phaseOn(6,'Phase 6 · executing on the confirmed asset, then verifying the result…');
-  const c=ctx;
-  await act('exec',
-    `Run on <strong>${esc(c.metrics[0].ds)}</strong>${c.metrics.length>1?` +${c.metrics.length-1} more`:''}<br>`+
-    `<span class="k">time:</span> ${esc(c.time||'Last 7 days')} · latest available partition`,700);
-  const v=node('ver');v.classList.add('run');
-  const dv=dyn('ver');v.classList.add('has');dv.innerHTML='';
-  const items=[];
-  for(const ck of CHECKS){
-    await sleep(380);
-    items.push(pill('✓ '+ck,'ok'));
-    dv.innerHTML=items.join('');
-  }
-  await sleep(250);
-  v.classList.remove('run');v.classList.add('done');
-  dv.innerHTML=items.join('')+`<br><strong>Passed</strong> — all ${CHECKS.length} checks`;
-  skip('fail','Not triggered in this run');
-  await act('back',`Query—asset pair → history candidates<br><span class="k">versioned, with expiry; no permission spill</span>`,650);
-  $('#loopTrust').classList.add('on');
-  $('#loopTrustT').textContent='Verified pair written back to the historical source in Phase 1.';
-  $('#loopFailT').textContent='Not triggered in this run — verification passed.';
-  phaseDone(6);
 }
 
 /* ================= orchestration ================= */
@@ -1399,8 +1280,6 @@ async function run(from){
       resetNodes(1);
       ctx=analyze(q);done3=false;
       await p1();
-      const ok=await p2();
-      if(!ok){$$('.phase').forEach(p=>p.classList.remove('active'));return;}
     }else{
       resetNodes(3);
     }
@@ -1408,7 +1287,6 @@ async function run(from){
     if(ok3===false){$$('.phase').forEach(p=>p.classList.remove('active'));return;}
     await p4();
     await p5();
-    await p6();
     done3=true;
     const c=ctx;
     $$('.phase').forEach(p=>p.classList.remove('active'));
@@ -1419,8 +1297,6 @@ async function run(from){
 }
 
 /* ================= events ================= */
-$('#tabAsk').addEventListener('click',()=>setTab('ask'));
-$('#tabDft').addEventListener('click',()=>setTab('dft'));
 $('#ctl').addEventListener('submit',e=>{e.preventDefault();run(1);});
 $('#reset').addEventListener('click',resetAll);
 $$('.phase').forEach(p=>{
@@ -1436,6 +1312,11 @@ $('#chips').addEventListener('click',e=>{
   const b=e.target.closest('.chip');if(!b||running)return;
   $('#q').value=b.dataset.q;$('#q').focus();
 });
+
+/* initial pre-run state: static role previews + ready status */
+renderStaticRoles();
+renderStaticP4();
+say('Ready — enter a question, then press Run.');
 })();
   </script>
  
