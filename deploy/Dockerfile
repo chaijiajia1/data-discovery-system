@@ -12,7 +12,7 @@ WORKDIR /app
 # browser-cookie3 只用于读本机浏览器 cookie（本地开发的 Sync cookie），演示镜像不需要，去掉可少装一批依赖
 COPY backend/requirements.txt /tmp/requirements.txt
 RUN grep -vi '^browser-cookie3' /tmp/requirements.txt > /tmp/requirements.demo.txt \
- && pip install -r /tmp/requirements.demo.txt && rm /tmp/requirements*.txt
+ && pip install --retries 5 --timeout 60 -r /tmp/requirements.demo.txt && rm /tmp/requirements*.txt
 
 COPY backend/app ./app
 COPY backend/prompts ./prompts
