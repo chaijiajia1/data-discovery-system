@@ -1,0 +1,25 @@
+[project]
+name = "data-discovery-backend"
+version = "0.1.0"
+description = "Data Discovery 资产发现流程后端：知识预注入 → 协调 → 工作流规划 → 并行召回 → 资产选择 → 执行与反馈（闭环）"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.0.0",
+    "browser-cookie3>=0.20.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
