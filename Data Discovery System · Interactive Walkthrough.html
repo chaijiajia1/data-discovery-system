@@ -62,16 +62,19 @@ button{cursor:pointer}
 
 /* ---------- control bar ---------- */
 .top{
-  position:sticky;top:0;z-index:20;padding:10px 24px 12px;
+  position:sticky;top:0;z-index:20;padding:10px 24px;
   background:var(--panel-strong);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
 }
-.top-in{max-width:1680px;margin:0 auto}
-.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
-.brand h1{margin:0;font-size:21px;font-weight:680;letter-spacing:-.02em;color:var(--ink-strong)}
+.top-in{max-width:1680px;margin:0 auto;display:flex;align-items:center;gap:22px}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;flex:none}
+.brand h1{margin:0;font-size:21px;font-weight:680;letter-spacing:-.02em;color:var(--ink-strong);white-space:nowrap}
 .brand p{margin:0;color:var(--muted);font-size:12px}
-.ctl{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:18px;align-items:start}
+.ctl{flex:1;min-width:0;display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:18px;align-items:center}
+.ctl .field{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.ctl .field .in{flex:1 1 300px;width:auto;min-width:240px}
+.ctl .field .chips{margin-top:0}
 .field>span{display:block;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
 .field>span i{font-style:normal;font-weight:500;color:var(--dim);margin-left:6px;text-transform:none;letter-spacing:0}
 .in{
@@ -109,16 +112,16 @@ button{cursor:pointer}
 .btn:disabled,.in:disabled{opacity:.5;cursor:not-allowed}
 
 /* ---------- canvas ---------- */
-.wrap{max-width:1680px;margin:0 auto;padding:18px 24px 44px}
+.wrap{max-width:1680px;margin:0 auto;padding:14px 24px 16px}
 .status{
-  margin:0 0 16px;padding:9px 14px;font-weight:600;font-size:12.5px;color:var(--ink);
+  margin:0 0 12px;padding:7px 14px;font-weight:600;font-size:12.5px;color:var(--ink);
   border-left:3px solid var(--brand);
   border-radius:0 10px 10px 0;
   background:linear-gradient(90deg,rgba(228,238,247,.85),rgba(228,238,247,0) 70%);
 }
 .row{display:grid;gap:20px 26px;align-items:stretch}
 .r1{grid-template-columns:48fr 70fr}
-.r2{grid-template-columns:86fr 49fr}
+.r2{grid-template-columns:57fr 43fr}
 .status:empty{display:none}
 body:not(.viz) .wrap{padding:10px 24px 18px}
 body:not(.viz) .row{row-gap:14px}
@@ -128,7 +131,7 @@ body:not(.viz) .loops,body:not(.viz) .foot,body:not(.viz) .strip{display:none}
 
 /* phase container — quiet dotted frame, guixu workflow-stage feel */
 .phase{
-  position:relative;min-width:0;border:1px dashed var(--border);border-radius:18px;padding:46px 16px 16px;
+  position:relative;min-width:0;border:1px dashed var(--border);border-radius:18px;padding:42px 16px 14px;
   background:rgba(255,255,255,.42);
   display:flex;flex-direction:column;gap:10px;
   transition:box-shadow .3s,border-color .3s,background .3s;
@@ -152,6 +155,12 @@ body:not(.viz) .loops,body:not(.viz) .foot,body:not(.viz) .strip{display:none}
   box-shadow:0 0 0 4px rgba(41,109,255,.07),var(--shadow-md);
 }
 .phase.done .ck{display:inline}
+/* L0 / L1: no workflow to edit or submit — Phase 3 keeps only the entry-level pane */
+#ph3.lvlonly .wfcols,#ph3.lvlonly /* skipped step: dimmed, stays collapsed, cannot be expanded */
+.phase.skipped{opacity:.55;border-style:dotted;background:rgba(244,247,250,.5)}
+.phase.skipped>h2{cursor:default}
+.phase.skipped>h2::after{content:""}
+.phase>h2 .skbadge{font-size:11px;font-weight:600;color:var(--dim);border:1px dashed var(--border);border-radius:9px;padding:1px 8px}
 .row>.phase:not(:last-child)::after{
   content:"\25B6";position:absolute;right:-18px;top:50%;font-size:12px;
   color:var(--dim);transform:translateY(-50%);
@@ -276,9 +285,10 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .wfpane>header .hintR{margin-left:auto;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:0;text-transform:none}
 .wfpane.ok{border-color:rgba(63,140,109,.45);box-shadow:0 0 0 4px rgba(63,140,109,.08),var(--shadow-md)}
 .wfok{color:var(--ok);font-weight:700;letter-spacing:0;text-transform:none}
-.wfcols{display:grid;grid-template-columns:minmax(225px,27fr) 73fr;gap:10px;align-items:stretch;min-width:0}
+.wfcols{display:grid;grid-template-columns:minmax(300px,35fr) 65fr;gap:10px;align-items:stretch;min-width:0}
 .wfcols .wfpane{min-width:0}
-.wfbar{display:grid;grid-template-columns:1fr;gap:8px;padding:10px 11px}
+.wfpane[hidden]{display:none}
+.wfbar{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,auto);grid-auto-flow:column;gap:8px;padding:10px 11px;align-content:start}
 .wfrole{
   display:flex;align-items:center;gap:9px;border:1px solid var(--border);border-radius:12px;
   background:rgba(255,255,255,.92);padding:6px 11px 6px 7px;
@@ -310,7 +320,7 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .wnode>circle{transition:stroke .15s}
 .wnode.sel>circle{stroke:var(--accent);stroke-width:3.5}
 .wnode.src>circle{stroke:var(--danger);stroke-width:3.5;stroke-dasharray:5 3}
-.wnl{font-size:11px;font-weight:700;fill:#162534}
+.wnl{font-size:10.5px;font-weight:700;fill:#162534;stroke:rgba(248,251,254,.9);stroke-width:3;paint-order:stroke}
 .wlab{font-size:10px;font-weight:700;fill:#4A5E74;stroke:rgba(248,251,254,.85);stroke-width:4;paint-order:stroke;font-family:var(--mono)}
 .wftool{display:flex;gap:7px;align-items:center;padding:9px 11px;border-top:1px solid var(--border);background:rgba(255,255,255,.85);flex-wrap:wrap}
 .wftool[hidden]{display:none}
@@ -338,20 +348,30 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .wtab.on i{color:rgba(238,248,255,.85)}
 .wtab:disabled{opacity:.55;cursor:default}
 .wfmaxbar{display:flex;align-items:center;padding:7px 13px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(228,238,247,.55),rgba(228,238,247,.15))}
-.wfmaxp{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted)}
-.wfmaxp input{width:54px;height:29px;border:1px solid var(--border-strong);border-radius:8px;padding:0 6px;background:rgba(255,255,255,.95);color:var(--ink);font-family:var(--mono);font-weight:700}
+.wfmaxp{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:0;text-transform:none}
+.wfrolefoot{margin-top:auto;display:flex;align-items:center;padding:7px 13px;border-top:1px solid var(--border);background:linear-gradient(180deg,rgba(228,238,247,.15),rgba(228,238,247,.5))}
+.wfpane>header .wfbrk{flex-basis:100%;height:0}
+#wfEditPane>header{row-gap:6px;padding:6px 13px}
+#wfEditPane>header .hintR,#wfEditPane>header .wfok{margin-left:auto}
+.phase.collapsed .wfrolefoot{display:none}
+.wfmaxp input{width:54px;height:27px;border:1px solid var(--border-strong);border-radius:8px;padding:0 6px;background:rgba(255,255,255,.95);color:var(--ink);font-family:var(--mono);font-weight:700}
 
-/* Phase 4 */
-.p4grid{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:stretch}
+/* Phase 4 — one row: retrieval services | discovery roles; swimlane below */
+.p4grid{display:grid;grid-template-columns:minmax(250px,31fr) 69fr;gap:12px;align-items:stretch}
 .svc{
   border:1px solid var(--border);border-radius:14px;
   background:linear-gradient(180deg,rgba(255,255,255,.82),var(--lgray));
-  padding:9px;display:flex;flex-direction:column;gap:8px;
+  padding:8px 9px 9px;display:flex;flex-direction:column;gap:6px;
 }
 .svc>h3,.rolesT{margin:0;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--brand)}
-.svc>small{color:var(--muted);font-size:11px;margin-top:-6px}
+.svc>h3 small{font-weight:500;color:var(--muted);font-size:10.5px;letter-spacing:0;text-transform:none;margin-left:6px}
+.svcRow{display:flex;flex-direction:column;gap:6px;flex:1}
+.svc .node{padding:7px 11px}
+.svc .node.has{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.svc .node.has .dyn{margin:0;padding:0;border:0;white-space:nowrap}
+.p4roles{display:flex;flex-direction:column;padding-top:8px}
 .rolesT{display:block;margin-bottom:6px}
-.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:1}
 .role .tags{display:flex;gap:4px;margin-top:4px}
 .tag{
   font-style:normal;font-size:10px;font-weight:700;
@@ -360,7 +380,7 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 }
 .tag.flash{background:var(--brand);color:#EEF8FF;border-color:var(--brand)}
 .role .dyn{font-size:11.5px}
-.node.role.has .sub{display:block}
+.node.role .dyn{margin-top:5px;padding-top:5px}
 .p4right{display:flex;flex-direction:column;gap:10px}
 
 /* Phase 4 · communication swimlane (dual-channel asking) */
@@ -369,22 +389,118 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .chd{font-size:9.5px;font-weight:700;fill:#162534}
 .clife{stroke:rgba(145,165,186,.55);stroke-width:1.4;stroke-dasharray:4 4}
 .clab{font-size:9px;font-weight:700;fill:#4A5E74;stroke:rgba(248,251,254,.92);stroke-width:3.5;paint-order:stroke}
+.ctime{font-size:9px;font-weight:700;fill:#7A8DA2;letter-spacing:.06em}
 .cev{transition:opacity .5s ease}
 .cev.pend{opacity:0}
-.clegend{display:flex;gap:5px 16px;flex-wrap:wrap;padding:8px 13px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);align-items:center}
+.clegend{display:flex;gap:5px 16px;flex-wrap:wrap;padding:6px 13px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);align-items:center}
 .clegend i{display:inline-block;width:24px;border-top:2px solid;margin-right:5px;vertical-align:middle}
 .clegend i.dash{border-top-style:dashed}
 .clegend i.dot{border-top-style:dotted}
 .wfscroll:has(.csvg:empty){display:none}
 .commPane{margin-top:2px}
-.commPane>header{cursor:pointer}
+.commPane>header{cursor:pointer;padding:6px 13px}
+.commPane .wfscroll{padding:2px 0}
+.csvg{margin:0 auto}
 .commPane>header::after{content:"▾";margin-left:8px;color:var(--dim);font-size:11px;font-weight:700}
 .commPane.collapsed>header::after{content:"▸"}
 .commPane.collapsed .wfscroll,.commPane.collapsed .clegend{display:none}
 .phase.collapsed .clegend{display:none}
 
+
+/* Phase 3 planner — live data */
+.warnbox{border:1px solid rgba(180,85,45,.35);background:var(--danger-soft);color:var(--danger);border-radius:9px;padding:5px 9px;font-size:11.5px;margin:5px 0}
+.warnbox.soft{border-color:rgba(138,106,31,.35);background:var(--yellow);color:var(--warn)}
+.lvl{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:10px;padding:3px 9px 3px 4px;background:rgba(255,255,255,.95);font-size:12px;cursor:help}
+.lvl i{font-style:normal;font-family:var(--mono);font-weight:800;font-size:11px;border-radius:7px;padding:1px 6px;color:#fff}
+.lvl.L0 i{background:var(--ok)}.lvl.L1 i{background:#B08A2E}.lvl.L2 i{background:var(--danger)}
+.lvl small{color:var(--dim);font-size:10px}
+.wflevels{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.wflevels .row2{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.wfdetail{padding:8px 12px 10px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11.5px}
+.wfdetail h4{margin:0 0 4px;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--brand)}
+.wfdetail .formula{grid-column:1/-1;font-family:var(--mono);font-size:11.5px;color:var(--ink-strong);background:rgba(228,238,247,.5);border-radius:8px;padding:5px 9px}
+.wtbl{width:100%;border-collapse:collapse}
+.wtbl td,.wtbl th{padding:2px 6px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+.wtbl th{font-size:10px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.wtbl .num{font-family:var(--mono);text-align:right}
+.c0{color:var(--ok);font-weight:700}
+.gb{position:relative;height:8px;min-width:90px;border-radius:4px;background:rgba(145,165,186,.22)}
+.gb i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--brand);opacity:.8}
+.unc{color:var(--danger);font-weight:700}
+.wtab.bad{text-decoration:line-through;opacity:.7}
+.wtab.bad em{color:var(--danger);text-decoration:none;display:inline-block}
+.wtg{font-size:9.5px;font-weight:600;fill:#4A5E74;stroke:rgba(248,251,254,.9);stroke-width:3;paint-order:stroke}
+.wfrole small{display:block;font-size:9.5px;color:var(--dim);font-family:var(--mono);margin-top:1px;white-space:nowrap}
+.wfrole .ph{font-size:9px;font-weight:700;border-radius:5px;padding:0 5px;margin-left:5px;vertical-align:1px;border:1px solid var(--border);color:var(--muted)}
+.wfrole .ph.sel{background:var(--yellow);color:var(--warn)}
+@media (max-width:1100px){.wfdetail{grid-template-columns:1fr}}
+
+/* coordination · supplementary information box */
+.clar{border:1px solid rgba(24,73,99,.35);border-left:4px solid var(--brand);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(228,238,247,.55));box-shadow:var(--shadow-md);padding:12px 16px 12px;margin:10px 0 14px}
+.clar[hidden]{display:none}
+.clar h3{margin:0 0 2px;font-size:13.5px;color:var(--ink-strong)}
+.clarwhy{margin:0 0 6px;color:var(--muted);font-size:11.5px}
+.clarfields{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 14px;margin:8px 0}
+.clarf label{display:block;font-size:11.5px;font-weight:700;color:var(--ink-strong);margin-bottom:3px}
+.clarf label small{font-weight:500;color:var(--dim);margin-left:6px;font-size:10.5px}
+.clarf .why{font-size:10.5px;color:var(--warn);margin:3px 0 0}
+.clarf input,.clarf select{width:100%;height:30px;border:1px solid var(--border-strong);border-radius:8px;padding:0 9px;background:rgba(255,255,255,.97);color:var(--ink);font:inherit;font-size:12.5px}
+.clarf input:focus,.clarf select:focus{outline:2px solid rgba(41,109,255,.35);border-color:var(--accent)}
+.clarf.bad input,.clarf.bad select{border-color:var(--danger);background:var(--danger-soft)}
+.clarmore{margin-top:2px;font-size:11.5px;color:var(--muted)}
+.clarmore summary{cursor:pointer;font-weight:600}
+.clarbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.clarmsg{font-size:11.5px;color:var(--danger)}
+
+/* entry level: one badge for the task, sub-goals show coverage status only */
+.lvlbig{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:12px;padding:4px 12px 4px 5px;background:rgba(255,255,255,.96);font-weight:700;font-size:12.5px;color:var(--ink-strong)}
+.lvlbig i{font-style:normal;font-family:var(--mono);font-weight:800;font-size:14px;border-radius:9px;padding:2px 10px;color:#fff}
+.lvlbig.L0 i{background:var(--ok)}.lvlbig.L1 i{background:#B08A2E}.lvlbig.L2 i{background:var(--danger)}
+.gst{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:10px;padding:3px 9px 3px 5px;background:rgba(255,255,255,.95);font-size:12px;cursor:help}
+.gst i{font-style:normal;font-weight:800;font-size:11px;width:16px;height:16px;border-radius:50%;display:inline-grid;place-items:center;color:#fff}
+.gst.covered i{background:var(--ok)}.gst.doubtful i{background:#B08A2E}.gst.uncovered i{background:var(--danger)}
+.gst small{color:var(--dim);font-size:10px}
+.gst.drive{border-color:var(--danger);box-shadow:0 0 0 2px rgba(180,85,45,.12)}
+.gst.doubtful.drive{border-color:#B08A2E;box-shadow:0 0 0 2px rgba(176,138,46,.15)}
+
+/* Phase 5 · live selection result */
+.s5rule{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.s5list{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.s5list li{font-size:11.5px;color:var(--muted);line-height:1.35}
+.s5list li code{font-family:var(--mono);color:var(--ink-strong);font-size:11px}
+.s5list li .why{color:var(--dim)}
+#d-out .pick{align-items:flex-start;flex-wrap:wrap}
+#d-out .pick .body{flex:1;min-width:200px}
+#d-out .qf{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+#d-out .qf span{font-family:var(--mono);font-size:10.5px;border:1px solid var(--border);border-radius:7px;padding:1px 6px;background:rgba(255,255,255,.9)}
+#d-out .qf span.m{border-color:rgba(41,109,255,.45)}#d-out .qf span.d{border-color:rgba(63,140,109,.5)}
+#d-out .why{display:block;margin-top:4px;font-size:11.5px;color:var(--muted);line-height:1.4}
+#d-out .blind{display:block;margin-top:3px;font-size:11px;color:var(--warn)}
+#d-out .flags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+#d-out .nopick{border:1px dashed rgba(180,85,45,.5);border-radius:11px;padding:8px 12px;margin:6px 0;color:var(--danger);font-size:12px}
+.pill.warn{border-color:rgba(176,138,46,.5);background:var(--yellow);color:var(--warn)}
+/* Phase 4 · roles + communication, driven by the confirmed workflow */
+.roles{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.p4empty{grid-column:1/-1;border:1px dashed var(--border);border-radius:12px;padding:16px;color:var(--dim);font-size:12px;text-align:center}
+.p4role{background:linear-gradient(180deg,var(--panel-strong),var(--c,#fff));border:1px solid var(--border);border-radius:12px;padding:8px 11px;box-shadow:var(--shadow-sm);transition:border-color .3s,box-shadow .3s}
+.p4role>b{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--ink-strong)}
+.p4role .rep{margin-left:auto;font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--brand);border:1px solid var(--border-strong);border-radius:7px;padding:0 6px;background:rgba(255,255,255,.8)}
+.p4role .sub{display:block;color:var(--muted);font-size:10.5px;margin-top:1px}
+.p4role .p4ns{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.p4n{font-family:var(--mono);font-size:10px;border:1px solid var(--border);border-radius:6px;padding:0 6px;background:rgba(255,255,255,.85);color:var(--muted)}
+.p4n.run{border-color:var(--accent);color:var(--accent-ink)}
+.p4n.done{border-color:rgba(63,140,109,.45);color:var(--ok)}
+.p4n.err{border-color:rgba(180,85,45,.5);color:var(--danger)}
+.p4role .st{margin-top:5px;font-size:11px;color:var(--ink)}
+.p4role.run{border-color:var(--accent);box-shadow:0 0 0 3px rgba(41,109,255,.1),var(--shadow-sm)}
+.p4role.done{border-color:rgba(63,140,109,.45)}
+.p4role.err{border-color:rgba(180,85,45,.5)}
+.p4role .ph{font-size:9px;font-weight:700;border-radius:5px;padding:0 5px;border:1px solid var(--border);color:var(--muted)}
+.p4role .ph.sel{background:var(--yellow);color:var(--warn)}
+.clife.sel{stroke-dasharray:2 5;opacity:.7}
+
 /* strips and loops */
-.strip{display:flex;align-items:center;gap:12px;margin:12px 0;font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.strip{display:flex;align-items:center;gap:12px;margin:8px 0;font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .strip::before,.strip::after{content:"";flex:1;border-top:1px dashed var(--border)}
 .strip span{
   border:1px solid var(--border);border-radius:999px;padding:2px 14px;
@@ -408,11 +524,32 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
 .loop.on i{color:var(--ok)}
 .loop.fail.on{border-color:rgba(180,85,45,.42);background:var(--danger-soft)}
 .loop.fail.on i{color:var(--danger)}
-.foot{margin:18px 0 0;color:var(--muted);font-size:11.5px}
+.foot{margin:10px 0 0;color:var(--muted);font-size:11.5px}
 
-@media (max-width:1500px){.roles{grid-template-columns:repeat(2,1fr)}}
+/* compact 2:1 layout helpers */
+.wfpane>.wfscroll{flex:1}
+.wfcanvas{margin:auto}
+.phase .down{margin:-4px 0}
+#d-sel .stats{display:flex;flex-wrap:nowrap;gap:6px}
+#d-sel .stat{flex:1 1 auto;min-width:0}
+#d-sel .stat b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#d-sel .pill{padding:0 7px;font-size:11px;margin:2px 3px 2px 0}
+.node .dyn{margin-top:6px;padding-top:6px}
+.ckbadge{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);padding:5px 10px;border-radius:999px;border:1px solid rgba(138,106,31,.35);background:#F5EFDD;color:var(--warn);white-space:nowrap}
+.ckbadge.ok{border-color:rgba(63,140,109,.4);background:var(--ok-soft);color:var(--ok)}
+.ckbadge i{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.plist,.klist{margin:4px 0 0;padding:0;list-style:none}
+.plist li,.klist li{padding:3px 0;border-top:1px dashed var(--border);line-height:1.35}
+.plist li:first-child,.klist li:first-child{border-top:0}
+.plist .pq,.klist .kn{font-weight:700;color:var(--ink-strong)}
+.rnote{margin:4px 0;padding:4px 8px;border:1px solid rgba(180,85,45,.35);border-radius:8px;background:var(--danger-soft);color:var(--danger);font-size:11.5px}
+.rnote code{font-family:var(--mono)}
+.stats{margin:5px 0}
+
+@media (max-width:1500px){.roles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:1100px){
   .ctl{grid-template-columns:1fr}
+  .top-in{flex-wrap:wrap}
   .r1,.r2{grid-template-columns:1fr}
   .row>.phase:not(:last-child)::after{display:none}
   .row{gap:16px}
@@ -425,7 +562,258 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
   *{transition:none!important}
 }
 
-  </style>
+  
+/* ============================================================================
+   one-screen layout — everything visible without page scrolling.
+   Detail that does not fit is folded into tooltips (hover) or a popover (click "Score" bar).
+   ============================================================================ */
+body{font-size:12px;line-height:1.4}
+.top{padding:7px 16px}
+.top-in{gap:14px}
+.brand h1{font-size:16px}
+.ctl{grid-template-columns:minmax(200px,1fr) auto;gap:10px}
+.ctl .field{position:relative;flex-wrap:nowrap;gap:0}
+.ctl .field .in{height:32px;min-width:0;flex:1 1 auto;border-radius:10px;font-size:12.5px}
+.ctl .field .chips{display:none}
+.ctl .field:focus-within .chips{display:flex;flex-direction:column;position:absolute;top:36px;left:0;right:0;z-index:40;gap:2px;
+  background:var(--panel-strong);border:1px solid var(--border);border-radius:10px;padding:5px;box-shadow:var(--shadow-md)}
+.ctl .field:focus-within .chip{border-radius:7px;border-color:transparent;text-align:left;font-weight:500;padding:5px 9px}
+.ctl .field:focus-within .chip:hover{background:var(--panel-muted)}
+.btn{height:32px;padding:0 16px;border-radius:10px;font-size:12px}
+.btns{gap:6px;align-items:center}
+.ckbadge{padding:3px 9px;font-size:10.5px}
+.status{margin:0;padding:3px 10px;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:0 8px 8px 0}
+.strip,.foot,.loops{display:none!important}
+.row>.phase:not(:last-child)::after{display:none}
+.phase{padding:28px 10px 8px;gap:6px;border-radius:14px}
+body:not(.viz) .phase{padding:28px 10px 8px;gap:6px}
+.phase>h2{top:7px;left:13px;right:10px;font-size:13px}
+.node{padding:6px 9px;border-radius:10px}
+body:not(.viz) .node{padding:6px 9px}
+.node>b{font-size:12px}
+.node .sub{font-size:10.5px;margin-top:1px}
+.node .dyn{margin-top:5px;padding-top:5px;font-size:11.5px}
+.pill{padding:0 7px;margin:0 3px 0 0;font-size:11px}
+.skbadge{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* compact building blocks */
+.mini{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:11px;color:var(--muted)}
+.mini b{font-family:var(--mono);color:var(--ink-strong);font-weight:700}
+.chiprow{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.chiprow .pill{margin:0}
+.rnote{margin:4px 0 0;padding:2px 7px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.plist{margin-top:3px}
+.plist li{padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help;font-size:11px}
+.kchip{display:inline-flex;align-items:baseline;gap:5px;border:1px solid var(--border);border-radius:8px;padding:1px 7px;font-size:11px;
+  background:rgba(255,255,255,.94);color:var(--ink-strong);cursor:help;font-weight:600}
+.kchip i{font-style:normal;font-size:9.5px;font-weight:600;color:var(--dim);font-family:var(--mono)}
+.kchip.metric_def{border-color:rgba(41,109,255,.4)}.kchip.dimension{border-color:rgba(63,140,109,.5)}.kchip.pair{border-color:rgba(122,90,248,.4)}
+.kchip.more{color:var(--muted);font-weight:700}.kchip.drop{color:var(--danger);border-style:dashed;border-color:rgba(180,85,45,.45)}
+
+/* ① knowledge */
+#ph1{display:flex;flex-direction:column}
+#ph1 .split{grid-template-columns:1fr;gap:6px}
+#ph1 .down{display:none}
+#ph1 #n-sel{flex:1;min-height:0;overflow:auto}
+
+/* ③ planning */
+#ph3{display:flex;flex-direction:column}
+#ph3 .wfpane{border-radius:10px;box-shadow:none}
+#wfLevelPane{flex:none}
+#wfLevelPane>header{display:none}
+.wflevels{flex-direction:row;flex-wrap:wrap;align-items:center;gap:5px 10px;padding:6px 10px}
+.lvlbig{padding:2px 9px 2px 3px;font-size:11.5px;gap:6px;flex:none}
+.lvlbig i{font-size:12px;padding:1px 8px}
+.lvgoals,.lvpills{display:flex;gap:4px;align-items:center;flex:none;flex-wrap:wrap}
+.lvpills .pill{margin:0}
+.gst{padding:1px 8px 1px 4px;font-size:11px;gap:5px}
+.gst i{width:14px;height:14px;font-size:10px}
+.wfcols{flex:1;min-height:0;grid-template-columns:minmax(150px,170px) minmax(0,1fr);gap:8px}
+#wfRolePane,#wfEditPane{min-height:0;min-width:0}
+.wfpane>header{padding:4px 10px;gap:6px;font-size:10.5px}
+.wfpane>header .lg{display:none}
+.wfpane>header .hintR{flex:1 1 120px;min-width:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wfbar{display:flex;flex-direction:column;gap:5px;padding:7px;overflow:auto;flex:1;min-height:0}
+.wfrole{padding:3px 8px 3px 5px;gap:7px;border-radius:9px;box-shadow:none}
+.wfrole svg{width:22px;height:22px;flex:none}
+.wfrole>div{min-width:0}
+.wfrole b{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wfrole small{display:none}
+.wfrole.on::after{content:"✓"}
+.wfrolefoot{padding:4px 9px}
+.wfmaxp{font-size:10.5px;gap:4px}
+.wfmaxp input{width:42px;height:24px}
+#wfEditPane>header{padding:4px 10px;row-gap:4px}
+.wftabs{gap:4px}
+.wtab{padding:2px 8px;font-size:11px;border-radius:8px}
+.wfscroll{flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.wfcanvas{max-width:100%;max-height:100%;width:auto;height:auto;margin:0}
+.wftool{padding:4px 9px;gap:6px;flex:none}
+.wbtn{height:25px;padding:0 10px;font-size:11.5px;border-radius:8px}
+.wfmsg{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10.5px}
+  background:rgba(255,255,255,.92);font:inherit;font-size:11px;color:var(--muted);cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden}
+  box-shadow:var(--shadow-md),0 0 0 1px var(--border-strong)}
+#ph3.lvlonly .wfcols,#ph3.lvlonly #ph3.lvlonly #wfLevelPane{flex:1;overflow:auto}
+#ph3.lvlonly .wflevels{padding:10px 12px;gap:8px 12px}
+#ph3.lvlonly 
+/* ④ retrieval */
+#ph4{display:flex;flex-direction:column}
+.p4grid{flex:none;grid-template-columns:minmax(128px,160px) minmax(0,1fr);gap:8px}
+.svc{padding:6px 7px;gap:4px;border-radius:10px}
+.svc>h3 small,.svc .node .sub{display:none}
+.svc .node{padding:5px 8px}.svc .node>b{font-size:11.5px}
+.svcRow{gap:5px}
+.p4roles{padding-top:0}
+.rolesT{margin-bottom:3px;font-size:10.5px}
+.rolesT span{display:none}
+.roles{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))!important;gap:6px;flex:none}
+.p4role{padding:5px 9px;border-radius:9px;box-shadow:none}
+.p4role .sub{display:none}
+.p4role .p4ns{margin-top:3px}
+.p4role .st{margin-top:3px;font-size:10.5px}
+.p4empty{padding:8px;font-size:11px}
+.commPane{flex:1;min-height:0;margin:0;border-radius:10px;box-shadow:none}
+.commPane>header{padding:4px 10px}
+.commPane .wfscroll{padding:0}
+.commPane .csvg{max-width:none;max-height:none;width:auto;height:auto;margin:auto;flex:none}
+.clegend{padding:3px 10px;gap:2px 12px;font-size:10px;flex:none}
+.clegend i{width:18px;margin-right:4px}
+
+/* ⑤ selection */
+#ph5{display:flex;flex-direction:column}
+#n-out{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#n-out .dyn{flex:1;min-height:0;overflow:auto}
+.picks{display:flex;flex-direction:column;gap:6px}
+#d-out .pick{margin:0;padding:6px 9px;gap:7px;align-items:flex-start;border-radius:9px;box-shadow:none}
+#d-out .pick .body{min-width:0;flex:1}
+#d-out .pick b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#d-out .pickTag{padding:0 6px;font-size:11px}
+#d-out .why{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:11px;margin-top:3px}
+#d-out .blind{font-size:10.5px;cursor:help}
+#d-out .qf{margin-top:4px;gap:3px}
+#d-out .qf span{font-size:10px;padding:0 5px}
+#d-out .qf .more{border-style:dashed;color:var(--dim)}
+#d-out .s5alts{margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help;font-size:11px}
+#d-out .flags{margin-top:5px}
+#d-out .nopick{margin:0;padding:6px 10px;font-size:11.5px}
+.s5rank{list-style:none;padding:0;margin:3px 0 0}
+.s5rank li{display:flex;align-items:center;gap:8px;padding:1px 0;cursor:help}
+.s5rank .rn{flex:1 1 55%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.s5rank .bar{flex:0 0 38%;margin:0;height:6px}
+
+/* fillers: dense one-line rows */
+.krows{list-style:none;margin:5px 0 0;padding:0}
+.krows li{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-top:1px dashed var(--border);font-size:11px;cursor:help;min-width:0}
+.krows li:first-child{border-top:0}
+.krows .kn{font-weight:700;color:var(--ink-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.krows i{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--dim);border:1px solid var(--border);border-radius:5px;padding:0 4px;flex:none}
+.krows .k{margin-left:auto;flex:none;font-family:var(--mono);font-size:10px}
+.krows li.metric_def i{border-color:rgba(41,109,255,.4)}.krows li.dimension i{border-color:rgba(63,140,109,.5)}.krows li.pair i{border-color:rgba(122,90,248,.4)}
+.krows li.more{color:var(--dim);justify-content:center}
+.s5list{margin:5px 0 0}
+.s5list li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help;font-size:10.5px}
+.s5list li .why{color:var(--dim)}
+#d-out .fb{color:var(--warn);border:1px dashed rgba(138,106,31,.45);border-radius:6px;padding:0 5px;font-size:10px;cursor:help}
+
+/* tidy: columns may shrink below their content; P1 cards share the height evenly */
+#ph1 .split{grid-template-columns:minmax(0,1fr)}
+#ph1{gap:6px}
+#ph1 .split{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+#ph1 .split>.node{flex:0 0 auto;min-width:0;overflow:hidden}
+#ph1 .node.has{display:flex;flex-direction:column;justify-content:flex-start}
+#ph1 #n-sel{flex:1 1 0;min-height:96px;overflow:hidden;display:flex;flex-direction:column}
+#ph1 #n-sel .dyn{flex:1;min-height:0;overflow:auto}
+.phase .node{min-width:0}
+#d-out .s5alts{margin-top:7px;font-size:11px}
+#d-out .s5alts ul{list-style:none;margin:3px 0 0;padding:0}
+#d-out .s5alts li{display:flex;gap:8px;align-items:baseline;padding:2px 0;border-top:1px dashed var(--border);cursor:help;min-width:0}
+#d-out .s5alts .an{font-weight:600;color:var(--ink-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 46%}
+#d-out .s5alts .k{margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;min-width:0}
+
+.picks.multi .why{-webkit-line-clamp:1!important}
+.commPane.collapsed{flex:0 0 auto}
+.wfscroll:has(.csvg:empty){display:grid!important;place-items:center;min-height:0;flex:1}
+.commPane .wfscroll:has(.csvg:empty)::after{content:"Agent communication appears here once the workflow runs";color:var(--dim);font-size:11.5px}
+
+/* a step the entry level skips: just a quiet placeholder, nothing to expand */
+.phase.skipped{justify-content:center;align-items:center;text-align:center}
+.phase.skipped>:not(h2){display:none!important}
+.row>.phase.skipped::after{display:block;content:"Not needed at this entry level — recall is skipped";color:var(--dim);font-size:12px;position:static;transform:none;right:auto;top:auto}
+.phase.skipped>h2{right:10px}
+
+/* L0 / L1: the whole Phase 3 pane is free — spell the level out */
+#ph3.lvlonly #ph3.lvlonly .lvgoals{display:none}
+
+.top-in{max-width:none}
+*{scrollbar-width:thin;scrollbar-color:rgba(120,140,160,.35) transparent}
+/* short screens (≈ 720p): tighter chrome so the same content still fits */
+@media (max-height:800px){
+  .top{padding:5px 14px}
+  .btn{height:29px}.ctl .field .in{height:29px}
+  .phase{padding-top:26px}
+  .phase>h2{top:5px}
+  .wfbar{gap:3px;padding:5px}
+  .wfrole{padding:2px 7px 2px 4px}
+  .wfrole svg{width:20px;height:20px}
+  .wflevels{padding:4px 9px}
+    .node .dyn{margin-top:3px;padding-top:3px}
+  #d-out .pick{padding:4px 8px}
+  .p4role .sub{display:none!important}
+  #wfEditPane>header .hintR{display:none}          /* the score is already in the Score bar below */
+  #wfEditPane>header .wftabs{flex-wrap:nowrap;gap:3px}
+  #wfEditPane .wtab{padding:2px 6px;font-size:10.5px}
+  #wfEditPane>header .wbtn{height:22px;padding:0 8px;font-size:10.5px}
+}
+
+.s5sum{display:flex;flex-wrap:wrap;align-items:center;gap:3px 6px;margin-bottom:6px;font-size:11px}
+.s5sum .k b{font-family:var(--mono);color:var(--ink-strong)}
+.s5sum .pill{margin:0}
+/* Phase 4 gets the room Phase 5 gave up: roomier role cards, bigger swimlane */
+.p4grid{grid-template-columns:minmax(150px,190px) minmax(0,1fr)}
+.roles{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;gap:8px}
+.p4role{padding:7px 11px}
+.p4role>b{font-size:13px}
+.p4role .sub{display:block;font-size:10.5px}
+.p4role .p4n{font-size:10.5px;padding:0 7px}
+.p4role .st{font-size:11px}
+.svc .node>b{font-size:12px}
+.clegend{font-size:10.5px}
+
+/* communication swimlane: natural size, pans sideways (drag / wheel / scrollbar) when there are many interactions */
+.commPane .wfscroll{overflow:auto;justify-content:flex-start;align-items:flex-start;overscroll-behavior:contain}
+.commPane .wfscroll.pannable{cursor:grab}
+.commPane .wfscroll.dragging{cursor:grabbing;user-select:none}
+.commPane .wfscroll.dragging *{user-select:none}
+.lbg{fill:rgba(248,251,254,.97);stroke:none;opacity:0;transition:opacity .15s}
+.scrolled .lbg{opacity:1;filter:drop-shadow(2px 0 3px rgba(15,23,42,.1))}
+.panhint{font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent-ink);border:1px solid rgba(41,109,255,.35);border-radius:999px;padding:0 8px;background:rgba(255,255,255,.9);align-self:center}
+.panhint[hidden]{display:none}
+.commPane .wfscroll::-webkit-scrollbar{height:9px;width:9px}
+.commPane .wfscroll::-webkit-scrollbar-thumb{background:rgba(120,140,160,.4);border-radius:6px}
+.commPane .wfscroll::-webkit-scrollbar-track{background:transparent}
+
+/* public demo (served with window.DD_DEMO): fake data only — there is no cookie / login to manage */
+body.demo #ckBadge,body.demo #ckSync,body.demo #ckClear{display:none!important}
+
+/* the fixed one-screen shell: only on viewports big enough; smaller ones fall back to a normal scrolling page */
+@media (min-width:1101px) and (min-height:561px){
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;height:100vh;overflow:hidden;background-attachment:scroll}
+  .top{position:static;flex:none}
+  .wrap{flex:1;min-height:0;width:100%;max-width:none;margin:0;padding:8px 14px 10px;display:flex;flex-direction:column;gap:8px}
+  .status{flex:none;min-height:21px}
+  .status:empty{display:block;visibility:hidden}
+  .clar{flex:none}
+  .row{flex:1 1 0;min-height:0;gap:10px;margin:0;align-items:stretch}
+  .r1{grid-template-columns:minmax(0,40fr) minmax(0,60fr)}
+  .r2{grid-template-columns:minmax(0,68fr) minmax(0,32fr);flex-grow:1.15}
+  .phase{min-height:0;overflow:hidden}
+}
+@media (max-width:1100px),(max-height:560px){
+  .wfscroll{overflow:auto}
+    .commPane{flex:none}
+}
+</style>
  <script src="./Data Discovery System · Interactive Walkthrough_files/uba-script.js"></script><script src="./Data Discovery System · Interactive Walkthrough_files/apm-insight.min.js" async="" crossorigin="anonymous"></script><script src="./Data Discovery System · Interactive Walkthrough_files/104101b831udegmhb2q06chlqrg9000000000018ckkuf4.js"></script></head>
  <body>
   <header class="top">
@@ -437,16 +825,16 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
     </div>
     <form autocomplete="off" class="ctl" id="ctl">
      <div class="field">
-      <input aria-describedby="qhint" class="in" id="q" type="text" value="Last 7 days DAU and GMV by channel">
+      <input aria-describedby="qhint" class="in" id="q" type="text" value="Last 7 days DAU and CTR by platform">
       <div class="chips" id="chips">
+       <button class="chip" data-q="Last 7 days DAU and CTR by platform" type="button">
+        Last 7 days DAU and CTR by platform
+       </button>
+       <button class="chip" data-q="Last 30 days CTR by platform" type="button">
+        Last 30 days CTR by platform
+       </button>
        <button class="chip" data-q="Last 7 days DAU and GMV by channel" type="button">
         Last 7 days DAU and GMV by channel
-       </button>
-       <button class="chip" data-q="Yesterday next-day retention" type="button">
-        Yesterday next-day retention
-       </button>
-       <button class="chip" data-q="Last 30 days CTR and conversion by platform" type="button">
-        Last 30 days CTR and conversion by platform
        </button>
       </div>
      </div>
@@ -457,6 +845,9 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
       <button class="btn sec" id="reset" type="button">
        Reset
       </button>
+      <span class="ckbadge" id="ckBadge" title="SSO cookie status"></span>
+      <button class="btn sec" id="ckSync" type="button">Sync cookie</button>
+      <button class="btn sec" id="ckClear" type="button" hidden>✕</button>
      </div>
     </form>
    </div>
@@ -464,9 +855,19 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
   <main class="wrap">
    <p aria-live="polite" class="status" id="status" role="status">
    </p>
+   <section class="clar" id="clarify" aria-labelledby="clarT" hidden>
+    <h3 id="clarT">Coordination needs a bit more information</h3>
+    <p class="clarwhy" id="clarWhy"></p>
+    <div class="chips" id="clarSeen"></div>
+    <form id="clarForm" novalidate>
+     <div class="clarfields" id="clarFields"></div>
+     <details class="clarmore" id="clarMore"><summary>Add more detail (optional)</summary><div class="clarfields" id="clarOpt"></div></details>
+     <div class="clarbar"><button class="btn" id="clarGo" type="submit">Continue</button><button class="btn sec" id="clarCancel" type="button">Cancel</button><span class="clarmsg" id="clarMsg" role="alert"></span></div>
+    </form>
+   </section>
    <div class="row r1">
     <section aria-labelledby="h1" class="phase" id="ph1"><h2 id="h1">Knowledge Pre-injection<span class="ck" aria-hidden="true">✓</span></h2><div class="split"><div class="node " id="n-hist" data-ph="1" style="--c:var(--green)"><b>Historical Query—Knowledge/Asset Pairs</b><span class="sub">Similar queries → datasets finally selected + knowledge referenced</span><div class="dyn" id="d-hist"></div></div><div class="node " id="n-kr" data-ph="1" style="--c:var(--blue)"><b>Knowledge Retrieval</b><span class="sub">Metric definitions · asset metadata · business terms</span><div class="dyn" id="d-kr"></div></div></div><div class="down">▼</div><div class="node " id="n-sel" data-ph="1" style="--c:var(--yellow)"><b>Token-budgeted Knowledge Selection</b><span class="sub">Independent contribution + interaction effects: synergy, redundancy, conflict</span><div class="dyn" id="d-sel"></div></div></section>
-    <section aria-labelledby="h3" class="phase" id="ph3"><h2 id="h3">Adaptive Workflow Planning<span class="ck" aria-hidden="true">✓</span></h2><div class="wfcols"><div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">from the query + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div><div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel agents <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div><div class="wftool" id="wfTool"><button type="button" class="wbtn" id="wfBtnLink" disabled>↔ Link arrow</button><button type="button" class="wbtn" id="wfBtnDel" disabled>✕ Delete selected</button><button type="button" class="wbtn" id="wfBtnReset" disabled>↺ Restore recommended</button><button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit workflow</button><span class="wfmsg" id="wfMsg"></span></div></div></div></section>
+    <section aria-labelledby="h3" class="phase" id="ph3"><h2 id="h3">Adaptive Workflow Planning<span class="ck" aria-hidden="true">✓</span></h2><div class="wfcols"><div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">templates · the channels each agent queries</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div><div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div><div class="wftool" id="wfTool"><button type="button" class="wbtn" id="wfBtnLink" disabled>↔ Link arrow</button><button type="button" class="wbtn" id="wfBtnDel" disabled>✕ Delete selected</button><button type="button" class="wbtn" id="wfBtnReset" disabled>↺ Restore recommended</button><button type="button" class="wbtn go" id="wfBtnGo" disabled>Submit workflow</button><span class="wfmsg" id="wfMsg"></span></div></div></div></section>
    </div>
    <div class="strip" id="dispatch">
     <span>
@@ -474,11 +875,11 @@ body.viz .node.skip{opacity:.62;border-style:dashed;background:rgba(244,247,250,
     </span>
    </div>
    <div class="row r2">
-    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4">Data Retrieval<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b><div class="roles" id="p4Roles"></div></div></div><div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header><div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div><div class="clegend" id="commLegend" hidden><span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span><span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span><span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span><span><i style="border-color:#3F8C6D"></i>volunteer / answer</span></div></div></section>
+    <section aria-labelledby="h4" class="phase" id="ph4"><h2 id="h4">Data Retrieval<span class="ck" aria-hidden="true">✓</span></h2><div class="p4grid"><div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small><div class="node " id="n-bi" data-ph="4" style="--c:var(--blue)"><b>BI Asset Retrieval</b><span class="sub">Returns base fact assets</span><div class="dyn" id="d-bi"></div></div><div class="node " id="n-kh" data-ph="4" style="--c:var(--green)"><b>Knowledge Hybrid Retrieval</b><span class="sub">Vector + graph dual channel; covers naming mismatch</span><div class="dyn" id="d-kh"></div></div></div><div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b><div class="roles" id="p4Roles"></div></div></div><div class="wfpane commPane" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header><div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div><div class="clegend" id="commLegend" hidden><span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span><span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span><span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span><span><i style="border-color:#3F8C6D"></i>volunteer / answer</span></div></div></section>
     <section aria-labelledby="h5" class="phase" id="ph5"><h2 id="h5">Asset Selection<span class="ck" aria-hidden="true">✓</span></h2><div class="node " id="n-hard" data-ph="5" style="--c:var(--lgray)"><b>① Hard Filter</b><span class="sub">Permission, grain and partition rules</span><div class="dyn" id="d-hard"></div></div><div class="node " id="n-soft" data-ph="5" style="--c:var(--yellow)"><b>② Soft Ranking</b><span class="sub">Evidence strength · granularity fit · dimension coverage · freshness</span><div class="dyn" id="d-soft"></div></div><div class="node " id="n-out" data-ph="5" style="--c:var(--blue)"><b>Selection Result: primary + supporting assets</b><span class="sub">Passed rules · rationale · rejected candidates · risk flags</span><div class="dyn" id="d-out"></div></div></section>
    </div>
    <p class="foot">
-    Asset, table and dashboard names are illustrative placeholders. KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements. Phase 4 swimlane: lanes = roles planned in Phase 3; solid = directed ask, dashed = decline.
+    Phases 1–5 show live data from the backend (Phase 6 is not wired into this page yet). KH = Knowledge Hybrid Retrieval (vector + graph); BI = BI Asset Retrieval. Durations are relative units, not measurements. Phase 4 swimlane: lanes = roles planned in Phase 3; solid = directed ask, dashed = decline.
    </p>
   </main>
   <script>
@@ -491,19 +892,10 @@ const $$=s=>Array.from(document.querySelectorAll(s));
 const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep=ms=>new Promise(r=>setTimeout(r,RM?Math.min(ms,60):ms));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 
 /* ================= static structure ================= */
 const NODE=(ph,id,c,t,s,x)=>`<div class="node ${x||''}" id="n-${id}" data-ph="${ph}" style="--c:var(--${c})"><b>${t}</b><span class="sub">${s||''}</span><div class="dyn" id="d-${id}"></div></div>`;
 const H=(n,name)=>`<h2 id="h${n}">${name}<span class="ck" aria-hidden="true">✓</span></h2>`;
-
-const ROLES=[
-  {id:'role0',name:'Metric Lookup'},
-  {id:'role1',name:'BI Asset Discovery'},
-  {id:'role2',name:'Table/Field Lineage Discovery'},
-  {id:'role3',name:'Permission &amp; Partition Precheck'}
-];
 
 $('#ph1').innerHTML=H(1,'Knowledge Pre-injection')+
   `<div class="split">${NODE(1,'hist','green','Historical Query—Knowledge/Asset Pairs','Similar queries → datasets finally selected + knowledge referenced')}`+
@@ -511,10 +903,13 @@ $('#ph1').innerHTML=H(1,'Knowledge Pre-injection')+
   `<div class="down">▼</div>`+
   NODE(1,'sel','yellow','Token-budgeted Knowledge Selection','Independent contribution + interaction effects: synergy, redundancy, conflict');
 
+
 $('#ph3').innerHTML=H(3,'Adaptive Workflow Planning')+
+  `<div class="wfpane" id="wfLevelPane" hidden><header>Entry level <span class="lg">one level for the whole task · L0 execute · L1 select only · L2 recall + select</span></header><div class="wflevels" id="wfLevels"></div></div>`+
   `<div class="wfcols">`+
-  `<div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">from the query + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div></div>`+
-  `<div class="wfpane" id="wfEditPane"><div class="wfmaxbar"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel agents <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span><span class="wfok" id="wfOk" hidden>✓ confirmed</span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div>`+
+  `<div class="wfpane" id="wfRolePane"><header>Roles <span class="lg">from the query + pre-injected knowledge</span><span class="hintR" id="wfRoleHint"></span></header><div class="wfbar" id="wfRoles"></div>`+
+  `<div class="wfrolefoot"><label class="wfmaxp" title="Upper bound of agents dispatched in parallel per wave">Max parallel <input id="wfMaxP" type="number" min="1" max="16" value="4"></label></div></div>`+
+  `<div class="wfpane" id="wfEditPane"><header>Workflow <span class="lg">→ then · ∥ parallel · dep waits-for</span><span class="wfok" id="wfOk" hidden>✓ confirmed</span><span class="wfbrk"></span><span class="wftabs" id="wfTabs"></span><button type="button" class="wbtn" id="wfBtnCustom" hidden disabled>✎ Custom graph</button><span class="hintR" id="wfEditHint"></span></header><div class="wfscroll"><svg class="wfcanvas" id="wfEditSvg" role="img" aria-label="Workflow graph"></svg></div>`+
   `<div class="wftool" id="wfTool" hidden>`+
     `<button type="button" class="wbtn" id="wfBtnLink" hidden disabled>↔ Link arrow</button>`+
     `<button type="button" class="wbtn" id="wfBtnDel" hidden disabled>✕ Delete selected</button>`+
@@ -526,154 +921,64 @@ $('#ph3').innerHTML=H(3,'Adaptive Workflow Planning')+
 
 $('#ph4').innerHTML=H(4,'Data Retrieval')+
   `<div class="p4grid">`+
-    `<div class="svc"><h3>Retrieval Services</h3><small>callable by every role</small>`+
+    `<div class="svc"><h3>Retrieval Services<small>callable by every role</small></h3><div class="svcRow">`+
       NODE(4,'bi','blue','BI Asset Retrieval','Returns base fact assets')+
       NODE(4,'kh','green','Knowledge Hybrid Retrieval','Vector + graph dual channel; covers naming mismatch')+
-    `</div>`+
-    `<div><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b>`+
+    `</div></div>`+
+    `<div class="p4roles"><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b>`+
     `<div class="roles" id="p4Roles"></div></div>`+
   `</div>`+
-  `<div class="wfpane commPane collapsed" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows ↓</span><span class="hintR" id="commHint"></span></header>`+
+  `<div class="wfpane commPane" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows →</span><span class="panhint" id="commPan" hidden title="Drag the swimlane (or use the scrollbar / shift+wheel) to see the rest">⇄ drag to pan</span><span class="hintR" id="commHint"></span></header>`+
     `<div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div>`+
     `<div class="clegend" id="commLegend" hidden>`+
-      `<span><i style="border-color:#296DFF"></i>directed ask — high-conf profile hit</span>`+
-      `<span><i style="border-color:#8A6A1F"></i>board broadcast — low conf / fallback</span>`+
-      `<span><i class="dash" style="border-color:#B4552D"></i>decline (autonomy) → downgrade</span>`+
-      `<span><i style="border-color:#3F8C6D"></i>volunteer / answer</span>`+
-    `</div>`+
+      `<span title="directed ask — high-confidence profile hit"><i style="border-color:#296DFF"></i>ask</span>`+
+      `<span title="handoff — a finding passed to another role to look into"><i style="border-color:#7B4FD0"></i>handoff</span>`+
+      `<span title="check — an agent reports the result of its inline check"><i style="border-color:#8A6A1F"></i>check</span>`+
+      `<span title="board broadcast — low confidence / fallback"><i style="border-color:#8A6A1F"></i>broadcast</span>`+
+      `<span title="decline (autonomy) → downgrade"><i class="dash" style="border-color:#B4552D"></i>decline</span>`+
+      `<span title="volunteer / answer"><i style="border-color:#3F8C6D"></i>answer</span>`+
+      `<span title="evidence reuse"><i class="dot" style="border-color:#5B7186"></i>reuse</span>`+
+      `</div>`+
   `</div>`;
 
 $('#ph5').innerHTML=H(5,'Asset Selection')+
-  NODE(5,'hard','lgray','① Hard Filter','Permission, grain and partition rules')+
-  NODE(5,'soft','yellow','② Soft Ranking','Evidence strength · granularity fit · dimension coverage · freshness')+
-  NODE(5,'out','blue','Selection Result: primary + supporting assets','Passed rules · rationale · rejected candidates · risk flags');
+  NODE(5,'out','blue','Selection Result: primary + supporting assets','Per metric: query fields · rationale · alternates · rejected candidates · risk flags');
 
 const PH_NODES={};
 $$('.node[data-ph]').forEach(n=>{const p=+n.dataset.ph;(PH_NODES[p]=PH_NODES[p]||[]).push(n);});
 
-/* ================= domain tables ================= */
-const METRICS=[
-  {re:/留存|retention/i,name:'Next-day retention',ds:'Retention Certified Dataset',bi:'User Retention Dashboard',tbl:'dws_user_retention_di'},
-  {re:/DAU|日活|活跃/i,name:'DAU',ds:'User Activity Certified Dataset',bi:'Core Activity Dashboard',tbl:'dws_user_active_di'},
-  {re:/GMV|成交|交易额/i,name:'GMV',ds:'Trade Certified Dataset',bi:'Trade Overview Dashboard',tbl:'dws_trade_order_di'},
-  {re:/曝光|impression/i,name:'Impressions',ds:'Exposure Certified Dataset',bi:'Content Exposure Dashboard',tbl:'dws_feed_expo_di'},
-  {re:/点击率|CTR/i,name:'CTR',ds:'Click Funnel Certified Dataset',bi:'Click Funnel Dashboard',tbl:'dws_feed_click_di'},
-  {re:/转化|conversion/i,name:'Conversion rate',ds:'Conversion Certified Dataset',bi:'Conversion Dashboard',tbl:'dws_conv_funnel_di'},
-  {re:/收入|营收|revenue/i,name:'Revenue',ds:'Revenue Certified Dataset',bi:'Revenue Dashboard',tbl:'dws_revenue_di'}
-];
-const DIMS=[
-  [/渠道|channel/i,'Channel'],[/城市|city/i,'City'],[/品类|category/i,'Category'],
-  [/平台|platform/i,'Platform'],[/地区|region/i,'Region'],[/性别|gender/i,'Gender']
-];
-const KT=[
-  {short:'Definition',u:9,tok0:260,tokR:200},
-  {short:'Metadata',u:8,tok0:380,tokR:220},
-  {short:'Lineage',u:6,tok0:480,tokR:300},
-  {short:'Dashboard doc',u:7,tok0:560,tokR:340},
-  {short:'Terms',u:5,tok0:240,tokR:200}
-];
-const IX={'01':4,'13':-8,'04':2,'12':3};   // pairwise interaction utility between knowledge types (same metric)
-
-function parseTime(q){
-  let m;
-  if((m=q.match(/近\s*(\d+)\s*[天日]/)))return 'Last '+m[1]+' days';
-  if((m=q.match(/last\s*(\d+)\s*days/i)))return 'Last '+m[1]+' days';
-  if(/昨[天日]|yesterday/i.test(q))return 'Yesterday';
-  if(/上周|last week/i.test(q))return 'Last week';
-  if(/本周|this week/i.test(q))return 'This week';
-  if(/上月|last month/i.test(q))return 'Last month';
-  if(/本月|this month/i.test(q))return 'This month';
-  if((m=q.match(/(\d{4})[-年\/](\d{1,2})/)))return m[1]+'-'+String(m[2]).padStart(2,'0');
-  return null;
-}
-
-/* ================= deterministic simulation model ================= */
-function analyze(q){
-  const rng=mulberry32(hash(q));
-  const metrics=METRICS.filter(m=>m.re.test(q)).slice(0,3);
-  const time=parseTime(q);
-  const dims=DIMS.filter(d=>d[0].test(q)).map(d=>d[1]);
-  const ctx={q,metrics,time,dims,ok:metrics.length>0&&q.length>=2};
-
-  // --- Phase 1: history pairs
-  const pairs=[];
-  if(ctx.ok){
-    const m=metrics[0], cnt=2+Math.floor(rng()*2);
-    const tpl=[`${time||'Last 30 days'} ${m.name} trend`,`${m.name} by ${dims[0]||'channel'}`,`${m.name} weekly report`];
-    const tgt=[m.ds,m.ds,m.bi];
-    for(let i=0;i<cnt;i++)pairs.push({q:tpl[i],ds:tgt[i],sim:Math.max(.62,.96-i*.07-rng()*.04),tok:420+Math.round(rng()*260)});
-  }
-  ctx.pairs=pairs;
-
-  // --- Phase 1: knowledge candidates + greedy selection under token budget
-  const cands=[];
-  metrics.forEach((m,mi)=>KT.forEach((t,ti)=>cands.push({mi,ti,label:t.short+' · '+m.name,u:t.u+Math.round(rng()*2),tok:t.tok0+Math.round(rng()*t.tokR)})));
-  const B=1600+900*metrics.length;
-  const inter=(a,b)=>a.mi!==b.mi?0:(IX[[a.ti,b.ti].sort().join('')]||0);
-  const sel=[];let used=0,acc=0;
-  for(;;){
-    let best=null;
-    for(const c of cands){
-      if(sel.includes(c)||used+c.tok>B)continue;
-      const gain=c.u+sel.reduce((s,x)=>s+inter(c,x),0);
-      if(gain<=0)continue;
-      const ratio=gain/c.tok;
-      if(!best||ratio>best.ratio)best={c,ratio,gain};
-    }
-    if(!best)break;
-    sel.push(best.c);used+=best.c.tok;acc+=best.gain;
-  }
-  const dropped=cands.filter(c=>!sel.includes(c)).map(c=>({c,why:sel.some(x=>inter(c,x)<0)?'redundant':'over budget'}));
-  ctx.know={cands,sel,dropped,B,used,utility:acc};
-
-  // --- Phase 3/4: tasks (independent of agent cap)
-  const tasks=[];
-  metrics.forEach((m,mi)=>ROLES.forEach((r,ri)=>tasks.push({m:mi,r:ri,key:mi+'-'+ri,bi:1+Math.floor(rng()*2),kh:1+Math.floor(rng()*2)})));
-  ctx.tasks=tasks;
-  const raw=tasks.length*2+Math.floor(rng()*3);
-  const unique=metrics.length*(3+Math.floor(rng()*2));
-  ctx.merge={raw,unique,dupes:raw-unique,conflicts:metrics.length>1?1:(rng()<.4?1:0)};
-
-  // --- Phase 5
-  let passed=unique-2*metrics.length,stale=0;
-  if(passed-1>=metrics.length&&rng()<.5){stale=1;passed--;}
-  ctx.filter={perm:metrics.length,grain:metrics.length,stale,passed,total:unique};
-  const s0=.9+rng()*.06,s1=s0-.08-rng()*.05,s2=s1-.1-rng()*.1;
-  ctx.rank=metrics.length?[
-    {n:metrics[0].ds,s:s0,why:'certified · reused by dashboards'},
-    {n:metrics[0].bi,s:s1,why:'dashboard source'},
-    {n:metrics[0].tbl,s:s2,why:'detail layer → supporting only'}
-  ]:[];
-  return ctx;
-}
+/* Phases 1–5 all run on the backend now; the context only carries the query and what the stages return. */
+function analyze(q){return {q,pre:null};}
 
 /* ================= UI state ================= */
 let ctx=null,running=false,done3=false;
 const statusEl=$('#status');
-const say=t=>{statusEl.textContent=t;};
+const say=t=>{statusEl.textContent=t;statusEl.title=t;};
 const node=id=>$('#n-'+id), dyn=id=>$('#d-'+id);
 
 function resetNodes(from){
   for(let p=from;p<=6;p++){
     (PH_NODES[p]||[]).forEach(n=>{n.classList.remove('run','done','skip','has');const d=n.querySelector('.dyn');if(d)d.innerHTML='';});
     const ph=$('#ph'+p);if(ph)ph.classList.remove('active','done');
+    phaseUnskip(p);
   }
   if(from<=4){
-    renderStaticP4();
+    p4Live=false;syncP4Preview();
     const cs=$('#commSvg');if(cs)cs.innerHTML='';
     const cl=$('#commLegend');if(cl)cl.hidden=true;
     const ch=$('#commHint');if(ch)ch.textContent='';
-    const cpane=$('#commPane');if(cpane)cpane.classList.add('collapsed');
   }
   if(from<=3)$('#dispatch').classList.remove('on');
-  if(from<=3)resetWFUI();
+  if(from<=3){resetWFUI();$('#ph3').classList.remove('lvlonly');}
 }
 function resetAll(){
+  if(clarResolve){const r=clarResolve;clarResolve=null;r(null);}
+  hideClarify();
   if(running&&wfSubmitResolve){wfAbort=true;const r=wfSubmitResolve;wfSubmitResolve=null;r();}
   resetNodes(1);
   document.body.classList.remove('viz');
   ctx=null;done3=false;
-  $$('.phase').forEach(p=>{p.classList.add('collapsed');const h=p.querySelector('h2');if(h)h.setAttribute('aria-expanded','false');});
+  $$('.phase').forEach(p=>{p.classList.remove('collapsed');const h=p.querySelector('h2');if(h)h.setAttribute('aria-expanded','true');});   /* one-screen layout: nothing to fold away */
   say('Ready — enter a question, then press Run.');
 }
 function phaseOn(n,msg){
@@ -684,6 +989,34 @@ function phaseOn(n,msg){
   if(msg)say(msg);
 }
 function phaseDone(n){const p=$('#ph'+n);p.classList.remove('active');p.classList.add('done');}
+/* a step the entry level skips: mark it, collapse it and keep it closed (no run, no payload, not expandable) */
+function phaseSkip(n,why){
+  const p=$('#ph'+n);if(!p)return;
+  p.classList.remove('active','done');p.classList.add('skipped','collapsed');
+  const h=p.querySelector('h2');
+  if(h){h.setAttribute('aria-expanded','false');h.querySelector('.skbadge')?.remove();h.insertAdjacentHTML('beforeend',`<span class="skbadge">skipped · ${esc(why)}</span>`);}
+}
+function phaseUnskip(n){
+  const p=$('#ph'+n);if(!p)return;
+  p.classList.remove('skipped');const b=p.querySelector('h2 .skbadge');if(b)b.remove();
+}
+const recallSkipped=plan=>!!plan&&plan.mode!=='recall_and_select';
+/* L1: recall is skipped but the backend still verifies the known assets (caliber doubt) — run it quietly, the Phase 4 panel stays closed */
+async function verifyInBackground(){
+  const c=ctx,p=c.plan,badge=t=>{const b=$('#ph4 h2 .skbadge');if(b)b.textContent=t;};
+  badge('skipped · L1 · verifying known assets in the background…');
+  try{
+    const b=await apiPost('/api/stage4',{query:c.q,run_id:c.runId||undefined,max_parallel:curMaxP(),clarifications:c.clar||undefined,graph:toAPI(toUI(p.chosen.graph))},60000);
+    c.runId=b.run_id;c.recall=b.recall;
+    const tr=b.recall.collab,ev=b.recall.evidences||[];
+    const fresh=ev.filter(e=>e.kind==='freshness').length,cal=ev.filter(e=>e.kind==='caliber').length;
+    badge(`skipped · L1 · verified in the background (${tr.stats.retrievals} probes · ${fresh} freshness · ${cal} caliber evidence)`);
+    return true;
+  }catch(e){
+    badge('skipped · L1 · background verification failed — '+String(e.message||e).slice(0,80));
+    return false;
+  }
+}
 async function act(id,html,ms){
   const n=node(id);n.classList.add('run');
   await sleep(ms==null?650:ms);
@@ -694,38 +1027,57 @@ function skip(id,html){const n=node(id);n.classList.add('skip','has');dyn(id).in
 const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
 function lock(v){
   running=v;
-  $('#run').disabled=v;$('#q').disabled=v;$('#reset').disabled=v;
+  $('#run').disabled=v;$('#q').disabled=v;$('#reset').disabled=v;$('#ckSync').disabled=v;
   $('#run').textContent=v?'Running…':'Run';
 }
-/* ================= phase 3 · workflow planner ================= */
+/* ================= phase 3 · workflow planner (live: /api/stage3 · /api/plan/evaluate) ================= */
 const WF_ROLES={
-  bad:{name:'BI Asset Discovery',l1:'BI Asset',l2:'Discovery',c:'blue',desc:'surface candidate BI assets & dashboards'},
-  tfld:{name:'Lineage Discovery',l1:'Lineage',l2:'Discovery',c:'green',desc:'trace tables and field lineage'},
-  ml:{name:'Definition Lookup',l1:'Definition',l2:'Lookup',c:'violet',desc:'resolve metric definitions from knowledge'},
-  des:{name:'Definition Evidence Selection',l1:'Definition',l2:'Evidence Selection',c:'purple',desc:'pick the authoritative definition evidence'},
-  gs:{name:'Granularity Selection',l1:'Granularity',l2:'Selection',c:'orange',desc:'choose the aggregation grain that fits the question'},
-  fas:{name:'Freshness &amp; Availability Selection',l1:'Freshness &amp;',l2:'Availability',c:'yellow',desc:'check data freshness & partition availability'}
+  bad:{name:'BI Asset Discovery',l1:'BI Asset',l2:'Discovery',c:'blue',desc:'certified dashboards, datasets and charts — the base channel'},
+  tfld:{name:'Lineage Discovery',l1:'Lineage',l2:'Discovery',c:'green',desc:'graph lineage expansion — covers naming mismatch'},
+  ml:{name:'Caliber Lookup',l1:'Caliber',l2:'Lookup',c:'violet',desc:'metric definitions, business terms and usage constraints'},
+  dvr:{name:'Dim Value Resolver',l1:'Dim Value',l2:'Resolver',c:'purple',desc:'resolve named dimension values (brand / merchant / category) to fields'},
+  omni:{name:'All-channel Discovery',l1:'All-channel',l2:'Discovery',c:'lgray',desc:'one agent queries bi + graph + knowledge: fewest agents, runs all three checks itself'}
 };
-const WF_KEYS=['bad','tfld','ml','des','gs','fas'];
-const WF2ROLE=['ml','bad','tfld'];
+const WF_KEYS=['bad','tfld','ml','omni','dvr'];
+const ROLE2KEY={bi_asset_discovery:'bad',lineage_discovery:'tfld',caliber_lookup:'ml',omni_discovery:'omni',dim_value_resolver:'dvr'};
+const KEY2ROLE=Object.fromEntries(Object.entries(ROLE2KEY).map(([a,b])=>[b,a]));
 const WF_ICONS={
   ml:'<circle cx="10" cy="10" r="6.5" fill="none" stroke="#111" stroke-width="2.2"/><line x1="15" y1="15" x2="20.5" y2="20.5" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>',
   bad:'<rect x="4" y="12" width="4.5" height="8.5" rx="1" fill="#111"/><rect x="9.75" y="8" width="4.5" height="12.5" rx="1" fill="#111"/><rect x="15.5" y="3.5" width="4.5" height="17" rx="1" fill="#111"/>',
   tfld:'<circle cx="12" cy="4.5" r="2.7" fill="#111"/><circle cx="5" cy="19" r="2.7" fill="#111"/><circle cx="19" cy="19" r="2.7" fill="#111"/><path d="M12 7.2v4.3M12 11.5H5v5M12 11.5h7v5" fill="none" stroke="#111" stroke-width="2"/>',
-  des:'<rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#111" stroke-width="2"/><path d="M9 12.5l2.4 2.4 4.6-5" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-  gs:'<line x1="4" y1="7" x2="20" y2="7" stroke="#111" stroke-width="2"/><circle cx="15" cy="7" r="2.6" fill="#111"/><line x1="4" y1="12" x2="20" y2="12" stroke="#111" stroke-width="2"/><circle cx="9" cy="12" r="2.6" fill="#111"/><line x1="4" y1="17" x2="20" y2="17" stroke="#111" stroke-width="2"/><circle cx="13" cy="17" r="2.6" fill="#111"/>',
-  fas:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="2"/><path d="M12 7.5V12l3.5 2" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/>'
+  dvr:'<circle cx="6.5" cy="7" r="2.5" fill="#111"/><line x1="12" y1="7" x2="20" y2="7" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><circle cx="6.5" cy="17" r="2.5" fill="#111"/><line x1="12" y1="17" x2="20" y2="17" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>',
+  omni:'<circle cx="12" cy="12" r="3" fill="#111"/><circle cx="12" cy="12" r="8" fill="none" stroke="#111" stroke-width="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#111" stroke-width="2" stroke-linecap="round"/>',
 };
-let wfEditing=false,wfSubmitted=false,wfSel=null,wfLinkSrc=null,wfLinkMode=false,wfRec=null,wfEdit=null,wfSubmitResolve=null,wfEid=0,wfNid=0,wfAbort=false;
-let wfCands=null,wfScores=null,wfBest=0,wfCand=0,wfMode='cand',wfBuilt=false;
-const WF_CIRC=['①','②','③'];
+let wfEditing=false,wfSubmitted=false,wfSel=null,wfLinkSrc=null,wfLinkMode=false,wfRec=null,wfEdit=null,wfSubmitResolve=null,wfAbort=false;
+let wfPlan=null,wfCands=null,wfBest=0,wfCand=0,wfMode='cand',wfBuilt=false,wfCustomEval=null,wfEvalTimer=null,wfEvalSeq=0,ROLE_INFO={};
+const WF_CIRC=['①','②','③','④','⑤','⑥','⑦','⑧'];
+const MODE_LABEL={execute:'Execute directly · no agent calls',select_only:'Select only · recall skipped',recall_and_select:'Recall + select'};
 
-const roleCardHTML=k=>{const r=WF_ROLES[k];
-  return `<div class="wfrole" data-role="${k}" title="${r.desc}">`+
+const fnum=(x,d)=>(x==null||isNaN(x))?'—':Number(x).toFixed(d==null?2:d);
+const roleCardHTML=k=>{const r=WF_ROLES[k],info=ROLE_INFO[KEY2ROLE[k]]||{};
+  const ch=(info.channels||[]).join(' + ');
+  const tag=info.phase==='select'?'<span class="ph sel">select</span>':'';
+  return `<div class="wfrole" data-role="${k}" title="${esc(r.desc)}${ch?' · channels: '+esc(ch):''}">`+
     `<svg viewBox="0 0 28 28" width="30" height="30" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.2"/><g transform="translate(4,4) scale(0.8333)">${WF_ICONS[k]}</g></svg>`+
-    `<span><b>${r.name}</b></span></div>`;};
+    `<span><b>${r.name}${tag}</b>${ch?`<small>${esc(ch)}</small>`:''}</span></div>`;};
 
-function wfLayout(wf){
+/* ---- backend graph <-> renderer graph ---- */
+const toUI=g=>({
+  nodes:g.nodes.map(n=>({id:n.id,role:ROLE2KEY[n.role]||'bad',brole:n.role,tgs:n.targets||[],tg:(n.targets||[]).join('+'),phase:n.phase})),
+  edges:g.edges.map(e=>({a:e.src,b:e.dst,t:e.kind==='then'?'seq':'dep'}))
+});
+const toAPI=w=>({
+  nodes:w.nodes.map(n=>({id:n.id,role:n.brole||KEY2ROLE[n.role],targets:n.tgs||[]})),
+  edges:w.edges.map(e=>({src:e.a,dst:e.b,kind:e.t==='seq'?'then':'dep'}))
+});
+const nodeLabel=id=>{
+  const w=wfMode==='custom'&&wfEdit?wfEdit:(wfCands&&wfCands[wfCand]?toUI(wfCands[wfCand].graph):null);
+  const n=w&&w.nodes.find(x=>x.id===id);
+  if(!n)return esc(id);
+  const r=WF_ROLES[n.role];return esc(r?(r.l1+' '+r.l2).replace(/&amp;/g,'&').trim():id)+(n.tg?` <span class="k">· ${esc(n.tg)}</span>`:'');
+};
+
+function wfLayout(wf,svg){
   const depth={},live={};
   wf.nodes.forEach(n=>live[n.id]=true);
   const calc=(id,vis)=>{
@@ -741,12 +1093,28 @@ function wfLayout(wf){
   wf.nodes.forEach(n=>{(cols[depth[n.id]]=cols[depth[n.id]]||[]).push(n.id);});
   const maxD=Math.max(0,...Object.keys(cols).map(Number));
   const maxCnt=Math.max(1,...Object.values(cols).map(a=>a.length));
-  const colW=150,rowH=72,padX=60,padY=30;
-  const W=padX*2+(maxD+1)*colW,H=padY*2+maxCnt*rowH;
+  const colW=140,rowH=64,padX=58,padY=16;
+  /* a layer with many nodes is folded into several sub-columns: pick the fold that keeps the graph biggest in the pane it is drawn in
+     (fewest rows wins ties, so small graphs keep the plain layered look) */
+  const box=svg&&svg.parentElement;
+  const aw=Math.max(300,(box&&box.clientWidth)||600),ah=Math.max(120,(box&&box.clientHeight)||200);
+  let best=null;
+  for(let rows=1;rows<=maxCnt;rows++){
+    const offs=[];let nx=0;
+    for(let d=0;d<=maxD;d++){offs[d]=nx;nx+=Math.ceil(((cols[d]||[]).length||1)/rows);}
+    const W=padX*2+nx*colW,H=padY*2+Math.min(rows,maxCnt)*rowH,scale=Math.min(1,aw/W,ah/H);
+    if(!best||scale>best.scale+1e-6)best={rows,W,H,offs,scale};
+  }
+  const {rows,W,H,offs}=best;
   const pos={};
+  const hasOut=id=>wf.edges.some(e=>e.a===id&&live[e.b]);
   for(let d=0;d<=maxD;d++){
-    const arr=cols[d]||[];
-    arr.forEach((id,i)=>{pos[id]={x:padX+d*colW,y:Math.round(H/2+(i-(arr.length-1)/2)*rowH)};});
+    let arr=cols[d]||[];
+    if(rows<arr.length)arr=[...arr].sort((a,b)=>hasOut(a)-hasOut(b));      /* folded layer: unconnected nodes first, so no node sits on an arrow between a node and its successor */
+    arr.forEach((id,i)=>{
+      const sub=Math.floor(i/rows),r=i%rows,inSub=Math.min(rows,arr.length-sub*rows);
+      pos[id]={x:padX+(offs[d]+sub)*colW,y:Math.round(H/2+(r-(inSub-1)/2)*rowH)};
+    });
   }
   return{pos,W,H};
 }
@@ -754,7 +1122,12 @@ function wfLayout(wf){
 function renderWF(svg,wf,mode,pfx,sel,srcId){
   if(!svg)return;
   if(!wf){svg.innerHTML='';return;}
-  const{pos,W,H}=wfLayout(wf);
+  if(!wf.nodes.length){
+    svg.setAttribute('viewBox','0 0 560 90');svg.setAttribute('width',560);svg.setAttribute('height',90);
+    svg.innerHTML='<text class="wlab" x="280" y="48" text-anchor="middle">no agent calls — every sub-goal is L0, go straight to execution</text>';
+    return;
+  }
+  const{pos,W,H}=wfLayout(wf,svg);
   let s=`<defs><marker id="arw-${pfx}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5B7186"/></marker></defs>`;
   wf.edges.forEach((ed,i)=>{
     const A=pos[ed.a],B=pos[ed.b];if(!A||!B)return;
@@ -763,30 +1136,32 @@ function renderWF(svg,wf,mode,pfx,sel,srcId){
     const c1x=sx+dx*.4,c1y=sy+dy*.12,c2x=ex-dx*.4,c2y=ey-dy*.12;
     const dPath=`M${sx.toFixed(1)} ${sy.toFixed(1)} C${c1x.toFixed(1)} ${c1y.toFixed(1)},${c2x.toFixed(1)} ${c2y.toFixed(1)},${ex.toFixed(1)} ${ey.toFixed(1)}`;
     s+=`<path class="wedge ${ed.t}${sel&&sel.k==='e'&&sel.i===i?' sel':''}" d="${dPath}" marker-end="url(#arw-${pfx})"/>`;
-    s+=`<text class="wlab" x="${((sx+ex)/2).toFixed(1)}" y="${((sy+ey)/2-7).toFixed(1)}" text-anchor="middle">${ed.t==='par'?'∥ parallel':ed.t==='dep'?'dep':'then'}</text>`;
+    s+=`<text class="wlab" x="${((sx+ex)/2).toFixed(1)}" y="${((sy+ey)/2-7).toFixed(1)}" text-anchor="middle">${ed.t==='dep'?'dep':'then'}</text>`;
     if(mode==='edit')s+=`<path class="whit" data-i="${i}" d="${dPath}"/>`;
   });
   wf.nodes.forEach(n=>{
     const r=WF_ROLES[n.role],p=pos[n.id];if(!r||!p)return;
     const cls='wnode'+(mode==='edit'?' live':'')+(sel&&sel.k==='n'&&sel.id===n.id?' sel':'')+(srcId===n.id?' src':'');
-    s+=`<g class="${cls}" data-id="${n.id}" transform="translate(${p.x},${p.y})">`+
+    const tg=n.tg||'';
+    s+=`<g class="${cls}" data-id="${esc(n.id)}" transform="translate(${p.x},${p.y})"><title>${esc(n.brole||'')}${tg?' · '+esc(tg):''}</title>`+
        `<circle r="22" fill="var(--${r.c})" stroke="rgba(22,37,52,.55)" stroke-width="1.6"/>`+
        `<g transform="translate(-13,-13) scale(1.05)">${WF_ICONS[n.role]}</g>`+
-       `<text class="wnl" y="36" text-anchor="middle">${r.l1}</text>`+
-       `<text class="wnl" y="48" text-anchor="middle">${r.l2}</text></g>`;
+       `<text class="wnl" y="36" text-anchor="middle">${(r.l1+' '+r.l2).trim()}</text>`+
+       (tg?`<text class="wtg" y="48" text-anchor="middle">${esc(tg.length>16?tg.slice(0,15)+'…':tg)}</text>`:'')+`</g>`;
   });
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.setAttribute('width',W);svg.setAttribute('height',H);
   svg.innerHTML=s;
 }
 
-function renderEdit(){renderWF($('#wfEditSvg'),wfEdit,'edit','e',wfSel,wfLinkSrc);}
+function renderEdit(){renderWF($('#wfEditSvg'),wfEdit,'edit','e',wfSel,wfLinkSrc);syncP4Preview();}
 function renderRoleBar(){
   $$('#wfRoles .wfrole').forEach(card=>{
     const k=card.dataset.role;
-    card.classList.toggle('on',!!wfEdit&&wfEdit.nodes.some(n=>n.id===k));
+    card.classList.toggle('on',!!wfEdit&&wfEdit.nodes.some(n=>n.role===k));
   });
 }
+function customOK(){return wfCustomEval&&wfCustomEval!=='pending'&&wfCustomEval.feasible;}
 function syncTool(){
   const custom=wfMode==='custom'&&wfEditing;
   $('#wfTool').hidden=!wfBuilt;
@@ -797,95 +1172,65 @@ function syncTool(){
   $('#wfBtnLink').hidden=!custom;$('#wfBtnDel').hidden=!custom;$('#wfBtnReset').hidden=!custom;
   $('#wfBtnLink').disabled=!custom;$('#wfBtnDel').disabled=!custom||!wfSel;$('#wfBtnReset').disabled=!custom;
   $('#wfBtnLink').classList.toggle('on',wfLinkMode);
-  $('#wfBtnGo').disabled=!wfBuilt||wfSubmitted;
+  const cand=wfCands&&wfCands[wfCand];
+  $('#wfBtnGo').disabled=!wfBuilt||wfSubmitted||(wfMode==='cand'?!(cand&&cand.feasible):!customOK());
   if(wfBuilt&&!wfSubmitted){
-    $('#wfMsg').textContent=custom
-      ?(wfLinkSrc?'Link arrow: now click the target role.':(wfLinkMode?'Link arrow: click the source role first.':'Click a role card above to add it · click a selected arrow again to switch then / dep / ∥.'))
-      :'Pick a candidate ①②③ (★ = highest P_cov) or click ✎ Custom graph to edit · then Submit.';
+    if(custom)$('#wfMsg').textContent=wfLinkSrc?'Link arrow: now click the target role.':(wfLinkMode?'Link arrow: click the source role first.':'Click a role card to add it (one node per caliber) · shift-click adds one batched node for all calibers · click a selected arrow again to switch then / dep.');
+    else if(cand&&!cand.feasible)$('#wfMsg').textContent='This candidate violates a hard constraint and cannot be submitted — see "Why infeasible" below.';
+    else $('#wfMsg').textContent='Pick a candidate (★ = best score among feasible) or click ✎ Custom graph to edit · then Submit.';
   }
 }
-function wfMsg(t){$('#wfMsg').textContent=t;}
+function wfMsg(t){const m=$('#wfMsg');m.textContent=t;m.title=t;}
 
 function addEdge(a,b){
   if(wfEdit.edges.some(e=>e.a===a&&e.b===b)){wfMsg('That arrow already exists — click a different target.');return;}
-  wfEdit.edges.push({a,b,t:'seq'});
+  wfEdit.edges.push({a,b,t:'dep'});
   wfSel={k:'e',i:wfEdit.edges.length-1};
-  wfMsg('Arrow added (then). Click it again to switch dep / ∥ parallel.');
+  wfMsg('Arrow added (dep). Click it again to switch to then.');
+  scheduleEval();
 }
-function addRoleNode(k){
-  if(wfEdit.nodes.some(n=>n.id===k)){wfMsg('That role is already on the canvas — select it and press ✕ Delete to remove it first.');return;}
-  wfEdit.nodes.push({id:k,role:k});
-  wfSel={k:'n',id:k};
+function addRoleNode(k,batch){
+  const role=KEY2ROLE[k],info=ROLE_INFO[role]||{phase:'recall'};
+  const metrics=(wfPlan&&wfPlan.context.metrics)||[];
+  const perCaliber=info.phase==='recall'&&!(info.channels||[]).includes('dim_value')&&metrics.length;
+  /* click = one node per caliber (more agents, more parallel) · shift-click = one batched node for all calibers (fewer agents, serial inside) */
+  const groups=perCaliber?(batch?[metrics.slice()]:metrics.map(m=>[m])):[[]];
+  let first=null;
+  groups.forEach(tg=>{
+    const id=tg.length?role+'@'+tg.join('+'):role;
+    if(wfEdit.nodes.some(n=>n.id===id))return;
+    wfEdit.nodes.push({id,role:k,brole:role,tgs:tg,tg:tg.join('+'),phase:info.phase||'recall'});
+    first=first||id;
+  });
+  if(!first){wfMsg('That role is already on the canvas — select it and press ✕ Delete to remove it first.');return;}
+  wfSel={k:'n',id:first};
   renderEdit();renderRoleBar();syncTool();
-  wfMsg(`Added ${WF_ROLES[k].name} — use ↔ Link arrow to connect it.`);
+  wfMsg(`Added ${WF_ROLES[k].name.replace(/&amp;/g,'&')} — use ↔ Link arrow to connect it.`);
+  scheduleEval();
 }
 
-/* K candidate AOV graphs over the six adaptive roles,
-   layer width capped by the user's max-parallel-agents value W */
-function buildCands(W){
-  const mk=nodes=>nodes.map(k=>({id:k,role:k}));
-  const chain=arr=>arr.slice(1).map((k,i)=>({a:arr[i],b:k,t:'seq'}));
-  const w=Math.max(1,Math.min(3,Math.round(W)||1));
-  const all=['ml','bad','tfld','des','gs','fas'];
-  const seq={name:'Sequential',nodes:mk(all),edges:chain(all)};
-  const bal= w>=2
-    ?{name:'Balanced',nodes:mk(all),edges:[
-      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
-      {a:'bad',b:'des',t:'dep'},{a:'tfld',b:'des',t:'dep'},
-      ...chain(['des','gs','fas'])]}
-    :{name:'Balanced',nodes:mk(all),edges:chain(all)};
-  const par= w>=3
-    ?{name:'Parallel-first',nodes:mk(all),edges:[
-      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
-      {a:'ml',b:'des',t:'dep'},
-      {a:'bad',b:'gs',t:'dep'},{a:'tfld',b:'gs',t:'dep'},
-      {a:'bad',b:'fas',t:'dep'},{a:'tfld',b:'fas',t:'dep'}]}
-    : w===2
-    ?{name:'Parallel-first',nodes:mk(all),edges:[
-      {a:'ml',b:'bad',t:'par'},{a:'ml',b:'tfld',t:'par'},
-      {a:'bad',b:'des',t:'dep'},{a:'tfld',b:'des',t:'dep'},
-      {a:'des',b:'gs',t:'par'},{a:'des',b:'fas',t:'par'}]}
-    :{name:'Parallel-first',nodes:mk(all),edges:chain(all)};
-  return [bal,par,seq];
-}
-
-/* 3.3.2 — P_cov(G) = (1/T)·Σ_t [ |ΔC(S_t)| + |S_t \ B| ] : topological layers as steps,
-   ΔC = new metric×role combos covered by recall branches, non-recall subtasks count 1 each */
-function wfScore(wf){
-  const M=Math.max(1,ctx.metrics.length);
-  const live={},depth={};
-  wf.nodes.forEach(n=>live[n.id]=true);
-  const calc=(id,vis)=>{
-    if(depth[id]!=null)return depth[id];
-    if(vis.has(id)||!live[id])return 0;
-    vis.add(id);
-    const ps=wf.edges.filter(e=>e.b===id&&live[e.a]).map(e=>e.a);
-    const d=ps.length?Math.max(...ps.map(p=>calc(p,vis)))+1:0;
-    vis.delete(id);depth[id]=d;return d;
-  };
-  wf.nodes.forEach(n=>calc(n.id,new Set()));
-  const T=Math.max(1,...wf.nodes.map(n=>depth[n.id]+1));
-  const RECALL={ml:1,bad:1,tfld:1};
-  const seen=new Set();let sum=0;
-  for(let t=0;t<T;t++){
-    const S=wf.nodes.filter(n=>depth[n.id]===t).map(n=>n.id);
-    const combos=new Set();
-    S.forEach(id=>{if(RECALL[id])for(let m=0;m<M;m++)combos.add(m+'·'+id);});
-    let dc=0;combos.forEach(k=>{if(!seen.has(k)){seen.add(k);dc++;}});
-    sum+=dc+S.filter(id=>!RECALL[id]).length;
-  }
-  return sum/T;
+/* ---- panes ---- */
+function renderLevels(plan){
+  const lv=plan.level;
+  const chip=g=>`<span class="gst ${g.status}"><i>${g.status==='covered'?'✓':g.status==='doubtful'?'?':'✕'}</i>${esc(g.name)}</span>`;
+  const known=plan.known_assets.length?`<span class="k" title="${esc(plan.known_assets.join('\n'))}">known assets: ${plan.known_assets.length}</span>`:'';
+  $('#wfLevels').innerHTML=
+    `<span class="lvlbig ${lv}"><i>${lv}</i>Entry level</span>`+
+    `<span class="lvgoals">${plan.sub_goals.map(chip).join('')}</span>`+
+    `<span class="lvpills">${pill(esc(MODE_LABEL[plan.mode]||plan.mode))}${pill('A<sub>max</sub> '+plan.max_parallel)}${plan.llm_used?pill('LLM','ok'):''}${known}</span>`+
+    (plan.degraded?`<div class="warnbox" style="flex-basis:100%">${plan.notes.map(esc).join('<br>')}</div>`:'');
+  $('#wfLevelPane').hidden=false;
 }
 
 function renderTabs(){
   const el=$('#wfTabs');el.innerHTML='';
-  wfCands.forEach((g,i)=>{
+  wfCands.forEach((c,i)=>{
     const b=document.createElement('button');
     b.type='button';
-    b.className='wtab'+(wfMode==='cand'&&i===wfCand?' on':'')+(i===wfBest?' best':'');
+    b.className='wtab'+(wfMode==='cand'&&i===wfCand?' on':'')+(c.feasible?'':' bad');
     b.disabled=wfSubmitted||!wfBuilt;
-    b.title=`${g.name} — P_cov(G) = ${wfScores[i].toFixed(2)}`;
-    b.innerHTML=`<i>${WF_CIRC[i]||i+1}</i>${wfScores[i].toFixed(2)}${i===wfBest?'<em>★</em>':''}`;
+    b.title=`${c.name} (${c.source})${c.feasible?'':'\nINFEASIBLE: '+c.violations.join('; ')}`;
+    b.innerHTML=`<i>${WF_CIRC[i]||i+1}</i>${esc(c.name)} ${c.feasible?fnum(c.score):'<em>✕</em>'}${i===wfBest&&c.feasible?'<em>★</em>':''}`;
     b.addEventListener('click',()=>selectCand(i));
     el.appendChild(b);
   });
@@ -893,48 +1238,75 @@ function renderTabs(){
 
 function selectCand(i){
   if(wfSubmitted||!wfCands)return;
+  clearTimeout(wfEvalTimer);
   wfCand=i;wfMode='cand';wfEditing=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;
-  renderWF($('#wfEditSvg'),wfCands[i],'view','e');
-  renderTabs();
-  $('#wfEditHint').innerHTML=`<strong>P_cov = ${wfScores[i].toFixed(2)}</strong> · ${wfCands[i].name}${i===wfBest?' · ★ best':''} — switch ①②③ or ✎ Custom graph`;
+  const c=wfCands[i];
+  renderWF($('#wfEditSvg'),toUI(c.graph),'view','e');
+  renderTabs();syncP4Preview();
+  $('#wfEditHint').innerHTML=c.graph.nodes.length
+    ?`<strong>${esc(c.name)}</strong>${c.feasible?(i===wfBest?' · ★ best':''):` · <span style="color:var(--danger)" title="${esc((c.violations||[]).join('\n'))}">✕ infeasible</span>`}`
+    :'<strong>direct execution</strong>';
   syncTool();
 }
 
 function enterCustom(){
   wfMode='custom';wfEditing=true;wfSel=null;wfLinkSrc=null;wfLinkMode=false;
-  if(!wfEdit)wfEdit=JSON.parse(JSON.stringify(wfCands[wfCand]));
-  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
-  renderEdit();renderRoleBar();
+  if(!wfEdit)wfEdit=JSON.parse(JSON.stringify(toUI(wfCands[wfCand].graph)));
+  const bestC=wfCands.find(c=>c.feasible)||wfCands[0];
+  wfRec=JSON.parse(JSON.stringify(toUI(bestC.graph)));
+  renderEdit();renderRoleBar();renderTabs();
   $('#wfRolePane').hidden=false;
   $('#wfRoleHint').textContent='editing: click a card to add its role';
   $$('#wfRoles .wfrole').forEach(el=>el.classList.add('edit'));
-  $('#wfEditHint').innerHTML=`custom graph — starts from your ①②③ selection · add roles & arrows, then submit`;
-  syncTool();
+  $('#wfEditHint').innerHTML='custom graph — starts from your selected candidate · add roles &amp; arrows; it is scored live with the same constraints';
+  syncTool();scheduleEval(true);
 }
 
-function buildP3(){
-  wfEditing=false;wfSubmitted=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;wfEdit=null;wfSubmitResolve=null;wfAbort=false;
-  wfBuilt=true;wfMode='cand';wfCand=0;
-  const c=ctx,T=c.tasks.length;
-  c.workers=Math.max(1,T);c.waves=1;
+/* custom graph: scored by the backend (single source of truth for formula + feasibility) */
+function scheduleEval(now){
+  if(wfMode!=='custom'||!wfEdit||!ctx||!ctx.runId)return;
+  clearTimeout(wfEvalTimer);
+  wfCustomEval='pending';syncTool();
+  const seq=++wfEvalSeq;
+  wfEvalTimer=setTimeout(async()=>{
+    try{
+      const Wm=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
+      const r=await fetch(API+'/api/plan/evaluate',apiOpts({method:'POST',headers:Object.assign({'Content-Type':'application/json'},ckHeaders()),
+        body:JSON.stringify({run_id:ctx.runId,max_parallel:Wm,graph:toAPI(wfEdit)})}));
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const c=await r.json();
+      if(seq!==wfEvalSeq||wfMode!=='custom')return;
+      wfCustomEval=c;
+      $('#wfEditHint').innerHTML=`custom graph · ${c.feasible?'<span style="color:var(--ok)">✓ feasible</span>':`<span style="color:var(--danger)" title="${esc((c.violations||[]).join('\n'))}">✕ infeasible</span>`}`;
+    }catch(e){if(seq===wfEvalSeq){wfCustomEval=null;wfMsg('Could not score the custom graph: '+String(e.message||e));}}
+    syncTool();
+  },now?0:250);
+}
+
+function buildP3(plan){
+  /* NB: do not touch wfSubmitResolve / wfAbort here — buildP3 is also used to re-plan while p3() is awaiting Submit */
+  wfEditing=false;wfSubmitted=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;wfEdit=null;wfCustomEval=null;
+  wfBuilt=true;wfMode='cand';wfPlan=plan;wfCands=plan.candidates;
+  wfBest=Math.max(0,wfCands.findIndex(c=>c.feasible));wfCand=wfBest;
   const bar=$('#wfRoles');bar.innerHTML='';
   WF_KEYS.forEach(k=>bar.insertAdjacentHTML('beforeend',roleCardHTML(k)));
-  const W=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
-  wfCands=buildCands(W);
-  wfScores=wfCands.map(wfScore);
-  wfBest=wfScores.indexOf(Math.max(...wfScores));
-  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
-  renderTabs();
-  selectCand(wfBest);
-  say(`Phase 3 · ${wfCands.length} candidate AOV workflows generated under max ${W} parallel agents, scored by P_cov — best is ${WF_CIRC[wfBest]} (${wfScores[wfBest].toFixed(2)}). Pick one or click ✎ Custom graph, then Submit.`);
+  $('#wfMaxP').value=plan.max_parallel;
+  renderLevels(plan);renderTabs();selectCand(wfCand);
+  const nF=wfCands.filter(c=>c.feasible).length;
+  say(plan.mode==='execute'
+    ?'Phase 3 · every sub-goal is L0 — no recall, no agents: straight to execution.'
+    :plan.mode==='select_only'
+    ?'Phase 3 · entry level L1 — recall is skipped, no workflow to submit: straight to selection.'
+    :`Phase 3 · ${wfCands.length} candidate AOV graphs under A_max ${plan.max_parallel}: ${nF} feasible, ${wfCands.length-nF} filtered out — best is ${WF_CIRC[wfBest]} ${esc(wfCands[wfBest].name)} (score ${fnum(wfCands[wfBest].score,3)}). Pick one or ✎ Custom graph, then Submit.`);
   $('#reset').disabled=false;
   syncTool();
 }
 
 function waitSubmit(){return new Promise(res=>{wfSubmitResolve=res;});}
 function resetWFUI(){
+  clearTimeout(wfEvalTimer);
   wfEditing=false;wfSubmitted=false;wfSel=null;wfLinkSrc=null;wfLinkMode=false;wfRec=null;wfEdit=null;wfSubmitResolve=null;wfAbort=false;
-  wfCands=null;wfScores=null;wfBest=0;wfCand=0;wfMode='cand';wfBuilt=false;
+  wfPlan=null;wfCands=null;wfBest=0;wfCand=0;wfMode='cand';wfBuilt=false;wfCustomEval=null;
   const bar=$('#wfRoles');if(bar)bar.innerHTML='';
   const es=$('#wfEditSvg');if(es)es.innerHTML='';
   const tabs=$('#wfTabs');if(tabs)tabs.innerHTML='';
@@ -950,6 +1322,7 @@ function resetWFUI(){
   const wt=$('#wfTool');if(wt)wt.hidden=true;
   const ep=$('#wfEditPane');if(ep)ep.classList.remove('ok');
   const msg=$('#wfMsg');if(msg)msg.textContent='';
+  ['#wfLevelPane'].forEach(s=>{const e=$(s);if(e)e.hidden=true;});
   const st=$('#dispatch span');if(st)st.textContent='▼ Dispatch: activate roles / parallel branches';
   renderStaticRoles();
 }
@@ -957,23 +1330,28 @@ function resetWFUI(){
 /* workflow planner events (bound once — svg containers persist) */
 $('#wfRoles').addEventListener('click',e=>{
   const card=e.target.closest('.wfrole');if(!card||!wfEditing)return;
-  addRoleNode(card.dataset.role);
+  addRoleNode(card.dataset.role,e.shiftKey);
 });
 $('#wfBtnCustom').addEventListener('click',()=>{
   if(!wfBuilt||wfSubmitted||!wfCands)return;
   if(wfMode==='custom')selectCand(wfCand);else enterCustom();
 });
+let wfReplanTimer=null;
 $('#wfMaxP').addEventListener('change',()=>{
-  if(!wfBuilt||wfSubmitted||!wfCands)return;
-  const W=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
-  wfCands=buildCands(W);
-  wfScores=wfCands.map(wfScore);
-  wfBest=wfScores.indexOf(Math.max(...wfScores));
-  wfRec=JSON.parse(JSON.stringify(wfCands[wfBest]));
-  wfCand=Math.min(wfCand,wfCands.length-1);
-  renderTabs();
-  if(wfMode==='cand')selectCand(wfCand);
-  say(`Phase 3 · candidates regenerated under max ${W} parallel agents — best is ${WF_CIRC[wfBest]} (${wfScores[wfBest].toFixed(2)}).`);
+  if(!wfBuilt||wfSubmitted||!wfCands||!ctx||!ctx.runId)return;
+  clearTimeout(wfReplanTimer);
+  wfReplanTimer=setTimeout(async()=>{
+    const Wm=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
+    const keepMode=wfMode,keepEdit=wfEdit;
+    say(`Phase 3 · re-planning under A_max ${Wm}…`);
+    try{
+      const b=await fetchStage3(ctx.q,Wm);
+      ctx.stage3=b;ctx.runId=b.run_id;
+      if(!b.plan)return;
+      buildP3(b.plan);
+      if(keepMode==='custom'&&keepEdit){wfEdit=keepEdit;enterCustom();}
+    }catch(e){say('Re-plan failed: '+String(e.message||e));}
+  },300);
 });
 $('#wfEditSvg').addEventListener('click',e=>{
   if(!wfEditing)return;
@@ -992,8 +1370,8 @@ $('#wfEditSvg').addEventListener('click',e=>{
   if(eh){
     const i=+eh.dataset.i;
     if(wfSel&&wfSel.k==='e'&&wfSel.i===i){
-      const order=['seq','dep','par'];
-      wfEdit.edges[i].t=order[(order.indexOf(wfEdit.edges[i].t)+1)%3];
+      wfEdit.edges[i].t=wfEdit.edges[i].t==='dep'?'seq':'dep';
+      scheduleEval();
     }else{wfSel={k:'e',i};}
     syncTool();renderEdit();return;
   }
@@ -1008,34 +1386,34 @@ $('#wfBtnDel').addEventListener('click',()=>{
   }else{
     wfEdit.edges.splice(wfSel.i,1);
   }
-  wfSel=null;renderEdit();renderRoleBar();syncTool();
+  wfSel=null;renderEdit();renderRoleBar();syncTool();scheduleEval();
 });
 $('#wfBtnReset').addEventListener('click',()=>{
   if(!wfEditing||!wfRec)return;
   wfEdit=JSON.parse(JSON.stringify(wfRec));wfSel=null;wfLinkMode=false;wfLinkSrc=null;
-  renderEdit();renderRoleBar();syncTool();
+  renderEdit();renderRoleBar();syncTool();scheduleEval();
   wfMsg('Restored the recommended workflow.');
 });
 $('#wfBtnGo').addEventListener('click',()=>{
   if(!wfBuilt||wfSubmitted||!wfCands)return;
   const custom=wfMode==='custom';
-  const g=custom?wfEdit:wfCands[wfCand];
-  if(!g)return;
-  if(custom&&(g.nodes.length<2||g.edges.length<1)){wfMsg('The custom graph needs at least 2 roles and 1 arrow — or pick a candidate ①②③.');return;}
+  const cand=custom?wfCustomEval:wfCands[wfCand];
+  if(!cand||cand==='pending'){wfMsg('Scoring the custom graph… try again in a moment.');return;}
+  if(!cand.feasible){wfMsg('Hard constraints violated — '+cand.violations.join('; '));return;}
+  const g=custom?wfEdit:toUI(cand.graph);
+  clearTimeout(wfEvalTimer);
   wfEditing=false;wfSubmitted=true;wfBuilt=false;wfSel=null;wfLinkMode=false;wfLinkSrc=null;
   syncTool();wfMsg('');renderTabs();
   renderWF($('#wfEditSvg'),g,'final','e');
   $('#wfEditPane').classList.add('ok');
-  $('#wfEditHint').innerHTML=(custom?'custom graph':`<strong>P_cov = ${wfScores[wfCand].toFixed(2)}</strong> · ${wfCands[wfCand].name}`)+' confirmed';
+  $('#wfEditHint').innerHTML=(custom?'custom graph':`<strong>score ${fnum(cand.score,3)}</strong> · ${esc(cand.name)}`)+' confirmed';
   $('#wfEditHint').hidden=false;$('#wfOk').hidden=false;
   $$('#wfRoles .wfrole').forEach(el=>{el.classList.remove('edit');el.classList.add('lock');});
   $('#wfRoleHint').textContent='';
-  ctx.wf=JSON.parse(JSON.stringify(g));
-  const Wmax=Math.max(1,Math.min(16,+$('#wfMaxP').value||1));
-  const T2=Math.max(1,ctx.tasks.filter(t=>ctx.wf.nodes.some(n=>n.id===WF2ROLE[t.r])).length);
-  ctx.workers=Math.max(1,Math.min(Wmax,T2));ctx.waves=Math.ceil(T2/ctx.workers);
+  ctx.wfFull=JSON.parse(JSON.stringify(g));          /* Phase 4 runs exactly this graph: one agent per node */
+  const kinds=new Set(g.nodes.map(n=>n.role)).size;
   const st=$('#dispatch span');if(st)st.textContent='▼ Dispatch: run the confirmed workflow';
-  say(`Workflow confirmed — ${ctx.wf.nodes.length} roles, ${ctx.wf.edges.length} arrows · max ${ctx.workers} agents/wave · ${ctx.waves} wave${ctx.waves>1?'s':''}. Dispatching to Phase 4…`);
+  say(`Workflow confirmed — ${g.nodes.length} agent node${g.nodes.length===1?'':'s'} (${kinds} role${kinds===1?'':'s'}), ${g.edges.length} arrows. Dispatching to Phase 4…`);
   if(wfSubmitResolve){const r=wfSubmitResolve;wfSubmitResolve=null;r();}
 });
 document.addEventListener('keydown',e=>{
@@ -1047,45 +1425,236 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ================= phases ================= */
+/* ---- Phase 1 · real data from backend ---- */
+/* served by the backend → same origin; opened as file:// → default local backend */
+const API=(window.DD_API||(/^https?:/.test(location.protocol)?location.origin:'http://127.0.0.1:8088')).replace(/\/$/,'');
+/* ---- SSO cookie (same approach as old-version DevCookieBadge) ----
+   Same-origin deployment: the browser sends its own Cookie header automatically.
+   Local dev (file:// or localhost): the browser does NOT send *.xiaohongshu.com cookies,
+   so "Sync cookie" reads them from the local browser via the backend and we forward them
+   in body.cookie + X-Forward-Cookie. */
+const CK_KEY='dd_dev_cookie',CK_META='dd_dev_cookie_meta';
+const getCk=()=>{try{return localStorage.getItem(CK_KEY)||''}catch(e){return ''}};
+const getCkMeta=()=>{try{return JSON.parse(localStorage.getItem(CK_META)||'null')}catch(e){return null}};
+const setCk=(c,m)=>{try{c?(localStorage.setItem(CK_KEY,c),localStorage.setItem(CK_META,JSON.stringify(m||{}))):(localStorage.removeItem(CK_KEY),localStorage.removeItem(CK_META));}catch(e){}};
+const sameOrigin=()=>{try{return new URL(API).origin===location.origin}catch(e){return false}};
+const ckHeaders=()=>{const c=getCk();return c?{'X-Forward-Cookie':c}:{};};
+const apiOpts=o=>Object.assign({credentials:sameOrigin()?'include':'omit'},o);
+function renderCk(user,err){
+  const c=getCk(),m=getCkMeta(),b=$('#ckBadge');
+  const name=user&&(user.display||user.name_en);
+  b.className='ckbadge'+(c&&name?' ok':'');
+  // green only means "cookie read"; a name means the SSO identity was actually verified
+  b.innerHTML='<i></i>'+(c?(name?`cookie · ${esc(name)}`:`cookie · synced, identity unverified`):'cookie · not synced');
+  b.title=err||(c?`${m&&m.count||'?'} cookies from ${m&&m.browser||'?'}${name?` · ${user.email||''}`:''}`:'Click “Sync cookie” to read your login cookie from the local browser');
+  $('#ckSync').textContent=c?'Re-sync':'Sync cookie';
+  $('#ckClear').hidden=!c;
+  if(c&&!name&&err)say('Cookie synced but identity not verified: '+err);
+}
+async function loadMe(){
+  if(!getCk()){renderCk();return;}
+  try{
+    const r=await fetch(API+'/api/me',apiOpts({headers:ckHeaders()}));
+    if(r.ok)renderCk(await r.json());
+    else{let d='';try{d=(await r.json()).detail||''}catch(e){}renderCk(null,d||('HTTP '+r.status));}
+  }catch(e){renderCk(null,'backend unreachable');}
+}
+async function syncCookie(){
+  const btn=$('#ckSync');btn.disabled=true;btn.textContent='Syncing…';
+  try{
+    const r=await fetch(API+'/api/cookie/fetch',apiOpts({}));
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.detail||('HTTP '+r.status));
+    if(!d.cookie_header)throw new Error('no cookie found');
+    setCk(d.cookie_header,{browser:d.browser,count:d.count,ts:Date.now()});
+    say(`Cookie synced from ${d.browser} (${d.count}).`+(d.warning?' ⚠ '+d.warning:''));
+  }catch(e){setCk('');renderCk(null,String(e.message||e));say('Cookie sync failed: '+String(e.message||e));return;}
+  finally{btn.disabled=false;}
+  await loadMe();
+}
+async function fetchStage1(q){
+  const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),30000);
+  try{
+    const ck=getCk();
+    const r=await fetch(API+'/api/stage1',apiOpts({method:'POST',headers:Object.assign({'Content-Type':'application/json'},ckHeaders()),
+      body:JSON.stringify(Object.assign({query:q,session_id:'ui'},ck?{cookie:ck}:{})),signal:ctrl.signal}));
+    if(!r.ok)throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,200));
+    const j=await r.json();
+    if(ctx)ctx.runId=j.run_id;
+    return j.result;
+  }finally{clearTimeout(to);}
+}
+/* ---- ② coordination + ③ planning are fetched in one request (/api/stage3); there is no Phase 2 panel ---- */
+async function apiPost(path,body,ms){
+  const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),ms||30000);
+  try{
+    const ck=getCk();
+    const r=await fetch(API+path,apiOpts({method:'POST',headers:Object.assign({'Content-Type':'application/json'},ckHeaders()),
+      body:JSON.stringify(Object.assign({session_id:'ui'},body,ck?{cookie:ck}:{})),signal:ctrl.signal}));
+    if(!r.ok)throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,200));
+    return await r.json();
+  }finally{clearTimeout(to);}
+}
+const curMaxP=()=>Math.max(1,Math.min(16,+$('#wfMaxP').value||4));
+/* supplementary answers must accompany every later request for the same run (re-planning on A_max change too), otherwise the backend asks again */
+const fetchStage3=(q,W)=>apiPost('/api/stage3',{query:q,run_id:ctx&&ctx.runId||undefined,max_parallel:W||curMaxP(),clarifications:ctx&&ctx.clar||undefined});
+/* ---- ② supplementary information box ---- */
+let clarResolve=null;
+const CLAR_LIST=new Set(['metrics','dimensions','filters']);
+const CLAR_LABEL={metrics:'Metric(s)',caliber:'Caliber',grain:'Grain',time_range:'Time range',dimensions:'Break down by',filters:'Filters'};
+const CLAR_HINT={metrics:'e.g. DAU, GMV  (comma separated)',caliber:'e.g. the definition you mean',time_range:'e.g. last_7_days · yesterday · 2026-01-01~2026-01-31',dimensions:'e.g. channel, platform  (comma separated)',filters:'e.g. platform=iOS  (comma separated)'};
+const splitList=v=>String(v||'').split(/[,，、;；\n]/).map(x=>x.trim()).filter(Boolean);
+function clarField(slot,q){
+  const lab=CLAR_LABEL[slot]||slot,id='clar_'+slot;
+  let ctl;
+  if(q&&q.options&&q.options.length){
+    ctl=`<select id="${id}" data-slot="${esc(slot)}"><option value="">Choose…</option>${q.options.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
+  }else if(slot==='grain'){
+    ctl=`<select id="${id}" data-slot="grain"><option value="">(default)</option>${['minute','hour','day','week','month'].map(o=>`<option>${o}</option>`).join('')}</select>`;
+  }else{
+    ctl=`<input id="${id}" data-slot="${esc(slot)}" type="text" autocomplete="off" placeholder="${esc(CLAR_HINT[slot]||'')}">`;
+  }
+  return `<div class="clarf" data-slot="${esc(slot)}"><label for="${id}">${esc(lab)}${q?'':'<small>optional</small>'}</label>${ctl}${q?`<div class="why">${esc(q.question)}${q.reason?' — '+esc(q.reason):''}</div>`:''}</div>`;
+}
+function clarValue(slot){
+  const el=$('#clar_'+slot);if(!el)return null;
+  const v=el.value.trim();if(!v)return null;
+  return CLAR_LIST.has(slot)?splitList(v):v;
+}
+function seenChips(c){
+  const rows=['metrics','caliber','grain','time_range','dimensions','filters'].map(k=>{
+    const sl=c[k]||{},v=sl.value;
+    const empty=v==null||v===''||(Array.isArray(v)&&!v.length);
+    return `<span class="chip" title="${esc((sl.rule_id||'')+(sl.note?' — '+sl.note:''))}">${esc(CLAR_LABEL[k])}<small>${empty?'—':esc(Array.isArray(v)?v.join(', '):v)}${!empty&&sl.source?' · '+esc(sl.source):''}</small></span>`;
+  });
+  return rows.join('');
+}
+function hideClarify(){const b=$('#clarify');if(b)b.hidden=true;}
+function askClarification(contract){
+  const qs=contract.open_questions||[],asked=new Set(qs.map(q=>q.slot));
+  $('#clarWhy').textContent=`The system could not decide ${qs.length>1?'these':'this'} on its own — answer below and it continues with the plan.`;
+  $('#clarSeen').innerHTML='<span class="k" style="margin-right:4px">Understood so far:</span>'+seenChips(contract);
+  $('#clarFields').innerHTML=qs.map(q=>clarField(q.slot,q)).join('');
+  $('#clarOpt').innerHTML=['time_range','grain','dimensions','filters','caliber'].filter(k=>!asked.has(k)).map(k=>clarField(k,null)).join('');
+  $('#clarMore').open=false;$('#clarMsg').textContent='';
+  $$('#clarForm .clarf').forEach(f=>f.classList.remove('bad'));
+  const box=$('#clarify');box.hidden=false;
+  /* the reset button stays usable while we wait for the user */
+  $('#reset').disabled=false;$('#run').textContent='Waiting for your answer…';
+  say('Phase 2 · coordination needs more information — fill in the box below.');
+  try{box.scrollIntoView({behavior:RM?'auto':'smooth',block:'nearest'});}catch(e){}
+  const first=box.querySelector('input,select');if(first)first.focus();
+  box.dataset.asked=[...asked].join(',');
+  return new Promise(res=>{clarResolve=res;});
+}
+$('#clarForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!clarResolve)return;
+  const asked=($('#clarify').dataset.asked||'').split(',').filter(Boolean);
+  const out={},missing=[];
+  asked.forEach(slot=>{
+    const v=clarValue(slot),f=$(`#clarFields .clarf[data-slot="${slot}"]`);
+    if(v==null||(Array.isArray(v)&&!v.length)){missing.push(CLAR_LABEL[slot]||slot);if(f)f.classList.add('bad');}
+    else{out[slot]=v;if(f)f.classList.remove('bad');}
+  });
+  if(missing.length){$('#clarMsg').textContent='Please fill in: '+missing.join(', ');return;}
+  $$('#clarOpt .clarf').forEach(f=>{const slot=f.dataset.slot,v=clarValue(slot);if(v!=null&&!(Array.isArray(v)&&!v.length))out[slot]=v;});
+  const r=clarResolve;clarResolve=null;hideClarify();r(out);
+});
+$('#clarCancel').addEventListener('click',()=>{
+  if(!clarResolve)return;
+  const r=clarResolve;clarResolve=null;hideClarify();r(null);
+});
+async function p2(){
+  say('Coordinating the question with the injected knowledge, then planning…');
+  let b;
+  const call=async()=>{
+    try{return await fetchStage3(ctx.q);}
+    catch(e){const msg=e.name==='AbortError'?'request timed out':String(e.message||e);say('Planning failed — '+msg+' (backend at '+API+')');return null;}
+  };
+  b=await call();if(!b)return false;
+  for(let round=0;round<4;round++){
+    ctx.runId=b.run_id;ctx.stage3=b;ctx.plan=b.plan;
+    if(b.status==='ready'&&b.plan)return true;
+    if(!(b.contract.open_questions||[]).length){say('Planning stopped: the contract is not ready and no question was returned.');return false;}
+    const ans=await askClarification(b.contract);
+    if(ans===null){if(ctx)say('Clarification cancelled — edit the question or answer next time, then Run again.');return false;}     /* ctx is null when the user pressed Reset */
+    ctx.clar=Object.assign({},ctx.clar||{},ans);       /* later answers win; sent with every following request of this run */
+    say('Re-coordinating with your answers: '+Object.entries(ans).map(([k,v])=>k+' = '+(Array.isArray(v)?v.join(', '):v)).join(' · ')+' …');
+    b=await call();if(!b)return false;
+  }
+  say('Still not ready after several clarification rounds — please rephrase the question.');
+  return false;
+}
+const clip=(t,n)=>{t=String(t==null?'':t);return t.length>n?t.slice(0,n-1)+'…':t;};
+const mini=(...ps)=>`<div class="mini">${ps.map(([u,v,t])=>`<span${t?` title="${esc(t)}"`:''}>${u} <b>${v}</b></span>`).join('')}</div>`;
+const routeNote=st=>st&&st!=='ok'?`<div class="rnote" title="${esc(st)}">⚠ ${esc(clip(st,80))}</div>`:'';
+const shortAsset=a=>esc(a);
+
+function renderHist(r){
+  const ms=r.pair_matches||[];
+  const tip=m=>`${m.query}\nsim ${m.similarity.toFixed(2)} · ${m.token_cost} tok\n→ ${m.asset_ids.join(', ')||'—'}${m.knowledge_titles.length?'\nknowledge: '+m.knowledge_titles.join(', '):''}`;
+  return mini(['Matched',ms.length],['Top sim',ms.length?ms[0].similarity.toFixed(2):'0'],['tok',ms.reduce((t,m)=>t+m.token_cost,0)])+
+    routeNote(r.route_status.pair)+
+    (ms.length
+      ?'<ul class="plist">'+ms.slice(0,2).map(m=>`<li title="${esc(tip(m))}"><span class="pq">${esc(clip(m.query,26))}</span> <span class="k">→ ${esc(clip(m.asset_ids.join(', ')||'—',30))}</span></li>`).join('')+(ms.length>2?`<li class="k">+${ms.length-2} more</li>`:'')+'</ul>'
+      :'<span class="k">No similar historical query</span>');
+}
+function renderKr(r){
+  const st=r.route_stats.retrieval||{count:0,tokens:0,kinds:{}};
+  const kinds=Object.entries(st.kinds).slice(0,4).map(([k,n])=>pill(`${esc(k)} ×${n}`)).join('');
+  return mini(['Recalled',st.count],['Top',st.count?st.top_relevance.toFixed(2):'0'],['tok',st.tokens])+
+    routeNote(r.route_status.retrieval)+(kinds?`<div class="chiprow">${kinds}</div>`:'');
+}
+function renderSel(r){
+  const inj=r.injected,tr=Object.fromEntries(r.trace.map(t=>[t.item_id,t]));
+  const route=i=>i.routes.length>1?'pair+retrieval':(i.routes[0]||i.origin);
+  const tip=i=>{const t=tr[i.id]||{};const ix=Object.values(t.interactions||{}).reduce((s,x)=>s+x,0);
+    return `${t.step||''}. ${i.title} [${i.kind} · ${route(i)}]\n${i.token_cost} tok · u ${t.utility!=null?t.utility.toFixed(2):i.relevance.toFixed(2)} · Δ ${t.delta!=null?t.delta.toFixed(2):'—'}${ix?` (w ${ix>0?'+':''}${ix.toFixed(2)})`:''} · Δ/c ${t.ratio!=null?t.ratio.toFixed(4):'—'}`;};
+  const dropped=r.dropped;
+  const MAXC=5;
+  return mini(['Selected',`${inj.length}/${r.candidate_count}`,'knowledge blocks chosen / candidates'],['Tokens',`${r.used_tokens}/${r.token_budget}`,`capacity L = ${r.token_budget} (hard cap) · stop when max Δ/c < τ = ${r.tau}`],['V(S)',r.total_value.toFixed(2),'Σ u_k + Σ w_ij'])+
+    (inj.length?`<ul class="krows">`+inj.slice(0,MAXC).map(i=>{const t=tr[i.id]||{};
+        return `<li class="${esc(i.kind)}" title="${esc(tip(i))}"><span class="kn">${esc(clip(i.title,22))}</span><i>${esc(i.kind.replace('_def','').replace('business_term','term').replace('asset_meta','asset'))}</i><span class="k">${i.token_cost} tok${t.delta!=null?' · Δ '+t.delta.toFixed(2):''}</span></li>`;}).join('')+
+        (inj.length>MAXC?`<li class="more" title="${esc(inj.slice(MAXC).map(tip).join('\n\n'))}">+${inj.length-MAXC} more</li>`:'')+`</ul>`+
+        (dropped.length?`<div class="chiprow"><span class="kchip drop" title="${esc(dropped.map(d=>(d.title||d.item_id)+' · '+d.reason+(d.detail?' — '+d.detail:'')).join('\n'))}">dropped ${dropped.length}</span></div>`:'')
+      :'<span class="k">No knowledge selected</span>');
+}
 async function p1(){
-  phaseOn(1,'Phase 1 · parsing the query and pre-injecting knowledge…');
-  const c=ctx;
-  // two sources in parallel
+  phaseOn(1,'Phase 1 · pre-injecting knowledge (historical queries + context-query retrieval)…');
   node('hist').classList.add('run');node('kr').classList.add('run');
-  await sleep(750);
+  let r;
+  try{
+    r=await fetchStage1(ctx.q);
+  }catch(e){
+    ['hist','kr','sel'].forEach(id=>{const n=node(id);n.classList.remove('run');n.classList.add('skip','has');});
+    const msg=e.name==='AbortError'?'request timed out':String(e.message||e);
+    const html=`<div class="rnote">✕ Backend unavailable: ${esc(msg)}<br><span class="k">Expected at ${esc(API)} — start it with <code>make serve</code> in backend/ (or set window.DD_API)</span></div>`;
+    dyn('hist').innerHTML=html;dyn('kr').innerHTML='';dyn('sel').innerHTML='';
+    phaseDone(1);
+    say('Phase 1 failed — backend unavailable. Start the backend and press Run again.');
+    return false;
+  }
+  ctx.pre=r;
   node('hist').classList.remove('run');node('kr').classList.remove('run');
   node('hist').classList.add('done','has');node('kr').classList.add('done','has');
-  const hpTok=c.pairs.reduce((s,p)=>s+p.tok,0);
-  dyn('hist').innerHTML=
-    `<div class="stats"><div class="stat"><u>Recalled</u><b>${c.pairs.length}</b></div><div class="stat"><u>Total len</u><b>${hpTok}</b></div><div class="stat"><u>Top sim</u><b>${c.pairs.length?c.pairs[0].sim.toFixed(2):'0'}</b></div></div>`+
-    (c.pairs.length
-      ?`<span class="k">Similar queries matched — their dataset & knowledge choices are reused as candidates.</span>`
-      :`No pair above the similarity threshold`);
-  const kc=c.know.cands,kSum=kc.reduce((s,x)=>s+x.tok,0);
-  dyn('kr').innerHTML=kc.length
-    ?`<div class="stats"><div class="stat"><u>Recalled</u><b>${kc.length}</b></div><div class="stat"><u>Total len</u><b>${kSum}</b></div><div class="stat"><u>Types</u><b>${KT.length}</b></div></div>`+
-      `<span class="k">${KT.map(t=>t.short).join(' · ')}</span>`
-    :`<div class="stats"><div class="stat"><u>Recalled</u><b>0</b></div><div class="stat"><u>Total len</u><b>0</b></div></div>`;
-  const k=c.know;
-  const util=k.sel.reduce((s,x)=>s+x.u,0);
-  await act('sel', k.cands.length?
-    `<div class="stats">`+
-    `<div class="stat"><u>Budget</u><b>${k.B} tok</b></div>`+
-    `<div class="stat"><u>Goal</u><b>max total utility</b></div>`+
-    `<div class="stat"><u>Selected</u><b>${k.sel.length} / ${k.cands.length}</b></div>`+
-    `<div class="stat"><u>Tokens used</u><b>${k.used} / ${k.B}</b></div>`+
-    `<div class="stat"><u>Total utility</u><b>${util}</b></div>`+
-    `</div>`+
-    `<div class="bar"><i style="width:0" data-w="${Math.round(k.used/k.B*100)}"></i></div>`+
-    k.sel.slice(0,6).map(x=>pill(esc(x.label),'ok')).join('')+(k.sel.length>6?pill('+'+(k.sel.length-6)):'')
-    :`<div class="stats"><div class="stat"><u>Budget</u><b>${k.B} tok</b></div><div class="stat"><u>Goal</u><b>max total utility</b></div><div class="stat"><u>Selected</u><b>0 / 0</b></div></div>Nothing to select`,700);
-  const bar=dyn('sel').querySelector('.bar i');if(bar){requestAnimationFrame(()=>{bar.style.width=bar.dataset.w+'%';});}
+  dyn('hist').innerHTML=renderHist(r);
+  dyn('kr').innerHTML=renderKr(r);
+  await act('sel',renderSel(r),500);
   phaseDone(1);
+  return true;
 }
 
 async function p3(){
-  phaseOn(3,'Phase 3 · generating K candidate AOV workflows and scoring parallel gain P_cov…');
-  buildP3();
+  phaseOn(3,'Phase 3 · planning agent grades each sub-goal, generates candidate AOV graphs, filters infeasible ones and scores the rest…');
+  buildP3(ctx.plan);
+  if(recallSkipped(ctx.plan)){                      /* L0 / L1: nothing to confirm — hide the workflow editor, keep the entry level, move on */
+    $('#ph3').classList.add('lvlonly');
+    ctx.wfFull=null;
+    $('#reset').disabled=false;
+    phaseDone(3);
+    return 'skip';
+  }
   await waitSubmit();
   $('#reset').disabled=true;
   if(wfAbort)return false;
@@ -1095,178 +1664,302 @@ async function p3(){
 }
 
 /* ---- Phase 4 · communication model (dual-channel asking) ---- */
-function genComms(c){
-  const L=c.lanes;
-  const evs=[];
-  const has=k=>L.includes(k);
-  const vol=not=>['bad','tfld','ml','ppp'].find(k=>L.includes(k)&&!not.includes(k));
-  const m0=c.metrics[0]?c.metrics[0].name:'metric';
-  const d0=c.metrics[0]?c.metrics[0].ds:'dataset';
-  if(has('bad')&&has('ml')){
-    evs.push({k:'ask',a:'bad',b:'ml',note:'metric caliber · '+m0,sub:'route: high conf → hit Definition Lookup profile'});
-    evs.push({k:'reply',a:'ml',b:'bad',note:'definition + caliber',sub:'adopted'});
-  }
-  if(has('tfld')&&has('ppp')){
-    evs.push({k:'ask',a:'tfld',b:'ppp',note:'partition precheck · '+d0,sub:'route: high conf → hit Precheck profile'});
-    evs.push({k:'decline',a:'ppp',b:'tfld',note:'declined — queue saturated',sub:'autonomy preserved'});
-    evs.push({k:'bc',a:'tfld',note:'downgraded to board broadcast',sub:'fallback keeps voluntary bidding'});
-    const v=vol(['tfld','ppp']);
-    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted'});
-  }else if(has('tfld')&&L.length>1){
-    evs.push({k:'bc',a:'tfld',note:'partition precheck — no profile hit',sub:'low conf → board broadcast'});
-    const v=vol(['tfld']);
-    if(v)evs.push({k:'pick',a:v,b:'tfld',note:'volunteered',sub:'adopted'});
-  }
-  if(has('bad')&&L.length>1){
-    evs.push({k:'bc',a:'bad',note:'cross-domain naming variant',sub:'low conf · profile uncovered → broadcast'});
-    const v=vol(['bad']);
-    if(v)evs.push({k:'pick',a:v,b:'bad',note:'volunteered',sub:'adopted'});
-  }
-  if(has('ml')&&has('bad')){
-    evs.push({k:'ask',a:'ml',b:'bad',note:'dashboards reusing '+d0,sub:'route: high conf → hit BI Asset profile'});
-    evs.push({k:'reply',a:'bad',b:'ml',note:'2 dashboards',sub:'ignored — already resolved via KH'});
-  }
-  c.comms=evs;
+/* ================= phase 4 · retrieval agents (live: /api/stage4 on the confirmed graph) ================= */
+let p4Live=false;
+const LANE_SHORT={bad:['BI Asset','Discovery'],tfld:['Lineage','Discovery'],ml:['Caliber','Lookup'],omni:['All-channel','Discovery'],dvr:['Dim Value','Resolver']};
+/* the graph Phase 4 mirrors: the confirmed one after Submit, otherwise whatever is currently selected / being edited in Phase 3 */
+function p4Graph(){
+  if(ctx&&ctx.wfFull)return ctx.wfFull;
+  if(wfMode==='custom'&&wfEdit)return wfEdit;
+  if(wfCands&&wfCands[wfCand])return toUI(wfCands[wfCand].graph);
+  return null;
 }
-function buildP4Roles(L){
+/* one entry per role (first appearance order) + one per node, with replica numbering */
+function p4Model(g){
+  const roles=[],byRole={};
+  g.nodes.forEach(n=>{
+    const k=n.brole||KEY2ROLE[n.role];
+    if(!byRole[k]){byRole[k]={brole:k,key:n.role,nodes:[]};roles.push(byRole[k]);}
+    byRole[k].nodes.push(n);
+  });
+  const rep={};
+  g.nodes.forEach(n=>{const k=n.brole||KEY2ROLE[n.role];rep[n.id]=[byRole[k].nodes.indexOf(n)+1,byRole[k].nodes.length];});
+  return{roles,rep};
+}
+function renderP4Roles(g,agents){
   const wrap=$('#p4Roles');if(!wrap)return;
-  wrap.innerHTML=L.map(k=>{const r=WF_ROLES[k];
-    return `<div class="node role" id="n-${k}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub">${esc(r.desc)}</span><div class="dyn" id="d-${k}"></div></div>`;}).join('');
+  if(!g||!g.nodes.length){wrap.innerHTML='<div class="p4empty">The roles of the workflow appear here once it is planned — one card per role, with one entry per node (agent replica).</div>';return;}
+  const {roles}=p4Model(g),A=Object.fromEntries((agents||[]).map(a=>[a.agent_id,a]));
+  wrap.innerHTML=roles.map(r=>{
+    const W=WF_ROLES[r.key],info=ROLE_INFO[r.brole]||{};
+    const rs=r.nodes.map(n=>A[n.id]).filter(Boolean);
+    const sum=f=>rs.reduce((t,a)=>t+f(a),0);
+    const stat=rs.length&&info.phase==='select'?`<div class="st">checked <strong>${sum(a=>a.checked)}</strong> candidate${sum(a=>a.checked)===1?'':'s'} · <strong>${sum(a=>a.issues)}</strong> issue${sum(a=>a.issues)===1?'':'s'}${sum(a=>a.handoffs)?` · <strong>${sum(a=>a.handoffs)}</strong> handed off`:''}</div>`:rs.length?`<div class="st"><strong>${sum(a=>a.produced.length)}</strong> probes · <strong>${sum(a=>a.reused.length)}</strong> reused · asks <strong>${sum(a=>a.asks_made)}</strong> made / <strong>${sum(a=>a.asks_served)}</strong> served${sum(a=>a.handoffs)?` · <strong>${sum(a=>a.handoffs)}</strong> handed off`:''}${sum(a=>a.declined)?` · <strong>${sum(a=>a.declined)}</strong> declined`:''}</div>`:'';
+    const cls=rs.length?(rs.some(a=>a.status&&a.status!=='ok')?' err':' done'):'';
+    return `<div class="p4role${cls}" data-brole="${esc(r.brole)}" style="--c:var(--${W.c})" title="${esc(W.desc)}">`+
+      `<b>${W.name}${info.phase==='select'?'<span class="ph sel">select</span>':''}<span class="rep">×${r.nodes.length}</span></b>`+
+      `<span class="sub">${esc(W.desc)}</span>`+
+      `<div class="p4ns">${r.nodes.map(n=>{const a=A[n.id];return `<span class="p4n${a?(a.status==='ok'?' done':' err'):''}" data-id="${esc(n.id)}" title="${esc(n.id)}">${esc(n.tg||'all')}${r.nodes.length>1?' ·'+(r.nodes.indexOf(n)+1)+'/'+r.nodes.length:''}</span>`;}).join('')}</div>${stat}</div>`;
+  }).join('');
 }
-/* pre-run static preview: role cards shown before Run so the page is filled out */
+function syncP4Preview(){
+  if(p4Live)return;
+  const g=p4Graph();
+  renderP4Roles(g,null);
+  buildComm(g,[],null);
+}
+function laneLabel(n,model){
+  const sh=LANE_SHORT[n.role]||[ (WF_ROLES[n.role]||{}).l1||n.role,'' ];
+  const [i,tot]=model.rep[n.id]||[1,1];
+  const t=(n.tg||'all');
+  return [sh[0]+' '+sh[1],(t.length>13?t.slice(0,12)+'…':t)+(tot>1?' ·'+i+'/'+tot:'')];
+}
+/* normalise backend events to the drawing vocabulary */
+function commEvents(evs,ids){
+  const K={ask:'ask',reply:'reply',decline:'decline',broadcast:'bc',volunteer:'pick',reuse:'reuse',unanswered:'none',deliver:'deliver',check:'check'};
+  return (evs||[]).filter(e=>K[e.kind]&&ids.has(e.a)&&(e.b==null||ids.has(e.b))).map(e=>({k:(e.kind==='ask'&&e.via)?'handoff':K[e.kind],a:e.a,b:e.b,via:e.via||'',hop:e.hop||0,
+    note:e.kind==='reuse'?'reuse '+(e.need_key||'')+(e.sub==='waited'?' (waited)':''):e.kind==='decline'?'declined — '+String(e.note||'').split('：')[0]:e.kind==='broadcast'?(e.sub==='downgraded'?'downgraded → broadcast':'broadcast '+(e.need_key||'')):e.kind==='ask'?(e.via?'handoff → ':'ask ')+(e.need_key||''):e.kind==='unanswered'?'no response '+(e.need_key||''):e.kind==='deliver'?(e.note||'candidates')+' →':e.kind==='check'?(e.note||'checked'):(e.kind==='reply'||e.kind==='volunteer')&&e.sub==='ignored'?'answered — ignored':(e.kind==='volunteer'?'volunteered · ':'answer · ')+(e.need_key||''),
+    sub:e.sub||''}));
+}
+/* Phase 3 role palette (the cards you click to add roles in a custom graph) */
 function renderStaticRoles(){
   const bar=$('#wfRoles');if(!bar)return;
   bar.innerHTML='';
   WF_KEYS.forEach(k=>bar.insertAdjacentHTML('beforeend',roleCardHTML(k)));
   const rp=$('#wfRolePane');if(rp)rp.hidden=false;
 }
-function renderStaticP4(){
-  const wrap=$('#p4Roles');if(!wrap)return;
-  wrap.innerHTML=WF2ROLE.map(k=>{const r=WF_ROLES[k];
-    return `<div class="node role" id="n-${k}" data-ph="4" style="--c:var(--violet)"><b>${r.name}</b><span class="sub">${esc(r.desc)}</span><div class="dyn" id="d-${k}"></div></div>`;}).join('');
-}
-function buildComm(){
-  const svg=$('#commSvg'),c=ctx,L=c.lanes;
-  if(!svg)return;
-  if(!L.length){svg.innerHTML='';$('#commHint').textContent='no discovery roles in this workflow';return;}
-  const laneW=132,padX=16,hTop=4,hH=34,gapY=18,rowH=38;
-  const need=padX*2+L.length*laneW;
-  const W=Math.max(need,470),off=(W-need)/2;
-  const xs={};L.forEach((k,i)=>xs[k]=off+padX+laneW*i+laneW/2);
-  const topY=hTop+hH+gapY,nE=c.comms.length;
-  const H=topY+(nE?nE*rowH:26)+10;
-  const col={ask:'#296DFF',ok:'#3F8C6D',dan:'#B4552D',warn:'#8A6A1F'};
-  const mk=(id,f)=>`<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${f}"/></marker>`;
-  let s=`<defs>${mk('cm-acc',col.ask)}${mk('cm-ok',col.ok)}${mk('cm-dan',col.dan)}${mk('cm-warn',col.warn)}</defs>`;
-  L.forEach(k=>{
-    const r=WF_ROLES[k],x=xs[k];
-    s+=`<rect x="${(x-laneW/2+6).toFixed(1)}" y="${hTop}" width="${laneW-12}" height="${hH}" rx="10" fill="var(--${r.c})" stroke="rgba(22,37,52,.5)" stroke-width="1.2"/>`;
-    s+=`<text class="chd" x="${x}" y="${hTop+14}" text-anchor="middle">${r.l1}</text>`;
-    s+=`<text class="chd" x="${x}" y="${hTop+26}" text-anchor="middle">${r.l2}</text>`;
-    s+=`<line class="clife" x1="${x}" y1="${hTop+hH+3}" x2="${x}" y2="${H-6}"/>`;
+function wrapLabel(t,max){
+  const out=[];let cur='';
+  String(t).split(' ').forEach(w=>{
+    if(cur&&(cur+' '+w).length>max){out.push(cur);cur=w;}else cur=cur?cur+' '+w:w;
   });
-  if(!nE)s+=`<text class="clab" x="${W/2}" y="${topY+14}" text-anchor="middle">no cross-role help needed — each lane worked independently</text>`;
-  c.comms.forEach((e,i)=>{
-    const y=topY+i*rowH;
-    let g=`<g class="cev pend" id="cev-${i}">`;
-    const dot=(x,f)=>`<circle cx="${x}" cy="${y}" r="3" fill="${f}"/>`;
-    const lab=(x,txt,cls,dy)=>`<text class="${cls}" x="${x}" y="${y+dy}" text-anchor="middle">${esc(txt)}</text>`;
-    if(e.k==='ask'){
-      const A=xs[e.a],B=xs[e.b];
-      g+=dot(A,col.ask)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.ask}" stroke-width="2" marker-end="url(#cm-acc)"/>`;
-      g+=lab((A+B)/2,e.note,'clab',-6);
-    }else if(e.k==='reply'||e.k==='pick'){
-      const A=xs[e.a],B=xs[e.b];
-      g+=dot(A,col.ok)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.ok}" stroke-width="2" marker-end="url(#cm-ok)"/>`;
-      g+=lab((A+B)/2,e.note,'clab',-6);
-    }else if(e.k==='decline'){
-      const A=xs[e.a],B=xs[e.b];
-      g+=dot(A,col.dan)+`<line x1="${A}" y1="${y}" x2="${B}" y2="${y}" stroke="${col.dan}" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#cm-dan)"/>`;
-      g+=lab((A+B)/2,e.note,'clab',-6);
+  if(cur)out.push(cur);
+  return out;
+}
+/* horizontal swimlane: one lane per workflow node (agent replica), time flows → ; each event is one column */
+function buildComm(g,events,note){
+  const svg=$('#commSvg');
+  if(!svg)return;
+  if(!g||!g.nodes.length){svg.innerHTML='';$('#commHint').textContent='';return;}
+  const model=p4Model(g),L=g.nodes.map(n=>n.id),byId=Object.fromEntries(g.nodes.map(n=>[n.id,n]));
+  const evs=commEvents(events,new Set(L));
+  const pane=$('#commPane');
+  const avail=Math.max(560,(pane&&pane.clientWidth?pane.clientWidth:900)-4);
+  const hdW=132,padL=6,padR=14,gapX=14,nE=evs.length;
+  const x0=padL+hdW+gapX;
+  const colW=nE?Math.max(96,Math.min(150,Math.floor((avail-x0-padR)/nE))):0;      /* many events: columns stop shrinking, the pane scrolls / drags sideways */
+  const maxCh=Math.max(13,Math.floor((colW-6)/5.3));
+  const availH=(pane&&pane.clientHeight?pane.clientHeight:260)-78;
+  const laneGap=Math.max(44,Math.min(78,Math.floor(availH/Math.max(2,L.length))));
+  const lines=evs.map(e=>{
+    let ls=wrapLabel(e.note,maxCh);
+    if(ls.length>3)ls=wrapLabel(e.note,Math.ceil(String(e.note).length/3)+3);
+    return ls;
+  });
+  const topNeed=Math.max(1,...evs.map((e,i)=>{
+    const up=e.k==='bc'||e.k==='none'||e.b==null?L.indexOf(e.a):Math.min(L.indexOf(e.a),L.indexOf(e.b));
+    return up===0?lines[i].length:1;
+  }));
+  const topY=Math.max(26,topNeed*10+12);
+  const ys={};L.forEach((k,i)=>ys[k]=topY+i*laneGap);
+  const lastY=topY+(L.length-1)*laneGap;
+  const W=Math.max(avail,x0+(nE?nE*colW:300)+padR);
+  const H=lastY+18;
+  const col={ask:'#296DFF',ok:'#3F8C6D',dan:'#B4552D',warn:'#8A6A1F',ho:'#7B4FD0',dl:'#5B7186'};
+  const mk=(id,f)=>`<marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${f}"/></marker>`;
+  let s=`<defs>${mk('cm-acc',col.ask)}${mk('cm-ok',col.ok)}${mk('cm-dan',col.dan)}${mk('cm-warn',col.warn)}${mk('cm-ho',col.ho)}${mk('cm-dl',col.dl)}${mk('cm-time','#AEBBC8')}</defs>`;
+  let heads='';       /* lane labels are drawn last, in a group that is pinned to the left edge while the pane scrolls sideways */
+  L.forEach(id=>{
+    const n=byId[id],r=WF_ROLES[n.role]||{c:'lgray'},y=ys[id],[l1,l2]=laneLabel(n,model);
+    s+=`<g class="lane" data-id="${esc(id)}"><title>${esc(id)}</title>`+
+       `<line class="clife${n.phase==='select'?' sel':''}" x1="${padL+hdW+3}" y1="${y}" x2="${W-padR}" y2="${y}" marker-end="url(#cm-time)"/></g>`;
+    heads+=`<g class="lane" data-id="${esc(id)}"><title>${esc(id)}</title>`+
+       `<rect x="${padL}" y="${y-15}" width="${hdW}" height="30" rx="9" fill="var(--${r.c})" stroke="rgba(22,37,52,.5)" stroke-width="1.2"/>`+
+       `<text class="chd" x="${padL+hdW/2}" y="${y-3}" text-anchor="middle">${l1}</text>`+
+       `<text class="chd" x="${padL+hdW/2}" y="${y+9}" text-anchor="middle" style="font-weight:500">${esc(l2)}</text></g>`;
+  });
+  if(!nE)s+=`<text class="clab" x="${x0+8}" y="${topY-8}">${esc(note||'no cross-agent communication yet')}</text>`;
+  evs.forEach((e,i)=>{
+    const x=x0+colW*i+colW/2;
+    let g2=`<g class="cev pend" id="cev-${i}">`;
+    const dot=(y,f)=>`<circle cx="${x}" cy="${y}" r="3" fill="${f}"/>`;
+    const lab=yTop=>{const ls=lines[i];return ls.map((t,j)=>`<text class="clab" x="${x}" y="${yTop-6-(ls.length-1-j)*10}" text-anchor="middle">${esc(t)}</text>`).join('');};
+    const vline=(ya,yb,f,m,dash)=>`<line x1="${x}" y1="${ya}" x2="${x}" y2="${yb}" stroke="${f}" stroke-width="2"${dash?` stroke-dasharray="${dash}"`:''} marker-end="url(#${m})"/>`;
+    if(e.k==='ask'||e.k==='handoff'||e.k==='deliver'||e.k==='reply'||e.k==='pick'||e.k==='decline'||e.k==='reuse'){
+      const A=ys[e.a],B=ys[e.b];
+      const f=e.k==='handoff'?col.ho:e.k==='deliver'?col.dl:e.k==='ask'?col.ask:e.k==='decline'?col.dan:col.ok;
+      const m=e.k==='handoff'?'cm-ho':e.k==='deliver'?'cm-dl':e.k==='ask'?'cm-acc':e.k==='decline'?'cm-dan':'cm-ok';
+      g2+=dot(A,f)+vline(A,B,f,m,e.k==='decline'?'6 4':(e.k==='reuse'||e.k==='deliver')?'2 4':'');
+      g2+=lab(Math.min(A,B));
     }else if(e.k==='bc'){
       const os=L.filter(k=>k!==e.a);
-      const x0=Math.min(xs[e.a],...os.map(k=>xs[k])),x1=Math.max(xs[e.a],...os.map(k=>xs[k]));
-      g+=dot(xs[e.a],col.warn)+`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="${col.warn}" stroke-width="2"/>`;
-      os.forEach(k=>{g+=`<line x1="${xs[k]}" y1="${y}" x2="${xs[k]}" y2="${y+13}" stroke="${col.warn}" stroke-width="1.6" marker-end="url(#cm-warn)"/>`;});
-      g+=lab(xs[e.a],e.note,'clab',-6);
+      const yA=ys[e.a],y0=Math.min(yA,...os.map(k=>ys[k]),yA),y1=Math.max(yA,...os.map(k=>ys[k]),yA);
+      g2+=dot(yA,col.warn)+`<line x1="${x}" y1="${y0}" x2="${x}" y2="${y1}" stroke="${col.warn}" stroke-width="2"/>`;
+      os.forEach(k=>{g2+=`<line x1="${x}" y1="${ys[k]}" x2="${x+13}" y2="${ys[k]}" stroke="${col.warn}" stroke-width="1.6" marker-end="url(#cm-warn)"/>`;});
+      g2+=lab(y0);
+    }else if(e.k==='check'){
+      const yA=ys[e.a];
+      g2+=`<rect x="${x-5}" y="${yA-5}" width="10" height="10" rx="2.5" fill="#FFF7E0" stroke="${col.warn}" stroke-width="1.8"/>`+lab(yA);
+    }else if(e.k==='none'){
+      const yA=ys[e.a];
+      g2+=`<circle cx="${x}" cy="${yA}" r="5" fill="none" stroke="${col.dan}" stroke-width="2"/><path d="M${x-3} ${yA-3}L${x+3} ${yA+3}M${x+3} ${yA-3}L${x-3} ${yA+3}" stroke="${col.dan}" stroke-width="1.6"/>`+lab(yA);
     }
-    g+=`</g>`;
-    s+=g;
+    g2+=`</g>`;
+    s+=g2;
   });
+  s+=`<g id="cmPin"><rect class="lbg" x="0" y="0" width="${x0-6}" height="${H}"/>${heads}</g>`;
   svg.innerHTML=s;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.setAttribute('width',W);svg.setAttribute('height',H);
-  $('#commHint').textContent=`${nE} interaction${nE===1?'':'s'} · solid = ask · dashed = decline`;
+  svg._geo={x0,colW};
+  const sc=svg.parentElement;if(sc){sc.scrollLeft=0;sc.scrollTop=0;}
+  requestAnimationFrame(syncCommScroll);
+  $('#commHint').textContent=events==null||!events.length&&note?`${L.length} lane${L.length===1?'':'s'} (one per node)`:`${L.length} lane${L.length===1?'':'s'} · ${nE} interaction${nE===1?'':'s'} · solid = ask · dashed = decline · dotted = evidence reuse · purple = handoff (${evs.filter(e=>e.k==='handoff').length}) · grey dotted = candidates delivered to a checker · square = check`;
+  svg._evs=evs;
 }
-function revealComm(i){
-  const c=ctx,e=c.comms[i];if(!e)return;
-  const g=$('#cev-'+i);if(g)g.classList.remove('pend');
+function commScroller(){const sv=$('#commSvg');return sv?sv.parentElement:null;}
+/* keep the lane labels pinned at the left edge, show the drag hint only when there is something to pan */
+function syncCommScroll(){
+  const sc=commScroller(),sv=$('#commSvg');if(!sc||!sv)return;
+  const pin=sv.querySelector('#cmPin');
+  if(pin)pin.setAttribute('transform',`translate(${sc.scrollLeft},0)`);
+  sv.classList.toggle('scrolled',sc.scrollLeft>2);
+  const over=sc.scrollWidth>sc.clientWidth+2||sc.scrollHeight>sc.clientHeight+2;
+  const h=$('#commPan');if(h)h.hidden=!over;
+  sc.classList.toggle('pannable',over);
 }
+/* follow the newest event while the interactions are replayed */
+function commFollow(i){
+  const sc=commScroller(),sv=$('#commSvg');if(!sc||!sv||!sv._geo||sc.scrollWidth<=sc.clientWidth+2)return;
+  const x=sv._geo.x0+sv._geo.colW*i+sv._geo.colW/2;
+  const left=sc.scrollLeft+sv._geo.x0+10,right=sc.scrollLeft+sc.clientWidth-sv._geo.colW*0.6;
+  if(x<left||x>right)sc.scrollTo({left:Math.max(0,x-sc.clientWidth*0.62),behavior:RM?'auto':'smooth'});
+}
+/* drag to pan (mouse / pen / touch), wheel pans sideways when there is nothing to scroll vertically */
+(function(){
+  const sc=commScroller();if(!sc)return;
+  let drag=null;
+  sc.addEventListener('pointerdown',e=>{
+    if(e.button!==0||!sc.classList.contains('pannable'))return;
+    drag={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop,id:e.pointerId};
+    sc.setPointerCapture(e.pointerId);sc.classList.add('dragging');
+  });
+  sc.addEventListener('pointermove',e=>{
+    if(!drag||e.pointerId!==drag.id)return;
+    sc.scrollLeft=drag.l-(e.clientX-drag.x);sc.scrollTop=drag.t-(e.clientY-drag.y);
+  });
+  const end=e=>{if(!drag)return;try{sc.releasePointerCapture(drag.id);}catch(_){}drag=null;sc.classList.remove('dragging');};
+  sc.addEventListener('pointerup',end);sc.addEventListener('pointercancel',end);
+  sc.addEventListener('wheel',e=>{
+    if(sc.scrollWidth<=sc.clientWidth+2||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+    if(sc.scrollHeight>sc.clientHeight+2)return;
+    sc.scrollLeft+=e.deltaY;e.preventDefault();
+  },{passive:false});
+  sc.addEventListener('scroll',syncCommScroll,{passive:true});
+  window.addEventListener('resize',()=>requestAnimationFrame(syncCommScroll));
+})();
+function revealComm(i){const g=$('#cev-'+i);if(g)g.classList.remove('pend');commFollow(i);}
 async function p4(){
-  const c=ctx;
-  const L=c.lanes=WF2ROLE.filter(k=>c.wf&&c.wf.nodes.some(n=>n.id===k));
-  genComms(c);
-  buildP4Roles(L);
-  buildComm();
-  const cl=$('#commLegend');if(cl)cl.hidden=false;
+  const c=ctx,g=c.wfFull;
+  p4Live=true;
   const cp=$('#commPane');if(cp)cp.classList.remove('collapsed');
-  phaseOn(4,'Data Retrieval · roles run the planned workflow, asking via directed hit or board broadcast…');
-  const tasks=c.tasks,W=c.workers,waves=c.waves;
-  const atasks=tasks.filter(t=>L.includes(WF2ROLE[t.r]));
-  const st={bi:0,kh:0};
-  const rDone={},rBI={},rKH={},rTot={};
-  L.forEach(k=>{rDone[k]=0;rBI[k]=0;rKH[k]=0;rTot[k]=atasks.filter(t=>WF2ROLE[t.r]===k).length;});
-  node('bi').classList.add('has','done');node('kh').classList.add('has','done');
-  const upd=()=>{
-    dyn('bi').innerHTML=`<strong>${st.bi}</strong> calls`;
-    dyn('kh').innerHTML=`<strong>${st.kh}</strong> calls`;
-    L.forEach(k=>{if(rBI[k]+rKH[k]>0){const n=$('#n-'+k);if(n){n.classList.add('has');$('#d-'+k).innerHTML=`BI×<strong>${rBI[k]}</strong> · KH×<strong>${rKH[k]}</strong>`;}}});
-  };
-  upd();
-  const per=Math.max(1,Math.ceil(c.comms.length/Math.max(1,waves)));
-  let ei=0;
-  const waveMs=waves<=4?950:Math.max(260,Math.round(3800/waves));
-  for(let w=0;w<waves;w++){
-    const batch=atasks.slice(w*W,(w+1)*W);
-    if(batch.length){
-      say(`Phase 4 · wave ${w+1}/${waves} — ${batch.length} agent${batch.length>1?'s':''} in parallel · dual-channel asking active…`);
-      batch.forEach(t=>{
-        const k=WF2ROLE[t.r];const n=$('#n-'+k);if(n)n.classList.add('run');
-        st.bi+=t.bi;st.kh+=t.kh;rBI[k]+=t.bi;rKH[k]+=t.kh;
-      });
-      upd();
-      await sleep(waveMs);
-      batch.forEach(t=>{
-        const k=WF2ROLE[t.r];rDone[k]++;const n=$('#n-'+k);
-        if(n){n.classList.remove('run');if((rDone[k]===rTot[k]&&rTot[k]>0)||rBI[k]>0)n.classList.add('done');}
-      });
-    }else{
-      await sleep(120);
-    }
-    for(let n=0;n<per&&ei<c.comms.length;n++,ei++)revealComm(ei);
-    upd();
+  phaseOn(4,'Data Retrieval · one agent per workflow node runs in parallel on the shared blackboard…');
+  renderP4Roles(g,null);
+  $$('#p4Roles .p4role').forEach(n=>n.classList.add('run'));$$('#p4Roles .p4n').forEach(n=>n.classList.add('run'));
+  buildComm(g,[],'agents are probing…');
+  const cl=$('#commLegend');if(cl)cl.hidden=false;
+  node('bi').classList.add('has');node('kh').classList.add('has');dyn('bi').innerHTML='…';dyn('kh').innerHTML='…';
+  let b;
+  try{
+    b=await apiPost('/api/stage4',{query:c.q,run_id:c.runId||undefined,max_parallel:curMaxP(),clarifications:c.clar||undefined,graph:toAPI(g)},60000);
+  }catch(e){
+    $$('#p4Roles .run').forEach(n=>{n.classList.remove('run');n.classList.add('err');});
+    const msg=e.name==='AbortError'?'request timed out':String(e.message||e);
+    dyn('bi').innerHTML='—';dyn('kh').innerHTML='—';
+    say('Phase 4 failed — '+msg);phaseDone(4);return false;
   }
-  while(ei<c.comms.length)revealComm(ei++);
-  if(c.comms.length)await sleep(500);
-  L.forEach(k=>{const n=$('#n-'+k);if(n)n.classList.add('done');});
+  c.runId=b.run_id;c.recall=b.recall;
+  const rec=b.recall,tr=rec.collab;
+  /* services: real probe counts (assets → BI; lineage / caliber / dimension → knowledge) */
+  const kinds={bi:0,kh:0};(tr.retrievals||[]).forEach(k=>{kinds[k.startsWith('assets:')?'bi':'kh']++;});
+  node('bi').classList.add('done');node('kh').classList.add('done');
+  dyn('bi').innerHTML=`<strong>${kinds.bi}</strong> calls`;dyn('kh').innerHTML=`<strong>${kinds.kh}</strong> calls`;
+  renderP4Roles(g,tr.agents);
+  buildComm(g,tr.events,'no cross-agent help needed — every agent worked independently');
+  const svg=$('#commSvg'),n=(svg._evs||[]).length;
+  say(`Phase 4 · ${g.nodes.length} agents ran — ${rec.candidates.length} candidate asset${rec.candidates.length===1?'':'s'} in the pool · ${tr.stats.retrievals} probes, ${tr.stats.reuse_hits} evidence reuse${tr.stats.reuse_hits===1?'':'s'}, ${tr.stats.asks} ask${tr.stats.asks===1?'':'s'} (${tr.stats.directed} directed, ${tr.stats.broadcast} broadcast, ${tr.stats.declined} declined), ${tr.stats.handoffs} handoff${tr.stats.handoffs===1?'':'s'}…`);
+  for(let i=0;i<n;i++){revealComm(i);await sleep(Math.min(420,Math.max(120,3200/n)));}
+  if(n)await sleep(300);
   phaseDone(4);
+  return true;
 }
 
+/* ================= phase 5 · asset selection (live: /api/stage5, reuses the Phase 4 recall cached under run_id) ================= */
+const RULE_LABEL={grain_hard:'grain too coarse',no_metric_field:'no metric field',pk_granularity:'key lacks dim',scope_insufficient:'scope too narrow'};
+const flagKind=f=>{const k=f.split(':')[0];return /^(no_asset_selected|metrics_not_covered|dim_term_unsupported|no_caliber_evidence|conflict|needs_permission|intent_conflict|dim_value_unresolved)$/.test(k)?'no':'warn';};
+function s5Assets(rec){const m={};((rec&&rec.candidates)||[]).forEach(c=>{m[c.asset_id]=c;});return m;}
+const assetName=(m,id)=>{const c=m[id];return esc(clip(c&&c.name&&c.name!==id?c.name:id,30));};
+const assetTip=(m,id)=>{const c=m[id];return esc(c&&c.name&&c.name!==id?c.name+'\n'+id:id);};
+/* what the removed Hard-filter panel used to say, as one line: pass count + why candidates were discarded (details on hover) */
+function filterSummary(sel){
+  const all=[...sel.primary,...sel.alternates,...sel.discarded];
+  const byRule={};sel.discarded.forEach(d=>{const r=(d.rule_ids&&d.rule_ids[0])||'other';(byRule[r]=byRule[r]||[]).push(d);});
+  const perm=sel.alternates.filter(d=>d.needs_permission).length;
+  const conf=all.filter(d=>(d.rule_ids||[]).includes('grain_conflict')).length;
+  const pills=Object.entries(byRule).map(([r,ds])=>`<span class="pill no" title="${esc(ds.map(d=>d.asset_id+' — '+d.reason.conclusion).join('\n'))}">${esc(RULE_LABEL[r]||r)} −${ds.length}</span>`).join('')
+    +(perm?pill(`permission → alt ${perm}`,'warn'):'')+(conf?pill(`grain conflict ${conf}`,'warn'):'');
+  return `<div class="s5sum"><span class="k">Hard rules <b>${all.length-sel.discarded.length}</b>/${all.length} pass</span>${pills}</div>`;
+}
+function groupFlags(flags){
+  const g={};flags.forEach(f=>{const i=f.indexOf(':'),k=i<0?f:f.slice(0,i);(g[k]=g[k]||[]).push(i<0?'':f.slice(i+1));});
+  return Object.entries(g).map(([k,v])=>`<span class="pill ${flagKind(k)}" title="${esc(v.filter(Boolean).join('\n')||k)}">${esc(k)}${v.length>1?' ×'+v.length:''}</span>`).join('');
+}
+function renderOut(sel,am){
+  const picks=sel.primary.length?sel.primary.map(d=>{
+    const QF=sel.primary.length>=3?4:8;
+    const qf=(d.query_fields||[]).slice(0,QF).map(f=>`<span class="${f.role==='metric'?'m':'d'}" title="${esc((f.note||'')||(f.role))}">${esc(f.field_alias?f.field_alias+'|'+f.field_name:f.field_name)}${f.dim_values&&f.dim_values.length?' = '+esc(f.dim_values.join(',')):''}</span>`).join('')
+      +((d.query_fields||[]).length>QF?`<span class="more">+${d.query_fields.length-QF}</span>`:'');
+    const blind=d.reason.blind_spots||[];
+    const g=(sel.groups||[]).find(x=>x.primary===d.asset_id);
+    return `<div class="pick"><span class="pickTag">✓</span><div class="body"><b title="${assetTip(am,d.asset_id)}">${assetName(am,d.asset_id)}</b>`
+      +`<span class="k">for ${esc((d.covers||[]).join(', ')||'—')}${g&&g.mode?' · '+esc(g.mode):''}${g&&g.fallback_reason?' <span class="fb" title="'+esc(g.fallback_reason)+'">LLM → rule</span>':''}</span>`
+      +(qf?`<div class="qf">${qf}</div>`:'')+`<span class="why" title="${esc(d.reason.conclusion)}">${esc(d.reason.conclusion)}</span>`
+      +(blind.length?`<span class="blind" title="${esc(blind.join('\n'))}">⚠ ${blind.length} blind spot${blind.length===1?'':'s'}</span>`:'')+`</div></div>`;}).join('')
+    :`<div class="nopick">No asset selected — ${esc((sel.risk_flags||[]).filter(f=>/^(metrics_not_covered|dim_term_unsupported)/.test(f)).join(' · ')||'no candidate supports the question')}</div>`;
+  const nP=sel.primary.length,altRows=nP>=3?2:nP===2?4:6;
+  const alt1=d=>`<li title="${esc(assetTip(am,d.asset_id)+'\n'+d.reason.conclusion)}"><span class="an">${assetName(am,d.asset_id)}</span><span class="k">${d.needs_permission?'needs permission':esc(clip(d.reason.conclusion,34))}</span></li>`;
+  const alts=sel.alternates.length||sel.discarded.length?`<div class="s5alts"><div class="k" title="${esc(sel.alternates.map(d=>assetTip(am,d.asset_id)).join('\n'))}">Alternates <b>${sel.alternates.length}</b> · rejected <b>${sel.discarded.length}</b></div>`+
+    (sel.alternates.length&&altRows?`<ul>${sel.alternates.slice(0,altRows).map(alt1).join('')}</ul>`:'')+`</div>`:'';
+  const warns=(sel.warnings||[]);
+  const flags=groupFlags(sel.risk_flags||[])+(warns.length?`<span class="pill warn" title="${esc(warns.join('\n'))}">⚠ ${warns.length} note${warns.length===1?'':'s'}</span>`:'');
+  return `${filterSummary(sel)}<div class="picks${nP>=2?' multi':''}">${picks}</div>${alts}${flags?`<div class="chiprow flags">${sel.mode?pill('mode '+esc(sel.mode),sel.mode==='llm'?'ok':''):''}${flags}</div>`:''}`;
+}
 async function p5(){
-  phaseOn(5,'Phase 5 · hard filter first, then soft ranking…');
-  const c=ctx,f=c.filter;
-  await act('hard',
-    `<strong>${f.passed}</strong>/${f.total} candidates pass<br>`+
-    pill(`permission −${f.perm}`,'no')+pill(`grain mismatch −${f.grain}`,'no')+(f.stale?pill(`stale partition −${f.stale}`,'no'):''),650);
-  await act('soft',
-    `<ul>`+c.rank.map(r=>`<li>${esc(r.n)} <span class="k">· ${esc(r.why)}</span><div class="bar"><i style="width:${Math.round(r.s*100)}%"></i></div></li>`).join('')+`</ul>`+
-    (c.metrics.length>1?`<span class="k">top-3 shown for ${esc(c.metrics[0].name)}; other metrics ranked the same way</span>`:''),750);
-  await act('out',
-    c.metrics.map(m=>
-      `<div class="pick"><span class="pickTag">✓ SELECTED</span><div><b>${esc(m.ds)}</b><span class="k">primary asset for ${esc(m.name)} · supporting: ${esc(m.tbl)}</span></div></div>`
-    ).join('')+
-    `<span class="k">Risk flags:</span> ${c.merge.conflicts?'1 evidence conflict kept for review':'none'}`,750);
+  phaseOn(5,'Phase 5 · selecting the primary asset for each metric from what Phase 4 collected and verified…');
+  const c=ctx;
+  node('out').classList.add('run');
+  let b;
+  try{
+    b=await apiPost('/api/stage5',{query:c.q,run_id:c.runId||undefined,max_parallel:curMaxP(),clarifications:c.clar||undefined},120000);
+  }catch(e){
+    node('out').classList.remove('run');node('out').classList.add('skip','has');
+    const msg=e.name==='AbortError'?'request timed out':String(e.message||e);
+    dyn('out').innerHTML=`<div class="rnote">✕ Selection failed: ${esc(msg)}</div>`;
+    say('Phase 5 failed — '+msg);phaseDone(5);return false;
+  }
+  c.runId=b.run_id;c.selection=b.selection;c.recall=b.recall||c.recall;
+  node('out').classList.remove('run');
+  const sel=b.selection;
+  if(!sel){
+    node('out').classList.add('skip','has');
+    dyn('out').innerHTML=`<div class="nopick">Selection did not run (${esc(b.status)}).</div>`;
+    phaseDone(5);return false;
+  }
+  const am=s5Assets(b.recall);
+  await act('out',renderOut(sel,am),450);
+  say(`Phase 5 · ${sel.primary.length?sel.primary.length+' primary asset'+(sel.primary.length===1?'':'s')+' selected':'no asset selected'} · ${sel.alternates.length} alternate${sel.alternates.length===1?'':'s'} · ${sel.discarded.length} rejected${b.recall_reused?' · reused the Phase 4 recall':''}.`);
   phaseDone(5);
+  return true;
 }
 
 /* ================= orchestration ================= */
@@ -1279,18 +1972,23 @@ async function run(from){
     if(from===1){
       resetNodes(1);
       ctx=analyze(q);done3=false;
-      await p1();
+      if((await p1())===false)return;
+      if((await p2())===false)return;
     }else{
       resetNodes(3);
     }
     const ok3=await p3();
     if(ok3===false){$$('.phase').forEach(p=>p.classList.remove('active'));return;}
-    await p4();
+    if(ok3==='skip'){
+      phaseSkip(4,ctx.plan.level+' · '+(ctx.plan.mode==='execute'?'no recall, no agents':'recall skipped'));
+      if(ctx.plan.mode==='select_only')await verifyInBackground();     /* L1 keeps the verification, just not as a panel */
+    }
+    else if((await p4())===false)return;
     await p5();
     done3=true;
     const c=ctx;
     $$('.phase').forEach(p=>p.classList.remove('active'));
-    say(`Done · workflow: ${ctx.wf?ctx.wf.nodes.length+' roles / '+ctx.wf.edges.length+' arrows · ':''}${c.metrics.length} metric(s) · ${c.tasks.length} discovery tasks in parallel. Click any phase header to collapse or expand it.`);
+    say(`Done · ${ctx.plan&&recallSkipped(ctx.plan)?ctx.plan.level+' — recall skipped, no workflow submitted'+(ctx.plan.mode==='select_only'?' (verification ran in the background)':'')+' · ':''}${ctx.wfFull?'workflow: '+ctx.wfFull.nodes.length+' agent nodes / '+ctx.wfFull.edges.length+' arrows · ':''}${ctx.recall?ctx.recall.candidates.length+' candidate assets retrieved. ':''}Hover chips and rows for details.`);
   }finally{
     lock(false);
   }
@@ -1299,11 +1997,13 @@ async function run(from){
 /* ================= events ================= */
 $('#ctl').addEventListener('submit',e=>{e.preventDefault();run(1);});
 $('#reset').addEventListener('click',resetAll);
+$('#ckSync').addEventListener('click',syncCookie);
+$('#ckClear').addEventListener('click',()=>{setCk('');renderCk();say('Local cookie cleared.');});
 $$('.phase').forEach(p=>{
   const h=p.querySelector('h2');
   h.setAttribute('role','button');h.setAttribute('tabindex','0');
   h.setAttribute('aria-expanded','true');
-  const tog=()=>{const c=p.classList.toggle('collapsed');h.setAttribute('aria-expanded',c?'false':'true');};
+  const tog=()=>{if(p.classList.contains('skipped'))return;const c=p.classList.toggle('collapsed');h.setAttribute('aria-expanded',c?'false':'true');};
   h.addEventListener('click',tog);
   h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
 });
@@ -1315,7 +2015,10 @@ $('#chips').addEventListener('click',e=>{
 
 /* initial pre-run state: static role previews + ready status */
 renderStaticRoles();
-renderStaticP4();
+syncP4Preview();
+async function loadRoles(){try{const r=await fetch(API+'/api/roles',apiOpts({}));if(r.ok){(await r.json()).forEach(x=>{ROLE_INFO[x.name]=x;});renderStaticRoles();}}catch(e){}}
+loadRoles();
+if(window.DD_DEMO){document.body.classList.add('demo');}else{renderCk();loadMe();}
 say('Ready — enter a question, then press Run.');
 })();
   </script>

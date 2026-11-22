@@ -1,0 +1,35 @@
+# 反向代理：自动申请 / 续期 HTTPS 证书；只放行演示需要的路径；限制请求体；加安全响应头。
+# DOMAIN 在 deploy/.env 里设置（见 README）；本机试跑用 DOMAIN=localhost（Caddy 自签证书）。
+{$DOMAIN:localhost} {
+	encode zstd gzip
+
+	# 演示不需要的端点：反向代理这一层再拦一次（应用里也拦了，纵深防御）
+	@blocked path /api/cookie /api/cookie/* /api/me /api/pairs /api/prompts /api/prompts/* /docs /docs/* /redoc /openapi.json
+	respond @blocked 404
+
+	# 请求体很小（问句 + 少量 JSON）
+	request_body {
+		max_size 64KB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# 页面是单文件、含内联脚本和样式；不加载任何外部资源，也不向外发请求
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+		-Server
+	}
+
+	reverse_proxy app:8080 {
+		# Phase 4/5 的请求可能较慢；应用端 LLM 关闭时通常 <2s，这里留足余量
+		transport http {
+			response_header_timeout 150s
+			dial_timeout 5s
+		}
+		# 覆盖客户端自带的 X-Forwarded-For，只写 Caddy 看到的真实地址（应用据此限流）
+		header_up X-Forwarded-For {remote_host}
+	}
+}

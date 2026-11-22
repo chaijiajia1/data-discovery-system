@@ -1,0 +1,9 @@
+# 只放行镜像需要的文件（仓库里还有 old-version/、.venv、真实数据、.env 等，一律不进构建上下文）
+*
+!backend/app
+!backend/prompts
+!backend/requirements.txt
+!backend/data/demo_history.jsonl
+!Data Discovery System · Interactive Walkthrough.html
+**/__pycache__
+**/*.pyc
