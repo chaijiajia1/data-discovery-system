@@ -7,6 +7,9 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.11-slim}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
     env_file: ./demo.env
     restart: unless-stopped
     expose: ["8080"]
@@ -25,7 +28,7 @@ services:
       start_period: 10s
 
   caddy:
-    image: caddy:2
+    image: ${CADDY_IMAGE:-caddy:2}
     restart: unless-stopped
     depends_on:
       app: {condition: service_healthy}

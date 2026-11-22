@@ -1,8 +1,12 @@
 # 外网演示镜像：只含后端代码 + 提示词 + 英文种子数据 + 前端页面；不含 .env、真实数据、浏览器 cookie 依赖。
 # 构建上下文 = 仓库根目录（见 docker-compose.yml）。
-FROM python:3.11-slim
+# 服务器连不上 Docker Hub / PyPI 时，通过 build args 换成可访问的镜像源（见 README「网络受限」）
+ARG PYTHON_IMAGE=python:3.11-slim
+ARG PIP_INDEX_URL=https://pypi.org/simple
+FROM ${PYTHON_IMAGE}
+ARG PIP_INDEX_URL
 
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1
+ENV PIP_INDEX_URL=${PIP_INDEX_URL} PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1
 WORKDIR /app
 
 # browser-cookie3 只用于读本机浏览器 cookie（本地开发的 Sync cookie），演示镜像不需要，去掉可少装一批依赖

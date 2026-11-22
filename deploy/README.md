@@ -34,3 +34,18 @@ docker compose up -d --build
 - **未验证**：Docker 镜像构建、compose 网络/只读文件系统、Caddy 证书与代理配置——开发机没有 Docker。首次部署后请先跑 `smoke.sh`，
   再看 `docker compose logs`。若 `read_only` 或 `internal` 网络与你的环境冲突，可先去掉这两项排查。
 - 限流依赖 Caddy 写入的 `X-Forwarded-For`；不要把 app 的 8080 直接暴露到公网。
+
+## 网络受限（服务器在中国大陆 / 连不上 Docker Hub、PyPI）
+
+症状：`registry-1.docker.io ... connection refused`（DNS 被污染，解析到非 Docker Hub 地址）。处理：
+
+1. 给 Docker 配镜像加速器（云厂商控制台里的加速地址优先），`/etc/docker/daemon.json`：
+   `{ "registry-mirrors": ["https://<加速地址>"] }`，然后 `sudo systemctl restart docker`。
+2. 或在 `deploy/.env` 指定镜像源（前缀换成你能访问的）：
+   ```
+   PYTHON_IMAGE=<镜像站>/library/python:3.11-slim
+   CADDY_IMAGE=<镜像站>/library/caddy:2
+   PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
+   ```
+3. 大陆服务器用域名对外提供 80/443 需要 ICP 备案；未备案可改用香港/海外机房。
+4. 无证书条件时，`.env` 里设 `DOMAIN=:80` 先走 HTTP 验证服务。
