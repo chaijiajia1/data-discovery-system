@@ -1,7 +1,7 @@
 """⑤ 资产选择：从 ④ 的候选池里为每个口径选出主资产，其余分入备选 / 丢弃，理由结构化可追溯。"""
 from __future__ import annotations
 
-from ...schemas.knowledge import KnowledgeItem, KnowledgeKind, KnowledgeOrigin
+from ...schemas.knowledge import CONSUMER_SELECTION, KnowledgeItem, KnowledgeKind, KnowledgeOrigin
 from ...schemas.selection import SelectionResult
 from ...structured_log import log_event
 from ..base import RunContext, Stage
@@ -12,7 +12,7 @@ from .rules import DimRef, SelectionInput, rule_select
 def build_input(ctx: RunContext) -> SelectionInput:
     """⑤ 的输入完全来自上游契约：任务契约 / ④ 候选池与证据 / ① 注入的知识 / 权限服务。"""
     rec = ctx.recall
-    knowledge = [k for k in (ctx.preinjection.injected if ctx.preinjection else []) if k.kind != KnowledgeKind.PAIR]
+    knowledge = [k for k in (ctx.preinjection.view(CONSUMER_SELECTION) if ctx.preinjection else []) if k.kind != KnowledgeKind.PAIR]   # 视图缺失回落全量时仍要剔除 PAIR 摘要块
     refs: list[DimRef] = []
     for card in rec.cards:
         for ent in card.entities:                    # 知识通道带出的关联实体：指标 / 维度也参与术语桥接

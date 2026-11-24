@@ -1,0 +1,11 @@
+# 构建覆盖：与 docker-compose.yml / docker-compose.http.yml 叠加使用（install.sh 在源码在场时自动加上）。
+#   docker compose -f docker-compose.http.yml -f docker-compose.build.yml up -d --build
+# 单独拆出来是因为离线包里没有源码，`build.context: ..` 不存在。
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.11-slim}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}

@@ -26,6 +26,7 @@ from ..schemas.collab import (
     AgentInfo, Ask, AskMode, AskRecord, AskReply, CollabEvent, CollabTrace, EvidenceCard, Need, ReplyKind, ReuseEvent,
 )
 from ..schemas.recall import BoardEntryKind
+from ..schemas.knowledge import recall_consumer
 from . import handoff as handoff_mod
 from . import router
 from .blackboard import Blackboard
@@ -48,7 +49,8 @@ class RoleEnv:
 
     deps: "Deps"
     contract: "TaskContract"
-    knowledge: list["KnowledgeItem"] = field(default_factory=list)
+    knowledge: list["KnowledgeItem"] = field(default_factory=list)    # ① 注入的全量知识（没有分发视图时各角色共用它）
+    views: dict[str, list["KnowledgeItem"]] = field(default_factory=dict)   # consumer → ① 分发给该消费方的知识（injected 的子集）
     cookie: str | None = None
     recall_params: dict[str, Any] = field(default_factory=dict)
     known_assets: list[str] = field(default_factory=list)     # L0/L1 子目标已知资产（预注入 / 会话确认）：血缘通道的种子来源之一
@@ -57,6 +59,11 @@ class RoleEnv:
     def domains(self) -> list[str]:
         d = self.contract.intent.domain if self.contract.intent else None
         return [d] if d else []
+
+    def knowledge_of(self, consumer: str) -> list["KnowledgeItem"]:
+        """某消费方的知识视图；没有登记视图 → 回落全量；登记了但为空 → 就是空（该消费方不需要知识）。"""
+        v = self.views.get(consumer)
+        return self.knowledge if v is None else v
 
 
 @dataclass
@@ -95,6 +102,10 @@ class CollabHub:
     def role_of(self, agent_id: str) -> str:
         r = self.agents.get(agent_id)
         return r.spec.name if r is not None else agent_id
+
+    def knowledge_for(self, agent_or_role: str) -> list["KnowledgeItem"]:
+        """该 agent（或角色名）看到的预注入知识：按角色取 ① 分发的视图，同一角色的多个副本看到同一份。"""
+        return self.env.knowledge_of(recall_consumer(self.role_of(agent_or_role)))
 
     @property
     def deps(self) -> "Deps":
@@ -345,7 +356,9 @@ class CollabHub:
 
 
 def build_hub(agents: dict[str, "Role"], deps: "Deps", *, contract: "TaskContract", knowledge: list["KnowledgeItem"], cookie: str | None,
-              recall_params: dict[str, Any], known_assets: list[str] | None = None, board: Blackboard | None = None) -> CollabHub:
+              recall_params: dict[str, Any], known_assets: list[str] | None = None, board: Blackboard | None = None,
+              views: dict[str, list["KnowledgeItem"]] | None = None) -> CollabHub:
     deps.profiles.ensure([r.spec for r in agents.values()])
-    env = RoleEnv(deps=deps, contract=contract, knowledge=knowledge, cookie=cookie, recall_params=recall_params, known_assets=list(known_assets or []))
+    env = RoleEnv(deps=deps, contract=contract, knowledge=knowledge, views=dict(views or {}), cookie=cookie, recall_params=recall_params,
+                  known_assets=list(known_assets or []))
     return CollabHub(board or Blackboard(), deps.profiles, agents, env)

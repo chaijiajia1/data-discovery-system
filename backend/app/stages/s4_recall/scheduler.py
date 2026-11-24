@@ -34,11 +34,12 @@ async def _run_node(role: Role, rc: RoleContext, timeout: float) -> RoleReport:
 async def run_workflow(
     graph: WorkflowGraph, *, contract: TaskContract, knowledge: list[KnowledgeItem], deps: Deps, max_parallel: int,
     seed: RoleReport | None = None, cookie: str | None = None, recall_params: dict | None = None, known_assets: list[str] | None = None,
-    mode: str = "recall_and_select",
+    mode: str = "recall_and_select", views: dict[str, list[KnowledgeItem]] | None = None,
 ) -> tuple[list[RoleReport], CollabHub]:
-    """seed：L0/L1 子目标的已知资产（由 ④ 物化），作为选择类节点的额外上游。"""
+    """seed：L0/L1 子目标的已知资产（由 ④ 物化），作为选择类节点的额外上游。
+    views：① 按角色分发的知识视图（consumer → 知识）；没登记视图的角色回落到 `knowledge` 全量。"""
     agents = build_agents(graph.nodes)        # 每个节点一个独立的 agent 副本；同一角色多个节点 = 多个副本并行
-    hub = build_hub(agents, deps, contract=contract, knowledge=knowledge, cookie=cookie, recall_params=recall_params or {}, known_assets=known_assets)
+    hub = build_hub(agents, deps, contract=contract, knowledge=knowledge, cookie=cookie, recall_params=recall_params or {}, known_assets=known_assets, views=views)
     if not graph.nodes:
         return [], hub
     graph.layers()                           # 只为校验：有环 / 悬空边在这里抛出，不会在运行中死锁

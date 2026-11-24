@@ -63,12 +63,13 @@ async def fetch_assets(hub: CollabHub, role: str, metric: str, hints: list[str] 
     return await hub.board.publish(card, assets=cands, evidences=evs)
 
 
-def lineage_seeds(hub: CollabHub, metric: str, bi_card: EvidenceCard | None, limit: int = 5) -> list[str]:
-    """血缘通道的种子 = 已有召回内容：预注入知识指明的该口径资产（含会话确认）在前，BI 通道召回的资产（经黑板复用）在后。"""
+def lineage_seeds(hub: CollabHub, metric: str, bi_card: EvidenceCard | None, limit: int = 5, role: str | None = None) -> list[str]:
+    """血缘通道的种子 = 已有召回内容：预注入知识指明的该口径资产（含会话确认）在前，BI 通道召回的资产（经黑板复用）在后。
+    预注入知识取该角色（`role`）的视图；不传 role 则用全量。"""
     from ..stages.s3_planning.levels import mentions
     env = hub.env
     seeds: list[str] = []
-    for k in env.knowledge:
+    for k in (hub.knowledge_for(role) if role else env.knowledge):
         if k.kind != KnowledgeKind.DIMENSION and mentions(k, metric):
             seeds += [a for a in k.asset_ids if a not in seeds]
     seeds += [a for a in env.known_assets if a not in seeds]
@@ -81,7 +82,7 @@ async def fetch_lineage(hub: CollabHub, role: str, metric: str, who: str, hints:
     """知识通道·图谱路：以已有召回内容为种子沿血缘找关联的表 / 数据集 / 图表。"""
     env = hub.env
     bi = await _carrier_card(hub, role, metric, who)          # 复用优先；自己能查 BI 就自己查，否则求助 BI 角色；都没有就只用知识种子
-    seeds = list(dict.fromkeys([*(hints or []), *lineage_seeds(hub, metric, bi.card)]))[:5]          # 转交带来的资产在前（如口径文档关联的资产）
+    seeds = list(dict.fromkeys([*(hints or []), *lineage_seeds(hub, metric, bi.card, role=role)]))[:5]          # 转交带来的资产在前（如口径文档关联的资产）
     names = [n for a in seeds if (n := (hub.board.pool.get(a).name if hub.board.pool.get(a) is not None else a))]
     params = {**env.recall_params, "seed_assets": seeds, "seed_names": list(dict.fromkeys(names))}
     cands = from_graph(await env.deps.lineage.search(query or metric, limit=_topk(hub, limit), cookie=env.cookie, params=params))
@@ -98,7 +99,7 @@ async def fetch_lineage(hub: CollabHub, role: str, metric: str, who: str, hints:
 async def fetch_caliber(hub: CollabHub, role: str, metric: str, who: str, hints: list[str] | None = None, query: str | None = None, limit: int | None = None) -> EvidenceCard:
     env = hub.env
     items = list(await env.deps.caliber_kb.search(query or metric, limit=_topk(hub, limit), cookie=env.cookie, params=env.recall_params))
-    items += [k for k in env.knowledge if k.id not in {i.id for i in items}]              # 复用预注入知识，避免重复检索
+    items += [k for k in hub.knowledge_for(role) if k.id not in {i.id for i in items}]    # 复用本角色的预注入知识视图，避免重复检索
     linked = [i for i in items if i.asset_ids and i.kind in (KnowledgeKind.METRIC_DEF, KnowledgeKind.ASSET_META, KnowledgeKind.DIMENSION)]
     ids = list(dict.fromkeys(a for i in linked for a in i.asset_ids))
     resolved = {c.asset_id: c for c in await env.deps.bi.get(ids)} if ids else {}           # 知识关联的资产：经 BI 取回真实元信息

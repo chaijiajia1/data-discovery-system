@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     DEMO_MODE: bool = False
     DEMO_RATE_LIMIT_PER_MIN: float = 30.0   # 每个客户端每分钟允许的 /api/stage* 等请求数
     DEMO_RATE_BURST: int = 15               # 令牌桶容量（允许的突发）
+    DEMO_TRUST_PROXY: bool = True           # 前面有可信反向代理（Caddy）时信其 X-Forwarded-For 最右地址；直接暴露端口时必须设 false
     CORS_ORIGINS: str = "*"      # 逗号分隔；前端 HTML 以 file:// 打开时 Origin 为 null，开发期用 *
 
     # LLM（OpenAI 兼容协议；为空时各阶段退化为规则/启发式实现）
@@ -41,6 +42,7 @@ class Settings(BaseSettings):
     PREINJECT_W_CONFLICT: float = 1.5
     PREINJECT_W_SYNERGY: float = 0.2
     PREINJECT_INCONSISTENT_DISCOUNT: float = 0.7   # consistencyStatus=possible_inconsistent 时 u_k 乘以该系数
+    PREINJECT_VIEWS_ENABLED: bool = True    # 按消费方（② 协调 / ③ 规划 / ④ 各角色 / ⑤ 选择）分发不同的知识视图；关闭 = 所有消费方共用 injected 全量
 
     # 路 1：context-query（POST /v1/context/retrieve）。鉴权 SSO：优先透传请求 Cookie，其次 CONTEXT_QUERY_COOKIE
     CONTEXT_QUERY_ENABLED: bool = True

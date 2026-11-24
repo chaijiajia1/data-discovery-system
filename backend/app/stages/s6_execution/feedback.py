@@ -28,8 +28,10 @@ def build_pair(query: str, contract: TaskContract, selection: SelectionResult, p
 
 
 def write_back(store: VerifiedPairStore, pair: VerifiedPair | None, pre: PreInjectionResult | None, success: bool) -> bool:
-    """成功：写入新 pair；无论成败：回写被预注入 pair 的命中/成功统计。"""
-    used_pairs = [i.source_pair_id for i in (pre.injected if pre else []) if i.source_pair_id]
+    """成功：写入新 pair；无论成败：回写被预注入 pair 的命中/成功统计。
+    只统计至少被一个消费方（视图）看到的 pair：注入了却没人用到的 pair 没有影响本次结果，不该记命中。"""
+    consumed = pre.consumed_ids() if pre else set()
+    used_pairs = [i.source_pair_id for i in (pre.injected if pre else []) if i.source_pair_id and i.id in consumed]
     if used_pairs:
         store.record_outcome(used_pairs, success)
     if success and pair is not None:

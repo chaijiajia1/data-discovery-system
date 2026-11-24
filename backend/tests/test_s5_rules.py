@@ -338,3 +338,12 @@ def test_name_inferred_hit_counts_half_and_loses_to_a_real_field_match_at_equal_
     res = rule_select(S(C(), [unknown, real]))
     assert res.primary[0].asset_id == "r" and next(x for x in res.ranking if x.asset_id == "u").dims["coverage"] == 0.5
     assert rule_select(S(C(), [unknown])).primary[0].reason.hits[0].how == "推断"          # 只有它时仍可用，不被丢弃
+
+
+# ── 分数组成：RankScore 携带权重，total = Σ weight × dim ────────────────────
+def test_rank_score_carries_weights_so_total_is_reproducible():
+    res = rule_select(SelectionInput(contract=C(dims=("渠道",)), candidates=[A("a", "A", fields=("dt", "channel", "dau"), pks=("dt", "channel")), A("b", "B", fields=("dt", "dau"))]))
+    for d in (*res.primary, *res.alternates):
+        s = d.score
+        assert set(s.weights) == set(s.dims) and sum(s.weights.values()) == pytest.approx(1.0)
+        assert s.total == pytest.approx(sum(s.weights[k] * s.dims[k] for k in s.dims), abs=1e-3)

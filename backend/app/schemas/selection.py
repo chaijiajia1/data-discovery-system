@@ -50,6 +50,7 @@ class FieldRef(BaseModel):
 class RankScore(BaseModel):
     asset_id: str
     dims: dict[str, float] = Field(default_factory=dict)    # coverage / type_rank / layer_rank / heat / retrieval …（排序用的各项）
+    weights: dict[str, float] = Field(default_factory=dict)  # dims 各项的权重（Σ=1）：total = Σ weights[k] × dims[k]，供界面展示分数组成
     total: float = 0.0                                      # 仅供展示的综合分；实际排序按选用原则的优先级，不是按它
 
 

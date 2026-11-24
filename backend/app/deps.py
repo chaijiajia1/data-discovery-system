@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from .llm_client import LLMClient, NullLLM, build_llm
 from .services.context_query import ContextQueryClient
+from .services.demo_data import DEMO_ASSETS, DEMO_KNOWLEDGE
 from .services.fakes import FakeBIRetrieval, FakeEngine, FakeKnowledgeRetrieval, FakeLineageRetrieval, FakePermission
 from .services.protocols import (
     BIAssetRetrieval, CaliberRetrieval, ExecutionEngine, KnowledgeHybridRetrieval, LineageRetrieval, PermissionService,
@@ -38,7 +39,7 @@ def build_default_deps(s: Settings | None = None) -> Deps:
             "LLM_API_KEY": "", "RECALL_LLM_ENABLED": False, "PLANNER_LLM_LEVEL_ENABLED": False, "PLANNER_LLM_EXTRA": 0,
             "ROLE_PROFILE_STORE_BACKEND": "memory",
         })
-    kh: KnowledgeHybridRetrieval = FakeKnowledgeRetrieval()
+    kh: KnowledgeHybridRetrieval = FakeKnowledgeRetrieval(DEMO_KNOWLEDGE) if s.DEMO_MODE else FakeKnowledgeRetrieval()
     if s.CONTEXT_QUERY_ENABLED:
         kh = ContextQueryClient(
             base_url=s.CONTEXT_QUERY_BASE_URL, source_types=s.context_source_types(), timeout_sec=s.CONTEXT_QUERY_TIMEOUT_SEC,
@@ -46,7 +47,9 @@ def build_default_deps(s: Settings | None = None) -> Deps:
             max_tokens=s.PREINJECT_TOKEN_BUDGET,
         )
     channels: dict = {}
-    if s.RECALL_CHANNELS_ENABLED:      # 默认关闭：真实资产元信息缺分区/粒度，⑤⑥ 仍是占位实现
+    if s.DEMO_MODE:                    # 演示：三条示例问句专用的假数据（见 services/demo_data.py）
+        channels = {"bi": FakeBIRetrieval(DEMO_ASSETS), "lineage": FakeLineageRetrieval(DEMO_ASSETS), "caliber_kb": FakeKnowledgeRetrieval(DEMO_KNOWLEDGE)}
+    elif s.RECALL_CHANNELS_ENABLED:      # 默认关闭：真实资产元信息缺分区/粒度，⑤⑥ 仍是占位实现
         channels = {"bi": BiChannel(s), "lineage": GraphChannel(s), "caliber_kb": FrameworkKnowledgeChannel(s)}
     return Deps(
         **channels,

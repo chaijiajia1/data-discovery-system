@@ -14,7 +14,7 @@ from typing import Any
 from ...errors import UpstreamError
 from ...llm_client import LLMClient
 from ...prompts import load_prompt
-from ...schemas.knowledge import KnowledgeItem, PreInjectionResult
+from ...schemas.knowledge import CONSUMER_PLANNER, KnowledgeItem, PreInjectionResult
 from ...schemas.task import TaskContract, ValueSource
 from ...schemas.workflow import GoalStatus, SubGoal
 from ..s2_coordination.agent import parse_llm_json
@@ -53,7 +53,7 @@ def build_prompt(contract: TaskContract, pre: PreInjectionResult | None, *, conf
         "required_types": "BI 资产（bi_dataset）" if required_asset_types(contract, require_bi=require_bi) else "任意数据源资产（BI 资产或明细表均可）",
         "goals": _goals_text(contract),
         "confirmed": json.dumps(confirmed, ensure_ascii=False) if confirmed else "（无）",
-        "knowledge": _knowledge_text(list(pre.injected) if pre else []),
+        "knowledge": _knowledge_text(pre.view(CONSUMER_PLANNER) if pre else []),
         "conflicts": _conflicts_text(pre),
     }
     return _PLACEHOLDER.sub(lambda m: values.get(m.group(1), m.group(0)), load_prompt("level"))
@@ -79,7 +79,7 @@ class LevelAgent:
         raw = data.get("goals")
         if not isinstance(raw, list):
             return None
-        allowed = {a for it in (pre.injected if pre else []) for a in it.asset_ids}
+        allowed = {a for it in (pre.view(CONSUMER_PLANNER) if pre else []) for a in it.asset_ids}      # 护栏白名单 = LLM 实际看到的知识
         by_key = {(str(x.get("kind")), str(x.get("name"))): x for x in raw if isinstance(x, dict)}
         out: list[SubGoal] = []
         for g in base:

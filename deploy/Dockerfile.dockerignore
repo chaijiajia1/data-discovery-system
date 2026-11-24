@@ -2,8 +2,8 @@
 *
 !backend/app
 !backend/prompts
-!backend/requirements.txt
 !backend/data/demo_history.jsonl
+!deploy/requirements.lock
 !Data Discovery System · Interactive Walkthrough.html
 **/__pycache__
 **/*.pyc

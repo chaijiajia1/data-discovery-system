@@ -52,9 +52,10 @@ def contract_json(hub: "CollabHub") -> str:
     })
 
 
-def knowledge_json(hub: "CollabHub", metrics: list[str], limit: int = 8) -> str:
+def knowledge_json(hub: "CollabHub", metrics: list[str], limit: int = 8, role: str | None = None) -> str:
+    """进 LLM prompt 的预注入知识：该角色（`role`）的视图里与指标相关的前 limit 条；不传 role 则用全量。"""
     from ..stages.s3_planning.levels import mentions       # 延迟导入：避免 roles ↔ stages 循环依赖
-    items = hub.env.knowledge
+    items = hub.knowledge_for(role) if role else hub.env.knowledge
     rel = [k for k in items if any(mentions(k, m) for m in metrics)] or items
     return _dumps([{"id": k.id, "kind": k.kind.value, "title": k.title, "content": k.content[:160], "asset_ids": k.asset_ids} for k in rel[:limit]]) if rel else "（无）"
 
@@ -81,7 +82,7 @@ async def plan_queries(hub: "CollabHub", spec: RoleSpec, metrics: list[str], kin
         return {}
     assignments = [{"metric": m, "channels": sorted(spec.channels), "needs": list(kinds)} for m in metrics]
     prompt = _render("roles/_plan", {
-        "role": role_text(spec), "assignments": _dumps(assignments), "contract": contract_json(hub), "knowledge": knowledge_json(hub, metrics),
+        "role": role_text(spec), "assignments": _dumps(assignments), "contract": contract_json(hub), "knowledge": knowledge_json(hub, metrics, role=spec.name),
         "default_limit": str(hub.settings.PREINJECT_RETRIEVAL_TOPK), "min_limit": str(hub.settings.RECALL_MIN_LIMIT), "max_limit": str(hub.settings.RECALL_MAX_LIMIT),
     })
     data = await hub.llm.json("plan", prompt)

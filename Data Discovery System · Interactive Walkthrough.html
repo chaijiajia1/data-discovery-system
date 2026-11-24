@@ -628,7 +628,7 @@ body:not(.viz) .node{padding:6px 9px}
 .lvpills .pill{margin:0}
 .gst{padding:1px 8px 1px 4px;font-size:11px;gap:5px}
 .gst i{width:14px;height:14px;font-size:10px}
-.wfcols{flex:1;min-height:0;grid-template-columns:minmax(150px,170px) minmax(0,1fr);gap:8px}
+.wfcols{flex:1;min-height:0;grid-template-columns:minmax(188px,210px) minmax(0,1fr);gap:8px}
 #wfRolePane,#wfEditPane{min-height:0;min-width:0}
 .wfpane>header{padding:4px 10px;gap:6px;font-size:10.5px}
 .wfpane>header .lg{display:none}
@@ -636,8 +636,8 @@ body:not(.viz) .node{padding:6px 9px}
 .wfbar{display:flex;flex-direction:column;gap:5px;padding:7px;overflow:auto;flex:1;min-height:0}
 .wfrole{padding:3px 8px 3px 5px;gap:7px;border-radius:9px;box-shadow:none}
 .wfrole svg{width:22px;height:22px;flex:none}
-.wfrole>div{min-width:0}
-.wfrole b{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wfrole>div,.wfrole>span{min-width:0;flex:1}
+.wfrole b{font-size:11.5px;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
 .wfrole small{display:none}
 .wfrole.on::after{content:"✓"}
 .wfrolefoot{padding:4px 9px}
@@ -679,6 +679,25 @@ body:not(.viz) .node{padding:6px 9px}
 .clegend{padding:3px 10px;gap:2px 12px;font-size:10px;flex:none}
 .clegend i{width:18px;margin-right:4px}
 
+/* ① order + marginal gain */
+.krows .ord{flex:none;width:16px;height:16px;border-radius:50%;background:var(--brand);color:#EEF8FF;font:700 9.5px/16px var(--mono);text-align:center}
+.krows .gain{margin-left:auto;flex:none;font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ok)}
+/* ⑤ card: metrics · score · composition · ambiguity */
+#d-out .phead{display:flex;align-items:baseline;gap:8px}
+#d-out .phead b{flex:1;min-width:0}
+#d-out .score{flex:none;font:700 15px var(--mono);color:var(--ink-strong)}
+#d-out .mets{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:3px}
+#d-out .met{font-size:10.5px;font-weight:700;border:1px solid rgba(41,109,255,.4);border-radius:7px;padding:0 6px;background:rgba(255,255,255,.9);color:var(--ink-strong)}
+#d-out .sbar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(145,165,186,.22);margin-top:6px}
+#d-out .sbar i{display:block;height:100%}
+#d-out .scomp{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px;font-size:10.5px;color:var(--muted)}
+#d-out .sc{cursor:help;white-space:nowrap}#d-out .pick .sc b,#d-out .pick .amb b{display:inline;font-size:inherit;font-weight:700;letter-spacing:0;white-space:normal;overflow:visible}
+#d-out .sc b{font-family:var(--mono);color:var(--ink-strong)}
+#d-out .sc u{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:4px;vertical-align:0}
+#d-out .s0{background:#296DFF}#d-out .s1{background:#7B4FD0}#d-out .s2{background:#3F8C6D}#d-out .s3{background:#D49A2A}#d-out .s4{background:#5B7186}
+#d-out .amb{margin-top:6px;padding:5px 8px;border:1px dashed rgba(138,106,31,.55);border-radius:8px;background:rgba(255,247,224,.7);font-size:10.5px;color:var(--warn);line-height:1.4}
+#d-out .amb ul{margin:2px 0 0;padding-left:14px}
+#d-out .amb .kept{margin-top:3px;color:var(--ink)}
 /* ⑤ selection */
 #ph5{display:flex;flex-direction:column}
 #n-out{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
@@ -928,7 +947,7 @@ $('#ph4').innerHTML=H(4,'Data Retrieval')+
     `<div class="p4roles"><b class="rolesT">Parallel discovery roles <span style="font-weight:400;color:var(--muted)">(as planned in Phase 3 — confirmed workflow)</span></b>`+
     `<div class="roles" id="p4Roles"></div></div>`+
   `</div>`+
-  `<div class="wfpane commPane" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows →</span><span class="panhint" id="commPan" hidden title="Drag the swimlane (or use the scrollbar / shift+wheel) to see the rest">⇄ drag to pan</span><span class="hintR" id="commHint"></span></header>`+
+  `<div class="wfpane commPane" id="commPane"><header>Communication · dual-channel asking <span class="lg">lanes = roles · time flows →</span><span class="panhint" id="commPan" hidden title="Drag the swimlane (or use the scrollbar / shift+wheel) to see the rest">⇄ drag to pan</span></header>`+
     `<div class="wfscroll"><svg class="csvg" id="commSvg" role="img" aria-label="Role communication swimlane"></svg></div>`+
     `<div class="clegend" id="commLegend" hidden>`+
       `<span title="directed ask — high-confidence profile hit"><i style="border-color:#296DFF"></i>ask</span>`+
@@ -966,7 +985,6 @@ function resetNodes(from){
     p4Live=false;syncP4Preview();
     const cs=$('#commSvg');if(cs)cs.innerHTML='';
     const cl=$('#commLegend');if(cl)cl.hidden=true;
-    const ch=$('#commHint');if(ch)ch.textContent='';
   }
   if(from<=3)$('#dispatch').classList.remove('on');
   if(from<=3){resetWFUI();$('#ph3').classList.remove('lvlonly');}
@@ -1093,7 +1111,7 @@ function wfLayout(wf,svg){
   wf.nodes.forEach(n=>{(cols[depth[n.id]]=cols[depth[n.id]]||[]).push(n.id);});
   const maxD=Math.max(0,...Object.keys(cols).map(Number));
   const maxCnt=Math.max(1,...Object.values(cols).map(a=>a.length));
-  const colW=140,rowH=64,padX=58,padY=16;
+  const colW=150,rowH=84,padX=64,padY=14,UP=24,DOWN=54;      /* a node = circle (up to UP above its centre) + role label + target label (down to DOWN below) — rowH must exceed UP+DOWN so neighbours never overlap */
   /* a layer with many nodes is folded into several sub-columns: pick the fold that keeps the graph biggest in the pane it is drawn in
      (fewest rows wins ties, so small graphs keep the plain layered look) */
   const box=svg&&svg.parentElement;
@@ -1102,7 +1120,7 @@ function wfLayout(wf,svg){
   for(let rows=1;rows<=maxCnt;rows++){
     const offs=[];let nx=0;
     for(let d=0;d<=maxD;d++){offs[d]=nx;nx+=Math.ceil(((cols[d]||[]).length||1)/rows);}
-    const W=padX*2+nx*colW,H=padY*2+Math.min(rows,maxCnt)*rowH,scale=Math.min(1,aw/W,ah/H);
+    const W=padX*2+nx*colW,H=padY*2+UP+DOWN+(Math.min(rows,maxCnt)-1)*rowH,scale=Math.min(1,aw/W,ah/H);
     if(!best||scale>best.scale+1e-6)best={rows,W,H,offs,scale};
   }
   const {rows,W,H,offs}=best;
@@ -1113,7 +1131,7 @@ function wfLayout(wf,svg){
     if(rows<arr.length)arr=[...arr].sort((a,b)=>hasOut(a)-hasOut(b));      /* folded layer: unconnected nodes first, so no node sits on an arrow between a node and its successor */
     arr.forEach((id,i)=>{
       const sub=Math.floor(i/rows),r=i%rows,inSub=Math.min(rows,arr.length-sub*rows);
-      pos[id]={x:padX+(offs[d]+sub)*colW,y:Math.round(H/2+(r-(inSub-1)/2)*rowH)};
+      pos[id]={x:padX+(offs[d]+sub)*colW,y:Math.round(padY+UP+(r+(rows-inSub)/2)*rowH)};
     });
   }
   return{pos,W,H};
@@ -1217,7 +1235,7 @@ function renderLevels(plan){
   $('#wfLevels').innerHTML=
     `<span class="lvlbig ${lv}"><i>${lv}</i>Entry level</span>`+
     `<span class="lvgoals">${plan.sub_goals.map(chip).join('')}</span>`+
-    `<span class="lvpills">${pill(esc(MODE_LABEL[plan.mode]||plan.mode))}${pill('A<sub>max</sub> '+plan.max_parallel)}${plan.llm_used?pill('LLM','ok'):''}${known}</span>`+
+    `<span class="lvpills">${pill(esc(MODE_LABEL[plan.mode]||plan.mode))}${plan.llm_used?pill('LLM','ok'):''}${known}</span>`+
     (plan.degraded?`<div class="warnbox" style="flex-basis:100%">${plan.notes.map(esc).join('<br>')}</div>`:'');
   $('#wfLevelPane').hidden=false;
 }
@@ -1609,13 +1627,16 @@ function renderKr(r){
 function renderSel(r){
   const inj=r.injected,tr=Object.fromEntries(r.trace.map(t=>[t.item_id,t]));
   const route=i=>i.routes.length>1?'pair+retrieval':(i.routes[0]||i.origin);
+  /* injected[] is already in greedy pick order; trace[k].delta = marginal gain of adding that block to the set so far */
+  const ord=Object.fromEntries(inj.map((i,n)=>[i.id,n+1]));
+  let run=0;const cum=Object.fromEntries(inj.map(i=>[i.id,run+=(tr[i.id]||{}).delta||0]));
   const tip=i=>{const t=tr[i.id]||{};const ix=Object.values(t.interactions||{}).reduce((s,x)=>s+x,0);
-    return `${t.step||''}. ${i.title} [${i.kind} · ${route(i)}]\n${i.token_cost} tok · u ${t.utility!=null?t.utility.toFixed(2):i.relevance.toFixed(2)} · Δ ${t.delta!=null?t.delta.toFixed(2):'—'}${ix?` (w ${ix>0?'+':''}${ix.toFixed(2)})`:''} · Δ/c ${t.ratio!=null?t.ratio.toFixed(4):'—'}`;};
+    return `#${ord[i.id]} picked · ${i.title} [${i.kind} · ${route(i)}]\nsimilarity to the query (independent score u) ${i.relevance.toFixed(2)}\nmarginal gain Δ ${t.delta!=null?(t.delta>=0?'+':'')+t.delta.toFixed(2):'—'}${ix?` = u ${ix>0?'+':'−'} interaction ${Math.abs(ix).toFixed(2)} (${ix>0?'synergy':'redundancy / conflict with blocks already picked'})`:' (no interaction with blocks already picked)'}\nset value so far V(S) = ${cum[i.id].toFixed(2)}\ncost ${i.token_cost} tok · Δ/c ${t.ratio!=null?t.ratio.toFixed(4):'—'}`;};
   const dropped=r.dropped;
   const MAXC=5;
-  return mini(['Selected',`${inj.length}/${r.candidate_count}`,'knowledge blocks chosen / candidates'],['Tokens',`${r.used_tokens}/${r.token_budget}`,`capacity L = ${r.token_budget} (hard cap) · stop when max Δ/c < τ = ${r.tau}`],['V(S)',r.total_value.toFixed(2),'Σ u_k + Σ w_ij'])+
+  return mini(['Selected',`${inj.length}/${r.candidate_count}`,'knowledge blocks chosen / candidates'],['Tokens',`${r.used_tokens}/${r.token_budget}`,`capacity L = ${r.token_budget} (hard cap) · stop when max Δ/c < τ = ${r.tau}`],['V(S)',r.total_value.toFixed(2),'value of the selected set = sum of every pick\'s marginal gain (Σ u_k + Σ w_ij)'])+
     (inj.length?`<ul class="krows">`+inj.slice(0,MAXC).map(i=>{const t=tr[i.id]||{};
-        return `<li class="${esc(i.kind)}" title="${esc(tip(i))}"><span class="kn">${esc(clip(i.title,22))}</span><i>${esc(i.kind.replace('_def','').replace('business_term','term').replace('asset_meta','asset'))}</i><span class="k">${i.token_cost} tok${t.delta!=null?' · Δ '+t.delta.toFixed(2):''}</span></li>`;}).join('')+
+        return `<li class="${esc(i.kind)}" title="${esc(tip(i))}"><span class="ord">${ord[i.id]}</span><span class="kn">${esc(clip(i.title,22))}</span><i>${esc(i.kind.replace('_def','').replace('business_term','term').replace('asset_meta','asset'))}</i><span class="gain">${t.delta!=null?(t.delta>=0?'+':'−')+Math.abs(t.delta).toFixed(2):'—'}</span></li>`;}).join('')+
         (inj.length>MAXC?`<li class="more" title="${esc(inj.slice(MAXC).map(tip).join('\n\n'))}">+${inj.length-MAXC} more</li>`:'')+`</ul>`+
         (dropped.length?`<div class="chiprow"><span class="kchip drop" title="${esc(dropped.map(d=>(d.title||d.item_id)+' · '+d.reason+(d.detail?' — '+d.detail:'')).join('\n'))}">dropped ${dropped.length}</span></div>`:'')
       :'<span class="k">No knowledge selected</span>');
@@ -1740,7 +1761,7 @@ function wrapLabel(t,max){
 function buildComm(g,events,note){
   const svg=$('#commSvg');
   if(!svg)return;
-  if(!g||!g.nodes.length){svg.innerHTML='';$('#commHint').textContent='';return;}
+  if(!g||!g.nodes.length){svg.innerHTML='';return;}
   const model=p4Model(g),L=g.nodes.map(n=>n.id),byId=Object.fromEntries(g.nodes.map(n=>[n.id,n]));
   const evs=commEvents(events,new Set(L));
   const pane=$('#commPane');
@@ -1814,7 +1835,6 @@ function buildComm(g,events,note){
   svg._geo={x0,colW};
   const sc=svg.parentElement;if(sc){sc.scrollLeft=0;sc.scrollTop=0;}
   requestAnimationFrame(syncCommScroll);
-  $('#commHint').textContent=events==null||!events.length&&note?`${L.length} lane${L.length===1?'':'s'} (one per node)`:`${L.length} lane${L.length===1?'':'s'} · ${nE} interaction${nE===1?'':'s'} · solid = ask · dashed = decline · dotted = evidence reuse · purple = handoff (${evs.filter(e=>e.k==='handoff').length}) · grey dotted = candidates delivered to a checker · square = check`;
   svg._evs=evs;
 }
 function commScroller(){const sv=$('#commSvg');return sv?sv.parentElement:null;}
@@ -1914,22 +1934,45 @@ function groupFlags(flags){
   const g={};flags.forEach(f=>{const i=f.indexOf(':'),k=i<0?f:f.slice(0,i);(g[k]=g[k]||[]).push(i<0?'':f.slice(i+1));});
   return Object.entries(g).map(([k,v])=>`<span class="pill ${flagKind(k)}" title="${esc(v.filter(Boolean).join('\n')||k)}">${esc(k)}${v.length>1?' ×'+v.length:''}</span>`).join('');
 }
+/* score composition: backend RankScore = weights × dims; each segment is that factor's contribution to the total */
+const SC_LABEL={coverage:'field coverage',type_rank:'asset type',layer_rank:'data layer',heat:'popularity',retrieval:'retrieval score'};
+const scoreParts=sc=>Object.keys(sc.weights||{}).map(k=>({k,label:SC_LABEL[k]||k,w:sc.weights[k],v:(sc.dims||{})[k]||0,c:sc.weights[k]*((sc.dims||{})[k]||0)}));
+function scoreHTML(sc){
+  if(!sc||!sc.weights)return '';
+  const ps=scoreParts(sc);
+  return `<div class="sbar" aria-hidden="true">${ps.map((p,i)=>`<i class="s${i}" style="width:${(p.c*100).toFixed(1)}%"></i>`).join('')}</div>`
+    +`<div class="scomp">${ps.map((p,i)=>`<span class="sc" title="${esc(`${p.label}: weight ${p.w.toFixed(2)} × value ${p.v.toFixed(2)} = ${p.c.toFixed(3)}`)}"><u class="s${i}"></u>${esc(p.label)} <b>${p.c.toFixed(2)}</b></span>`).join('')}</div>`;
+}
+/* ambiguity = the primary was not the only reasonable answer: another candidate ties on coverage, or a hit was bridged by synonym / inference */
+function ambiguityOf(sel,d,am){
+  const out=[],cov=x=>x.score&&x.score.dims?x.score.dims.coverage:null;
+  const mine=d.covers||[];
+  /* only alternates that were eligible and simply lost count as a tie — a chart that failed its strict conditions or an asset without permission was never a real contender */
+  const ties=sel.alternates.filter(a=>!a.needs_permission&&!(a.rule_ids||[]).some(r=>r==='chart_conditions'||r==='permission')&&a.score&&d.score&&(a.covers||[]).some(c=>mine.includes(c))&&Math.abs(cov(a)-cov(d))<.005)
+    .sort((x,y)=>Math.abs(x.score.total-d.score.total)-Math.abs(y.score.total-d.score.total));
+  ties.slice(0,2).forEach(a=>out.push(`Ties with <b>${assetName(am,a.asset_id)}</b> on field coverage ${cov(d).toFixed(2)} (score ${a.score.total.toFixed(2)} vs ${d.score.total.toFixed(2)}${a.score.total>d.score.total?' — higher, but the ranking follows the selection rules, not the score':''}) — ${esc(a.reason.conclusion)}`));
+  if(ties.length>2)out.push(`+${ties.length-2} more candidates tie on field coverage`);
+  (d.reason.hits||[]).filter(h=>h.how==='同义'||h.how==='推断').forEach(h=>
+    out.push(h.matched==='[]'?`“${esc(h.term)}” is assumed supported: the asset declares no dimension limit`:`“${esc(h.term)}” is matched by ${h.how==='同义'?'synonym':'inference'} (${esc(h.matched)}), not literally`));
+  (d.reason.downweights||[]).forEach(w=>out.push(esc(w)));
+  if(!out.length)return '';
+  const why=(d.reason.rules&&d.reason.rules.length?d.reason.rules.join(' · '):d.reason.conclusion)||'';
+  return `<div class="amb"><b>⚠ Ambiguous</b><ul>${out.map(x=>`<li>${x}</li>`).join('')}</ul>${why?`<div class="kept"><b>Why this one is kept:</b> ${esc(why)}</div>`:''}</div>`;
+}
 function renderOut(sel,am){
   const picks=sel.primary.length?sel.primary.map(d=>{
-    const QF=sel.primary.length>=3?4:8;
-    const qf=(d.query_fields||[]).slice(0,QF).map(f=>`<span class="${f.role==='metric'?'m':'d'}" title="${esc((f.note||'')||(f.role))}">${esc(f.field_alias?f.field_alias+'|'+f.field_name:f.field_name)}${f.dim_values&&f.dim_values.length?' = '+esc(f.dim_values.join(',')):''}</span>`).join('')
-      +((d.query_fields||[]).length>QF?`<span class="more">+${d.query_fields.length-QF}</span>`:'');
-    const blind=d.reason.blind_spots||[];
-    const g=(sel.groups||[]).find(x=>x.primary===d.asset_id);
-    return `<div class="pick"><span class="pickTag">✓</span><div class="body"><b title="${assetTip(am,d.asset_id)}">${assetName(am,d.asset_id)}</b>`
-      +`<span class="k">for ${esc((d.covers||[]).join(', ')||'—')}${g&&g.mode?' · '+esc(g.mode):''}${g&&g.fallback_reason?' <span class="fb" title="'+esc(g.fallback_reason)+'">LLM → rule</span>':''}</span>`
-      +(qf?`<div class="qf">${qf}</div>`:'')+`<span class="why" title="${esc(d.reason.conclusion)}">${esc(d.reason.conclusion)}</span>`
-      +(blind.length?`<span class="blind" title="${esc(blind.join('\n'))}">⚠ ${blind.length} blind spot${blind.length===1?'':'s'}</span>`:'')+`</div></div>`;}).join('')
+    const sc=d.score;
+    return `<div class="pick"><span class="pickTag">✓</span><div class="body"><div class="phead"><b title="${assetTip(am,d.asset_id)}">${assetName(am,d.asset_id)}</b>`
+      +(sc?`<span class="score" title="total = Σ weight × factor value (display only — the actual ranking follows the selection rules in priority order)">${sc.total.toFixed(2)}</span>`:'')+`</div>`
+      +`<div class="mets"><span class="k">metrics</span>${(d.covers||[]).map(m=>`<span class="met">${esc(m)}</span>`).join('')||'<span class="k">—</span>'}</div>`
+      +scoreHTML(sc)+ambiguityOf(sel,d,am)+`</div></div>`;}).join('')
     :`<div class="nopick">No asset selected — ${esc((sel.risk_flags||[]).filter(f=>/^(metrics_not_covered|dim_term_unsupported)/.test(f)).join(' · ')||'no candidate supports the question')}</div>`;
-  const nP=sel.primary.length,altRows=nP>=3?2:nP===2?4:6;
+  const nP=sel.primary.length,ALT_MAX=5;
+  /* keep only the five strongest alternates (by display score); the rest are still listed in the tooltip */
+  const altAll=[...sel.alternates].sort((x,y)=>((y.score&&y.score.total)||0)-((x.score&&x.score.total)||0)),altShown=altAll.slice(0,ALT_MAX);
   const alt1=d=>`<li title="${esc(assetTip(am,d.asset_id)+'\n'+d.reason.conclusion)}"><span class="an">${assetName(am,d.asset_id)}</span><span class="k">${d.needs_permission?'needs permission':esc(clip(d.reason.conclusion,34))}</span></li>`;
-  const alts=sel.alternates.length||sel.discarded.length?`<div class="s5alts"><div class="k" title="${esc(sel.alternates.map(d=>assetTip(am,d.asset_id)).join('\n'))}">Alternates <b>${sel.alternates.length}</b> · rejected <b>${sel.discarded.length}</b></div>`+
-    (sel.alternates.length&&altRows?`<ul>${sel.alternates.slice(0,altRows).map(alt1).join('')}</ul>`:'')+`</div>`:'';
+  const alts=sel.alternates.length||sel.discarded.length?`<div class="s5alts"><div class="k" title="${esc(altAll.map(d=>assetTip(am,d.asset_id)).join('\n'))}">Alternates <b>${altShown.length}</b>${altAll.length>ALT_MAX?` of ${altAll.length}`:''} · rejected <b>${sel.discarded.length}</b></div>`+
+    (altShown.length?`<ul>${altShown.map(alt1).join('')}</ul>`:'')+`</div>`:'';
   const warns=(sel.warnings||[]);
   const flags=groupFlags(sel.risk_flags||[])+(warns.length?`<span class="pill warn" title="${esc(warns.join('\n'))}">⚠ ${warns.length} note${warns.length===1?'':'s'}</span>`:'');
   return `${filterSummary(sel)}<div class="picks${nP>=2?' multi':''}">${picks}</div>${alts}${flags?`<div class="chiprow flags">${sel.mode?pill('mode '+esc(sel.mode),sel.mode==='llm'?'ok':''):''}${flags}</div>`:''}`;

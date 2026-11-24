@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 
 from ..asset_match import covered_dims
 from ..schemas.collab import Need
+from ..schemas.knowledge import CONSUMER_CHECKS
 from ..schemas.recall import CandidateAsset, Evidence, EvidenceKind
 from .base import new_evidence_id
 from .retrieve import make_need
@@ -67,7 +68,7 @@ async def inline_checks(role: "Role", rc: "RoleContext", metrics: list[str]) -> 
         dims_wanted = [str(d) for d in (rc.contract.dimensions.value or [])]
         uncovered = list(dims_wanted)
         for c in cands:
-            covered = covered_dims(c, dims_wanted, hub.env.knowledge)             # 与 ⑤ 共用 asset_match：字面 / 同义（知识桥接）/ 部分（角色一致）
+            covered = covered_dims(c, dims_wanted, hub.env.knowledge_of(CONSUMER_CHECKS))             # 与 ⑤ 共用 asset_match：字面 / 同义（知识桥接）/ 部分（角色一致）
             uncovered = [d for d in uncovered if d not in covered]
             evs.append(Evidence(id=new_evidence_id(), asset_id=c.asset_id, kind=EvidenceKind.FIELD, statement=f"{c.name} 覆盖维度 {covered or '无'}",
                                 value=covered, role=spec.name, source="bi_asset", confidence=0.6))

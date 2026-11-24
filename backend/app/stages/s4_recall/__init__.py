@@ -8,10 +8,16 @@ L0 / L1 子目标跳过召回：③ 给出的已知资产经 `deps.bi.get` 物�
 """
 from __future__ import annotations
 
+from ...schemas.knowledge import PreInjectionResult
 from ...schemas.recall import RecallResult, RoleReport
 from ..base import RunContext, Stage
 from .merger import merge
 from .scheduler import run_workflow
+
+
+def views_for_hub(pre: PreInjectionResult | None) -> dict:
+    """① 分发给 ④ 各角色（及内联核对）的知识视图：consumer（recall.*）→ 知识。没有分发视图 → 空（各角色回落全量）。"""
+    return {c: pre.view(c) for c in (pre.views if pre else {}) if c.startswith("recall.")}
 
 
 class RecallStage(Stage[RecallResult]):
@@ -27,6 +33,7 @@ class RecallStage(Stage[RecallResult]):
         reports, hub = await run_workflow(
             ctx.plan.chosen.graph, contract=ctx.contract, knowledge=knowledge, deps=ctx.deps, max_parallel=ctx.plan.max_parallel,
             seed=seed, cookie=ctx.cookie, recall_params=ctx.plan.recall_params, known_assets=ctx.plan.known_assets, mode=ctx.plan.mode,
+            views=views_for_hub(ctx.preinjection),
         )
         result = merge(([seed] if seed else []) + reports, knowledge, board=hub.board, role_of=hub.role_of)
         result.role_reports = reports            # seed 不是角色，不进角色报告

@@ -1,6 +1,6 @@
 # 外网演示部署（假数据，完全公开）
 
-单容器同源提供前端页面 + API，前面是 Caddy（自动 HTTPS）。演示模式（`DEMO_MODE=true`）下：
+单容器同源提供前端页面 + API；可选在前面放 Caddy（自动 HTTPS）。演示模式（`DEMO_MODE=true`）下：
 
 - 只使用内置假数据，不连内网、不调 LLM、不读/存 cookie、不展示 Cookie 控件；
 - `/api/cookie*`、`/api/me`、`/api/pairs`、`/api/prompts*`、`/docs`、`/redoc`、`/openapi.json` 全部 404（应用与 Caddy 各拦一次）；
@@ -8,32 +8,86 @@
 - 页面已去掉遥测脚本；种子历史只读，公开请求产生的配对只存内存，重启即恢复；
 - 必须单实例单 worker（run 缓存在进程内存）。
 
-## 部署步骤
+前提：服务器已装 Docker + compose 插件。
 
-前提：服务器已装 Docker + compose 插件；域名 A 记录指向服务器；放行 80/443（含 UDP 443）。
+## 三种部署方式
+
+| 方式 | 服务器需要 | 命令 |
+|---|---|---|
+| A. 离线包（推荐，换服务器最省事） | 只要 Docker + compose 插件 | 本机 `./pack.sh` → 拷包 → 服务器 `./install.sh http` |
+| B. 服务器上直接构建 | Docker + compose + 能访问 Docker Hub / PyPI（或镜像源）+ 整个仓库 | `cd deploy && ./install.sh http` |
+| C. 手动 compose / `docker run` | 同 B | 见下 |
+
+两种访问形态（任选其一，`install.sh` 的参数）：
+
+- `http`：只起 app，`http://<服务器IP>:8080`。没有域名 / 内网 / 先验证时用。**没有反向代理**，所以自动设 `DEMO_TRUST_PROXY=false`（限流只认连接对端地址，`X-Forwarded-For` 不可信）。
+- `https`：app + Caddy 自动申请证书，需要域名（A 记录指向本机）并放行 80/443（含 UDP 443）。先在 `.env` 里把 `DOMAIN` 改成真实域名。
+
+### A. 离线包
 
 ```bash
+# 开发机（有 Docker + buildx，能联网）
 cd deploy
-cp demo.env.example demo.env          # 无密钥，可直接用；按需改限流
-echo "DOMAIN=demo.example.com" > .env # 你的域名
-docker compose up -d --build
-./smoke.sh https://demo.example.com   # 冒烟：健康检查、页面、屏蔽路径、3 条示例问句、超长输入
+./pack.sh                                  # 默认 linux/amd64；ARM 服务器：PLATFORM=linux/arm64 ./pack.sh
+scp dist/dd-demo-bundle.tar.gz user@server:~
+
+# 目标服务器
+tar xzf dd-demo-bundle.tar.gz && cd dd-demo-bundle
+./install.sh http                          # 或 ./install.sh https（先改 .env 里的 DOMAIN）
 ```
 
-更新：`git pull && docker compose up -d --build`。日志：`docker compose logs -f app`。
+`install.sh` 会：`docker load` 镜像 → 没有 `demo.env` / `.env` 就从示例复制 → `docker compose up -d` → 等健康检查 → 跑 `smoke.sh`。停止：`./install.sh down`。
 
-## 示例问句（均已验证每个指标都能选出主资产）
+> **Apple Silicon（M 系列 Mac）注意**：默认构建出的是 arm64 镜像，拷到 x86 服务器会报 `exec format error`。`build-image.sh` 因此显式指定平台（默认 `linux/amd64`），不要绕过它直接 `docker build`。
 
-- Last 7 days DAU and CTR by platform
-- Last 30 days CTR by platform
-- Last 7 days DAU and GMV by channel
+### B / C. 在服务器上构建 / 手动
+
+```bash
+git clone <repo> && cd <repo>/deploy
+./install.sh http                          # 等价于下面这条（叠加 docker-compose.build.yml 以便本机构建）
+docker compose -f docker-compose.http.yml -f docker-compose.build.yml up -d --build
+
+# 只想看一眼、不用 compose：镜像内置了全部演示默认值
+docker build -f deploy/Dockerfile -t dd-demo .        # 在仓库根目录执行
+docker run --rm -p 8080:8080 -e DEMO_TRUST_PROXY=false dd-demo
+```
+
+更新：`git pull && ./install.sh http`（或重新 `./pack.sh` 拷新包）。日志：`docker compose -f docker-compose.http.yml logs -f app`。
+
+### 配置文件
+
+| 文件 | 作用 |
+|---|---|
+| `.env`（`.env.example`） | compose 变量：`DOMAIN` / `APP_PORT` / `APP_BIND` / `DD_IMAGE` / 镜像源 |
+| `demo.env`（`demo.env.example`） | 传给应用的环境变量（限流等）；镜像里已内置默认值，不改也能跑 |
+| `requirements.lock` | 镜像里的依赖版本锁，保证不同服务器、不同时间构建结果一致 |
+
+更新依赖锁（需要 Python 3.11）：
+
+```bash
+python3.11 -m venv /tmp/lockvenv && grep -vi '^browser-cookie3' ../backend/requirements.txt > /tmp/req.txt
+/tmp/lockvenv/bin/pip install -r /tmp/req.txt && /tmp/lockvenv/bin/pip freeze > requirements.lock
+```
+
+## 示例问句与演示数据
+
+三条示例问句的假数据在 `backend/app/services/demo_data.py`（资产 / 知识）和 `backend/data/demo_history.jsonl`（历史配对），均为示意占位，每个面板都有内容：
+
+| 问句 | 入口级别 | 看点 |
+|---|---|---|
+| Last 7 days DAU and CTR by platform | L2 完整召回 | DAU / CTR 各有「应用层 vs 明细层」同覆盖度平局（界面上的 Ambiguous 说明）、月表被丢弃、明细日志无指标字段 |
+| Last 30 days CTR by platform | L2 完整召回 | 召回阶段有询问 / 转交；备选含未达标图表 |
+| Last 7 days DAU and GMV by channel | L0 直接执行 | 知识已覆盖全部子目标，跳过 Phase 3 / 4；财务审计表无权限，降级到备选 |
+
+Phase 5 的备选最多显示 5 个（按展示分数从高到低）。
 
 ## 验证状态（如实说明）
 
-- 已验证：全量 pytest（含 `tests/test_demo_mode.py`）；用与 `demo.env` 相同的环境变量起本地 uvicorn，`smoke.sh` 全部通过。
-- **未验证**：Docker 镜像构建、compose 网络/只读文件系统、Caddy 证书与代理配置——开发机没有 Docker。首次部署后请先跑 `smoke.sh`，
-  再看 `docker compose logs`。若 `read_only` 或 `internal` 网络与你的环境冲突，可先去掉这两项排查。
-- 限流依赖 Caddy 写入的 `X-Forwarded-For`；不要把 app 的 8080 直接暴露到公网。
+- 已验证：全量 pytest（含 `tests/test_demo_mode.py`、`tests/test_demo_data.py`）在**仅按 `requirements.lock` 安装的干净 venv** 里通过；
+  按镜像的目录布局（只含 app / prompts / demo_history / index.html）和镜像内置的环境变量起 uvicorn，`smoke.sh` 全部通过；脚本 `bash -n` 通过，三个 compose 文件 YAML 可解析。
+- **未验证**：Docker 镜像构建、compose 网络 / 只读文件系统、Caddy 证书与代理、`pack.sh` / `install.sh` 的实际执行——开发机没有 Docker。
+  首次部署后请看 `install.sh` 末尾的冒烟结果和 `docker compose logs`。若 `read_only` 或 `internal` 网络与你的环境冲突，可先去掉这两项排查。
+- 限流依赖 Caddy 写入的 `X-Forwarded-For`（https 模式）；http 模式已自动改为只认连接地址。https 模式下不要把 app 的 8080 直接暴露到公网。
 
 ## 网络受限（服务器在中国大陆 / 连不上 Docker Hub、PyPI）
 

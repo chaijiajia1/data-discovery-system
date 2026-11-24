@@ -177,10 +177,23 @@ def test_every_example_question_selects_a_primary_asset_for_every_metric_on_demo
 
 def test_demo_seed_is_english_only_and_loads():
     assert not re.search(r"[\u4e00-\u9fff]", DEMO_SEED.read_text(encoding="utf-8"))
-    assert len(build_pair_store("jsonl_ro", DEMO_SEED).all()) == 3
+    assert len(build_pair_store("jsonl_ro", DEMO_SEED).all()) == 6
 
 
 def test_the_third_example_skips_recall_while_the_first_two_run_the_full_flow():
     c = demo_client(PAIR_STORE_BACKEND="jsonl_ro", PAIR_STORE_PATH=DEMO_SEED)
     lv = [c.post("/api/stage3", json={"query": q}).json()["plan"]["level"] for q in _chips()]
     assert lv[0] == "L2" and lv[1] == "L2" and lv[2] == "L0"
+
+
+# ── 不带反向代理的部署（docker-compose.http.yml）：X-Forwarded-For 不可信，必须只认连接对端地址 ─────────────────
+def test_client_ip_ignores_forwarded_for_when_no_trusted_proxy():
+    assert client_ip({"x-forwarded-for": "6.6.6.6"}, "10.0.0.1", trust_proxy=False) == "10.0.0.1"
+    assert client_ip({"x-forwarded-for": "6.6.6.6"}, None, trust_proxy=False) == "unknown"
+    assert client_ip({"x-forwarded-for": "6.6.6.6"}, "10.0.0.1") == "6.6.6.6"                 # 默认行为不变
+
+
+def test_spoofed_forwarded_for_cannot_dodge_the_rate_limit_without_a_proxy():
+    c = demo_client(DEMO_RATE_LIMIT_PER_MIN=3, DEMO_RATE_BURST=3, DEMO_TRUST_PROXY=False)
+    codes = [c.post("/api/stage1", json={"query": "Last 7 days DAU by channel"}, headers={"X-Forwarded-For": f"9.9.9.{i}"}).status_code for i in range(5)]
+    assert codes == [200, 200, 200, 429, 429]

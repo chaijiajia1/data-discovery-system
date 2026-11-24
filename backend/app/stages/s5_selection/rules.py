@@ -336,8 +336,11 @@ def rank_dims(e: Eval) -> dict[str, float]:
             "heat": round(min(1.0, _heat(e.c) / 12), 4), "retrieval": round(e.c.retrieval_score, 4)}
 
 
+SCORE_WEIGHTS = {"coverage": 0.5, "type_rank": 0.1, "layer_rank": 0.1, "heat": 0.2, "retrieval": 0.1}   # 综合分各项权重（Σ=1）
+
+
 def _total(d: dict[str, float]) -> float:
-    return round(0.5 * d["coverage"] + 0.1 * d["type_rank"] + 0.1 * d["layer_rank"] + 0.2 * d["heat"] + 0.1 * d["retrieval"], 4)
+    return round(sum(w * d[k] for k, w in SCORE_WEIGHTS.items()), 4)
 
 
 def evaluate_group(inp: SelectionInput, facts: dict[str, Facts], metric: str | None, support: dict[str, dict[str, str | None]]) -> dict[str, Eval]:
@@ -561,7 +564,7 @@ def _decision(e: Eval, role: str, label: str) -> AssetDecision:
 
 def _score(e: Eval) -> RankScore:
     d = rank_dims(e)
-    return RankScore(asset_id=e.c.asset_id, dims=d, total=_total(d))
+    return RankScore(asset_id=e.c.asset_id, dims=d, weights=dict(SCORE_WEIGHTS), total=_total(d))
 
 
 def _primary_decision(inp: SelectionInput, w: Eval, evals: dict[str, Eval], od: bool, trend: bool, label: str) -> AssetDecision:

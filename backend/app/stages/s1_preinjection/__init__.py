@@ -18,6 +18,7 @@ from .merge import merge_routes
 from .pair_source import PairKnowledgeSource, PairRoute
 from .retrieval_source import RetrievalKnowledgeSource
 from .selector import SelectorParams, greedy_select
+from .views import build_views
 
 
 def _covered(items, query_terms: list[str]) -> list[str]:
@@ -97,7 +98,8 @@ class PreInjectionStage(Stage[PreInjectionResult]):
         out = greedy_select(candidates, s.PREINJECT_TOKEN_BUDGET, params)
         covered = _covered(out.selected, terms)
         return PreInjectionResult(
-            injected=out.selected, dropped=out.dropped, trace=out.trace, token_budget=s.PREINJECT_TOKEN_BUDGET,
+            injected=out.selected, views=build_views(out.selected) if s.PREINJECT_VIEWS_ENABLED else {},
+            dropped=out.dropped, trace=out.trace, token_budget=s.PREINJECT_TOKEN_BUDGET,
             tau=s.PREINJECT_TAU, used_tokens=out.used_tokens, total_value=round(sum(t.delta for t in out.trace), 4), candidate_count=len(candidates), route_status=status,
             route_stats={"pair": _route_stat(pair_items), "retrieval": _route_stat(retrieval_items)}, pair_matches=matches,
             covered_terms=covered, uncovered_terms=[t for t in terms if t not in covered],

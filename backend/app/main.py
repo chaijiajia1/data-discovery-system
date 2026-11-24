@@ -82,7 +82,7 @@ def create_app(deps: Deps | None = None) -> FastAPI:
             if path.startswith(DEMO_BLOCKED_PREFIXES):
                 return JSONResponse({"detail": "Not Found"}, status_code=404)
             if request.method != "OPTIONS" and path.startswith(RATE_LIMITED_PREFIXES):
-                ok, retry = limiter.allow(client_ip(request.headers, request.client.host if request.client else None))
+                ok, retry = limiter.allow(client_ip(request.headers, request.client.host if request.client else None, ds.DEMO_TRUST_PROXY))
                 if not ok:
                     return JSONResponse({"detail": "Rate limit exceeded — please slow down and retry shortly."}, status_code=429, headers={"Retry-After": str(retry)})
             return await call_next(request)

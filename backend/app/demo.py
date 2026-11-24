@@ -36,7 +36,10 @@ class RateLimiter:
         return ok, 0 if ok else max(1, int((1.0 - tokens) / self.rate + 0.999))
 
 
-def client_ip(headers: Mapping[str, str], peer: str | None) -> str:
+def client_ip(headers: Mapping[str, str], peer: str | None, trust_proxy: bool = True) -> str:
+    """trust_proxy=False：前面没有可信反向代理（直接暴露端口），X-Forwarded-For 全是客户端自己写的，只认连接对端地址。"""
+    if not trust_proxy:
+        return peer or "unknown"
     h = {k.lower(): v for k, v in headers.items()}
     xff = [p.strip() for p in (h.get("x-forwarded-for") or "").split(",") if p.strip()]
     return xff[-1] if xff else (peer or "unknown")

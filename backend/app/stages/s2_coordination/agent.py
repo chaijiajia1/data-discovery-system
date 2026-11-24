@@ -19,7 +19,7 @@ from ...errors import UpstreamError
 from ...llm_client import LLMClient
 from ...prompts import load_prompt
 from ...schemas.intent import AssetRef, Intent
-from ...schemas.knowledge import PreInjectionResult
+from ...schemas.knowledge import CONSUMER_COORDINATION, PreInjectionResult
 from ...schemas.task import SLOT_NAMES
 from .extractor import heuristic_extract
 from .intent_rules import extract_asset_refs, infer_domain, infer_sub_domains, rule_intent
@@ -41,7 +41,8 @@ class CoordinationOutput:
 
 # ── prompt ────────────────────────────────────────────────────────────────
 def format_knowledge(pre: PreInjectionResult | None) -> str:
-    items = pre.injected if pre else []
+    """进 LLM prompt 的知识 = ① 分发给 ② 的视图（规则兜底路径仍读 injected 全量，见 extractor / defaults / intent_rules）。"""
+    items = pre.view(CONSUMER_COORDINATION) if pre else []
     return "\n".join(f"- [{i.kind.value}] {i.title}: {i.content}" for i in items) or "（无）"
 
 

@@ -62,7 +62,7 @@ class RetrievalPack(BaseModel):
 class DroppedKnowledge(BaseModel):
     item_id: str
     title: str = ""
-    reason: str  # over_budget | redundant | conflict | low_gain
+    reason: str  # over_budget | redundant | conflict | low_gain（① 全局选择）；kind_filtered | topk | over_budget（视图排除）
     detail: str = ""
 
 
@@ -99,8 +99,33 @@ class RouteStat(BaseModel):
     kinds: dict[str, int] = Field(default_factory=dict)
 
 
+# ── 按消费方分发的知识视图 ────────────────────────────────────────────────
+CONSUMER_COORDINATION = "coordination"     # ② 意图 / 契约补全
+CONSUMER_PLANNER = "planner"               # ③ 入口定级 / 规划
+CONSUMER_SELECTION = "selection"           # ⑤ 资产选择
+CONSUMER_CHECKS = "recall.checks"          # ④ 角色内联核对（维度覆盖的知识桥接）：不属于某个角色，各角色共用
+
+
+def recall_consumer(role: str) -> str:
+    """④ 某个角色模板（RoleSpec.name）的视图名。同一角色的多个副本看到同一份视图。"""
+    return f"recall.{role}"
+
+
+class KnowledgeView(BaseModel):
+    """某个消费方（agent）看到的知识：`injected` 的子集，只存 id，不重复存正文（体积小，且不可能凭空多出知识）。
+
+    冲突 / 冗余已在全局选择里裁决一次，视图只做「哪些对该消费方有用」的投影，不会让不同 agent 对同一冲突各自择一。"""
+
+    consumer: str
+    item_ids: list[str] = Field(default_factory=list)       # 保持 injected 的顺序
+    token_budget: int | None = None                         # 该视图的 token 上限（None = 不限）
+    used_tokens: int = 0
+    excluded: list[DroppedKnowledge] = Field(default_factory=list)   # reason: kind_filtered | topk | over_budget
+
+
 class PreInjectionResult(BaseModel):
     injected: list[KnowledgeItem] = Field(default_factory=list)
+    views: dict[str, KnowledgeView] = Field(default_factory=dict)    # consumer -> 视图；为空表示未分发（消费方回落到 injected 全量）
     dropped: list[DroppedKnowledge] = Field(default_factory=list)
     trace: list[SelectionStep] = Field(default_factory=list)
     token_budget: int = 0                                # 容量 L（硬上界）
@@ -120,6 +145,21 @@ class PreInjectionResult(BaseModel):
     def coverage(self) -> float:
         total = len(self.covered_terms) + len(self.uncovered_terms)
         return len(self.covered_terms) / total if total else 0.0
+
+    def view(self, consumer: str) -> list[KnowledgeItem]:
+        """该消费方看到的知识。没有分发视图（未启用 / 未登记的消费方）→ 回落到 `injected` 全量；
+        视图存在但为空 → 就是空（该消费方不需要知识，不能回落）。"""
+        v = self.views.get(consumer)
+        if v is None:
+            return list(self.injected)
+        wanted = set(v.item_ids)
+        return [i for i in self.injected if i.id in wanted]
+
+    def consumed_ids(self) -> set[str]:
+        """至少被一个消费方看到的知识 id；没有分发视图时视为全部被消费。"""
+        if not self.views:
+            return {i.id for i in self.injected}
+        return {i for v in self.views.values() for i in v.item_ids}
 
 
 class VerifiedPair(BaseModel):

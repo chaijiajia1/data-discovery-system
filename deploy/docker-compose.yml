@@ -1,15 +1,12 @@
-# 外网演示部署：app（FastAPI，假数据）+ caddy（HTTPS 入口）。
-#   cp demo.env.example demo.env ; echo "DOMAIN=demo.example.com" > .env ; docker compose up -d --build
+# 外网演示部署（HTTPS）：app（FastAPI，假数据）+ caddy（自动 HTTPS 入口，需要域名）。
+#   cp .env.example .env ; 编辑 DOMAIN ; ./install.sh https
+# 没有域名 / 只想用 IP:端口 访问：用 docker-compose.http.yml（./install.sh http）。
+# 镜像名由 DD_IMAGE 决定：本机构建后 `docker save` 拷到别的服务器 `docker load` 即可，服务器不需要源码、不需要联网构建。
 name: dd-demo
 
 services:
   app:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile
-      args:
-        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.11-slim}
-        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    image: ${DD_IMAGE:-dd-demo:latest}     # 构建配置在 docker-compose.build.yml（只有源码在场时才叠加；离线包里没有）
     env_file: ./demo.env
     restart: unless-stopped
     expose: ["8080"]
@@ -20,12 +17,7 @@ services:
     security_opt: ["no-new-privileges:true"]
     mem_limit: 512m
     pids_limit: 128
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3).status == 200 else 1)"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    # 健康检查在镜像里（Dockerfile HEALTHCHECK）
 
   caddy:
     image: ${CADDY_IMAGE:-caddy:2}

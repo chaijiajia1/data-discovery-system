@@ -1,0 +1,22 @@
+# 外网演示部署（HTTP，无反向代理）：只起 app，直接映射端口。适合没有域名 / 内网试用 / 先验证再上 HTTPS。
+#   cp .env.example .env ; ./install.sh http            → http://<服务器IP>:8080
+# 与 docker-compose.yml 的区别：
+#   - 没有 Caddy：不自动 HTTPS，端口直接对外（需要 HTTPS 就用 docker-compose.yml，或自己在前面放 nginx / 云厂商 LB）；
+#   - 没有可信反向代理：DEMO_TRUST_PROXY=false，限流只按连接对端地址（X-Forwarded-For 可被客户端伪造，不能信）；
+#   - 端口发布要求容器在非 internal 网络：容器可以出站（演示本身不会发起任何出站请求）。
+name: dd-demo-http
+
+services:
+  app:
+    image: ${DD_IMAGE:-dd-demo:latest}     # 构建配置在 docker-compose.build.yml（只有源码在场时才叠加；离线包里没有）
+    env_file: ./demo.env
+    environment:
+      DEMO_TRUST_PROXY: "false"
+    restart: unless-stopped
+    ports: ["${APP_BIND:-0.0.0.0}:${APP_PORT:-8080}:8080"]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    pids_limit: 128
