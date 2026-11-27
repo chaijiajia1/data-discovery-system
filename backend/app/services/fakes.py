@@ -33,8 +33,14 @@ class FakeBIRetrieval:
 
     async def get(self, asset_ids: list[str]) -> list[CandidateAsset]:
         by_id = {a.asset_id: a for a, _ in self.assets}
-        return [by_id[i].model_copy(update={"retrieval_score": 0.6}, deep=True) if i in by_id else CandidateAsset(asset_id=i, name=i, retrieval_score=0.5)
-                for i in asset_ids]
+        resolved = []
+        for aid in asset_ids:
+            asset = by_id.get(aid)
+            if asset is None:
+                resolved.append(CandidateAsset(asset_id=aid, name=aid, retrieval_score=0.5))
+            else:
+                resolved.append(asset.model_copy(update={"retrieval_score": asset.retrieval_score or 0.6}, deep=True))
+        return resolved
 
     async def search(self, query: str, *, limit: int = 10, cookie=None, params=None) -> list[CandidateAsset]:
         terms = set(extract_terms(query))
@@ -42,7 +48,7 @@ class FakeBIRetrieval:
         for asset, keywords in self.assets:
             hit = len(terms & {k.upper() for k in keywords} | {t for t in terms if any(t in k for k in keywords)})
             if hit:
-                out.append(asset.model_copy(update={"retrieval_score": min(1.0, 0.4 + 0.2 * hit)}, deep=True))
+                out.append(asset.model_copy(update={"retrieval_score": asset.retrieval_score or min(1.0, 0.4 + 0.2 * hit)}, deep=True))
         out.sort(key=lambda a: a.retrieval_score, reverse=True)
         return out[:limit]
 

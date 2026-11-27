@@ -95,11 +95,12 @@ class PreInjectionStage(Stage[PreInjectionResult]):
             tau=s.PREINJECT_TAU, redundancy=s.PREINJECT_W_REDUNDANCY, conflict=s.PREINJECT_W_CONFLICT,
             synergy=s.PREINJECT_W_SYNERGY,
         )
-        out = greedy_select(candidates, s.PREINJECT_TOKEN_BUDGET, params)
+        budget = ctx.token_budget if ctx.token_budget is not None else s.PREINJECT_TOKEN_BUDGET
+        out = greedy_select(candidates, budget, params)
         covered = _covered(out.selected, terms)
         return PreInjectionResult(
             injected=out.selected, views=build_views(out.selected) if s.PREINJECT_VIEWS_ENABLED else {},
-            dropped=out.dropped, trace=out.trace, token_budget=s.PREINJECT_TOKEN_BUDGET,
+            dropped=out.dropped, trace=out.trace, token_budget=budget,
             tau=s.PREINJECT_TAU, used_tokens=out.used_tokens, total_value=round(sum(t.delta for t in out.trace), 4), candidate_count=len(candidates), route_status=status,
             route_stats={"pair": _route_stat(pair_items), "retrieval": _route_stat(retrieval_items)}, pair_matches=matches,
             covered_terms=covered, uncovered_terms=[t for t in terms if t not in covered],

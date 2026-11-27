@@ -87,3 +87,26 @@ def test_demo_data_is_english_only():
     from app.services import demo_data as d
     text = " ".join(f"{a.name} {a.meta.description or ''}" for a, _ in d.DEMO_ASSETS) + " ".join(k.content + k.title for k in d.DEMO_KNOWLEDGE)
     assert not re.search(r"[\u4e00-\u9fff]", text)
+
+
+@pytest.mark.parametrize(("query", "baseline_ids", "decoy_id", "decision"), [
+    ("Last 7 days DAU and CTR by platform", {"app.user_active_d", "dws.ad_ctr_m"}, "dws.ad_ctr_m", "discarded"),
+    ("Last 30 days CTR by platform", {"dws.ad_ctr_m"}, "dws.ad_ctr_m", "discarded"),
+    ("Last 7 days DAU and GMV by channel", {"app.user_active_d", "ads.finance_gmv_audit"}, "ads.finance_gmv_audit", "alternates"),
+])
+def test_equal_budget_comparison_on_the_shared_pool(results, query, baseline_ids, decoy_id, decision):
+    from app.demo import DEMO_CASE_ANSWERS
+
+    candidates = results[query]["stage4"]["candidates"]
+    selection = results[query]["stage5"]
+    reference = DEMO_CASE_ANSWERS[query.casefold()]
+    assert {metric: pick["asset_id"] for pick in selection["primary"] for metric in pick["covers"]} == reference
+    ranked = sorted(candidates, key=lambda asset: (-asset["retrieval_score"], asset["asset_id"]))
+    k = len(selection["primary"])
+    assert {asset["asset_id"] for asset in ranked[:k]} == baseline_ids
+    decoy = next(pick for pick in selection[decision] if pick["asset_id"] == decoy_id)
+    metadata = next(asset["meta"] for asset in candidates if asset["asset_id"] == decoy_id)
+    if decision == "discarded":
+        assert metadata["grain"] == "month"
+    else:
+        assert metadata["permission_scope"] == "finance" and decoy["needs_permission"]

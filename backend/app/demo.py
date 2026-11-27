@@ -14,6 +14,14 @@ from typing import Callable, Mapping
 DEMO_BLOCKED_PREFIXES = ("/api/cookie", "/api/me", "/api/pairs", "/api/prompts")
 RATE_LIMITED_PREFIXES = ("/api/stage", "/api/discover", "/api/plan")
 
+# Reference primary asset for each metric in the three published examples.
+# These labels describe the demo catalog and never participate in selection.
+DEMO_CASE_ANSWERS = {
+    "last 7 days dau and ctr by platform": {"DAU": "app.user_active_d", "CTR": "app.ad_perf_board_d"},
+    "last 30 days ctr by platform": {"CTR": "app.ad_perf_board_d"},
+    "last 7 days dau and gmv by channel": {"DAU": "app.user_active_d", "GMV": "app.trade_overview_d"},
+}
+
 
 class RateLimiter:
     """令牌桶：每个 key 容量 burst，每分钟补 per_minute 个。表有上限，超过时丢最久没用的 key。"""

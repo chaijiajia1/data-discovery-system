@@ -196,3 +196,18 @@ def test_stage4_rejects_unknown_roles_and_cyclic_graphs():
 def test_stage4_without_graph_still_runs_the_planned_chosen_graph():
     b = _client().post("/api/stage4", json={"query": "最近7天DAU"}).json()
     assert [a["agent_id"] for a in b["recall"]["collab"]["agents"]] == [n["id"] for n in b["plan"]["chosen"]["graph"]["nodes"]]
+
+
+def test_token_budget_limits_selection_and_is_reused_by_planning():
+    client = _client()
+    query = {"query": "Last 7 days DAU and CTR by platform"}
+    first = client.post("/api/stage1", json={**query, "token_budget": 1}).json()
+    assert first["result"]["token_budget"] == 1
+    assert first["result"]["used_tokens"] <= 1
+    resumed = client.post("/api/stage3", json={**query, "run_id": first["run_id"]}).json()
+    assert resumed["preinjection"] == first["result"]
+    revised = client.post("/api/stage3", json={**query, "run_id": first["run_id"], "token_budget": 500}).json()
+    assert revised["run_id"] != first["run_id"]
+    assert revised["preinjection"]["token_budget"] == 500
+    assert revised["preinjection"]["used_tokens"] > first["result"]["used_tokens"]
+    assert client.post("/api/stage1", json={**query, "token_budget": -1}).status_code == 422

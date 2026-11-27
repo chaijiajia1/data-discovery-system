@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 
 from app.deps import Deps
 from app.main import create_app
+from app.settings import Settings
 from app.services.fakes import FakeBIRetrieval
 
 
@@ -63,3 +64,26 @@ def test_l0_known_assets_need_no_cached_recall():
     c, bi = client()
     s5 = c.post("/api/stage5", json={"query": "DAU", "confirmed_assets": {"DAU": ["dws.user_active_d"]}}).json()
     assert s5["recall_reused"] is False and [d["asset_id"] for d in s5["selection"]["primary"]] == ["dws.user_active_d"] and bi.calls == []
+
+
+def test_demo_answer_is_a_reference_independent_of_the_workflow():
+    c = TestClient(create_app(Deps(settings=Settings(_env_file=None, DEMO_MODE=True))))
+    q = "Last 7 days DAU and CTR by platform"
+    # A workflow that only searches DAU must still be graded against both metrics.
+    s4 = c.post("/api/stage4", json={"query": q, "graph": GRAPH}).json()
+    result = c.post("/api/stage5", json={"query": q, "run_id": s4["run_id"]}).json()
+    assert result["demo_answer"] == {"DAU": "app.user_active_d", "CTR": "app.ad_perf_board_d"}
+    for query, expected in [
+        ("Last 30 days CTR by platform", {"CTR": "app.ad_perf_board_d"}),
+        ("Last 7 days DAU and GMV by channel", {"DAU": "app.user_active_d", "GMV": "app.trade_overview_d"}),
+        ("Last 7 days CTR by region", None),
+    ]:
+        assert c.post("/api/stage5", json={"query": query}).json()["demo_answer"] == expected
+    changed = c.post("/api/stage5", json={"query": q, "clarifications": {"metrics": ["GMV"]}}).json()
+    assert changed["demo_answer"] is None
+
+
+def test_live_mode_has_no_synthetic_reference():
+    c, _ = client()
+    result = c.post("/api/stage5", json={"query": "Last 30 days CTR by platform"}).json()
+    assert result["demo_answer"] is None

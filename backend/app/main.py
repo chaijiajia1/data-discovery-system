@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from . import __service_name__, __version__, cookie_fetcher, upstream_diagnose
 from .auth import fetch_user_info_ex, resolve_cookie, username_from_cookie
-from .demo import DEMO_BLOCKED_PREFIXES, RATE_LIMITED_PREFIXES, RateLimiter, client_ip, render_html
+from .demo import DEMO_BLOCKED_PREFIXES, DEMO_CASE_ANSWERS, RATE_LIMITED_PREFIXES, RateLimiter, client_ip, render_html
 from .deps import Deps, build_default_deps
 from .pipeline import stream_pipeline
 from .prompts import load_prompt
@@ -40,6 +40,7 @@ class DiscoverRequest(BaseModel):
     session_id: str = "default"
     user_id: str | None = None
     cookie: str | None = None        # 可选；缺省时透传请求的 Cookie 头（SSO）
+    token_budget: int | None = Field(default=None, ge=0)
     # 用户主动补充的条件（可选，不会被追问）：{"metrics": ["DAU"], "caliber": "..."}，优先级最高
     clarifications: dict[str, Any] = Field(default_factory=dict)
     max_parallel: int | None = Field(default=None, ge=1, le=16)    # A_max：前端输入的最大并行 Agent 数
@@ -90,13 +91,13 @@ def create_app(deps: Deps | None = None) -> FastAPI:
     async def _ctx(req: DiscoverRequest, request: Request) -> RunContext:
         if demo:        # 演示模式不处理任何 cookie / 身份：假数据不需要，也不去查内网的用户信息接口
             return RunContext(query=req.query, deps=deps, user_id=None, session_id=req.session_id, clarifications=req.clarifications, cookie=None,
-                              max_parallel=req.max_parallel, confirmed_assets=req.confirmed_assets)
+                              max_parallel=req.max_parallel, confirmed_assets=req.confirmed_assets, token_budget=req.token_budget)
         cookie = resolve_cookie(req.cookie, request.headers)
         # 身份：显式 user_id > cookie 解析出的用户名 > CONTEXT_QUERY_OWNER（客户端兜底）
         user_id = req.user_id or await asyncio.to_thread(username_from_cookie, cookie)
         return RunContext(query=req.query, deps=deps, user_id=user_id, session_id=req.session_id,
                           clarifications=req.clarifications, cookie=cookie, max_parallel=req.max_parallel,
-                          confirmed_assets=req.confirmed_assets)
+                          confirmed_assets=req.confirmed_assets, token_budget=req.token_budget)
 
     runs: OrderedDict[str, RunContext] = OrderedDict()      # 阶段间续跑 / 自定义图评分用的 run 缓存（LRU，进程内）
 
@@ -110,7 +111,9 @@ def create_app(deps: Deps | None = None) -> FastAPI:
         """同一 query 带 run_id 续跑：复用已有的 ① / ② 产物（② 仅在补充信息未变时复用）。"""
         ctx = await _ctx(req, request)
         prev = runs.get(req.run_id) if req.run_id else None
-        if prev is not None and prev.query == req.query:
+        if (prev is not None and prev.query == req.query and prev.preinjection is not None
+                and req.token_budget in (None, prev.preinjection.token_budget)):
+            ctx.token_budget = prev.preinjection.token_budget
             ctx.run_id, ctx.preinjection = prev.run_id, prev.preinjection
             if prev.contract is not None and prev.clarifications == req.clarifications:
                 ctx.contract = prev.contract
@@ -234,6 +237,7 @@ def create_app(deps: Deps | None = None) -> FastAPI:
             ctx.selection = await SelectionStage().run(ctx)
         _remember(ctx)
         return {"run_id": ctx.run_id, "status": ctx.contract.status, "recall_reused": reused, "contract": ctx.contract.model_dump(mode="json"),
+                "demo_answer": DEMO_CASE_ANSWERS.get(" ".join(req.query.casefold().split())) if demo and not req.clarifications and not req.confirmed_assets else None,
                 "recall": ctx.recall.model_dump(mode="json") if ctx.recall else None,
                 "selection": ctx.selection.model_dump(mode="json") if ctx.selection else None}
 

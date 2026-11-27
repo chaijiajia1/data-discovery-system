@@ -35,6 +35,7 @@ class RunContext:
     recall: RecallResult | None = None
     selection: SelectionResult | None = None
     execution: ExecutionResult | None = None
+    token_budget: int | None = None
 
 
 class Stage(Generic[T]):

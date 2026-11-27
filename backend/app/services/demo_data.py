@@ -16,9 +16,9 @@ from ..schemas.recall import AssetMeta, CandidateAsset
 from ..text_utils import estimate_tokens
 
 
-def _asset(aid, name, grain, fields, *, main, heat, refs, pks=(), typ="table", scope="public", latest="2026-11-23", desc=None, **meta):
+def _asset(aid, name, grain, fields, *, main, heat, refs, retrieval_score=0.0, pks=(), typ="table", scope="public", latest="2026-11-23", desc=None, **meta):
     return CandidateAsset(
-        asset_id=aid, name=name, asset_type=typ,
+        asset_id=aid, name=name, asset_type=typ, retrieval_score=retrieval_score,
         meta=AssetMeta(grain=grain, partition_field="dt", partition_latest=latest, fields=list(fields), primary_keys=list(pks), main_table=main,
                        heat_30d=heat, ref_count=refs, permission_scope=scope, description=desc, **meta),
     )
@@ -26,8 +26,10 @@ def _asset(aid, name, grain, fields, *, main, heat, refs, pks=(), typ="table", s
 
 # (资产, 检索关键词)。关键词只放指标名：维度词（platform / channel）不进关键词，否则每个指标的检索都会带出无关资产。
 DEMO_ASSETS: list[tuple[CandidateAsset, list[str]]] = [
+    # 合成检索分反映目录中的可发现性：常用 DAU 表、常引用的月报和财务表容易召回。
+    # 选择阶段另行评估统计粒度和访问权限。
     # ── DAU ──
-    (_asset("app.user_active_d", "App-layer user activity (daily)", "day", ["dt", "platform", "channel", "dau"], main="app_user_active_d", heat=9000, refs=150,
+    (_asset("app.user_active_d", "App-layer user activity (daily)", "day", ["dt", "platform", "channel", "dau"], main="app_user_active_d", retrieval_score=0.86, heat=9000, refs=150,
             pks=["dt", "platform", "channel"], desc="Certified daily active users by platform and channel"), ["DAU"]),
     (_asset("dws.user_active_d", "User daily-active detail", "day", ["dt", "platform", "channel", "dau"], main="dws_user_active_d", heat=6000, refs=80,
             pks=["dt", "platform", "channel"]), ["DAU"]),
@@ -44,7 +46,7 @@ DEMO_ASSETS: list[tuple[CandidateAsset, list[str]]] = [
             pks=["dt", "platform"], desc="Certified ad performance board"), ["CTR"]),
     (_asset("dws.ad_ctr_h", "Ad CTR hourly table", "hour", ["dt", "hour", "platform", "ctr"], main="dws_ad_ctr_h", heat=900, refs=12,
             pks=["dt", "hour", "platform"]), ["CTR"]),
-    (_asset("dws.ad_ctr_m", "Ad CTR monthly table", "month", ["dt", "platform", "ctr"], main="dws_ad_ctr_m", heat=1800, refs=25,
+    (_asset("dws.ad_ctr_m", "Ad CTR monthly table", "month", ["dt", "platform", "ctr"], main="dws_ad_ctr_m", retrieval_score=0.97, heat=1800, refs=25,
             pks=["dt", "platform"]), ["CTR"]),
     (_asset("dwd.ad_click_log", "Ad click detail log", "day", ["dt", "ad_id", "platform", "is_click"], main="dwd_ad_click_log", heat=400, refs=8), ["CTR"]),
     (_asset("chart.ad_dashboard_ctr", "Ad dashboard: CTR trend", "day", [], main=None, heat=3000, refs=40, typ="chart", is_strict=False,
@@ -54,7 +56,7 @@ DEMO_ASSETS: list[tuple[CandidateAsset, list[str]]] = [
             pks=["dt", "channel"], desc="Certified trade overview"), ["GMV"]),
     (_asset("dws.trade_gmv_d", "Trade GMV daily detail", "day", ["dt", "channel", "gmv"], main="dws_trade_gmv_d", heat=5200, refs=90, pks=["dt", "channel"]), ["GMV"]),
     (_asset("dws.trade_gmv_m", "Trade GMV monthly summary", "month", ["dt", "channel", "gmv"], main="dws_trade_gmv_m", heat=2100, refs=35, pks=["dt", "channel"]), ["GMV"]),
-    (_asset("ads.finance_gmv_audit", "Finance GMV audit table (restricted)", "day", ["dt", "channel", "gmv", "gmv_net"], main="ads_finance_gmv_audit", heat=600, refs=5,
+    (_asset("ads.finance_gmv_audit", "Finance GMV audit table (restricted)", "day", ["dt", "channel", "gmv", "gmv_net"], main="ads_finance_gmv_audit", retrieval_score=0.96, heat=600, refs=5,
             pks=["dt", "channel"], scope="finance"), ["GMV"]),
 ]
 
@@ -76,9 +78,9 @@ DEMO_KNOWLEDGE: list[KnowledgeItem] = [
     _k("k_dau_meta", K.ASSET_META, "app.user_active_d metadata", "Daily partition dt, grain = day, certified app-layer table",
        ["DAU"], ["app.user_active_d"]),
     _k("k_ctr", K.METRIC_DEF, "CTR", "Click-through rate = clicks / impressions",
-       ["CTR"], ["dws.ad_ctr_d", "app.ad_perf_board_d"]),
-    _k("k_ctr_meta", K.ASSET_META, "dws.ad_ctr_d metadata", "Daily partition dt, grain = day, ctr / cvr computed from the ad exposure log",
-       ["CTR"], ["dws.ad_ctr_d"]),
+       ["CTR"], ["dws.ad_ctr_m"]),
+    _k("k_ctr_meta", K.ASSET_META, "Monthly CTR archive", "Frequently cited in executive reports; only calendar-month totals are retained",
+       ["CTR"], ["dws.ad_ctr_m"]),
     _k("k_gmv", K.METRIC_DEF, "GMV", "Gross merchandise value: paid orders, refunds not deducted",
        ["GMV"], ["app.trade_overview_d", "dws.trade_gmv_d", "dws.trade_gmv_m", "ads.finance_gmv_audit"]),
     _k("k_gmv_meta", K.ASSET_META, "dws.trade_gmv_d metadata", "Daily partition dt, grain = day, fields channel / gmv",

@@ -71,15 +71,7 @@ python3.11 -m venv /tmp/lockvenv && grep -vi '^browser-cookie3' ../backend/requi
 
 ## 示例问句与演示数据
 
-三条示例问句的假数据在 `backend/app/services/demo_data.py`（资产 / 知识）和 `backend/data/demo_history.jsonl`（历史配对），均为示意占位，每个面板都有内容：
-
-| 问句 | 入口级别 | 看点 |
-|---|---|---|
-| Last 7 days DAU and CTR by platform | L2 完整召回 | DAU / CTR 各有「应用层 vs 明细层」同覆盖度平局（界面上的 Ambiguous 说明）、月表被丢弃、明细日志无指标字段 |
-| Last 30 days CTR by platform | L2 完整召回 | 召回阶段有询问 / 转交；备选含未达标图表 |
-| Last 7 days DAU and GMV by channel | L0 直接执行 | 知识已覆盖全部子目标，跳过 Phase 3 / 4；财务审计表无权限，降级到备选 |
-
-Phase 5 的备选最多显示 5 个（按展示分数从高到低）。
+三条问句共用合成目录。月度 CTR 归档表和受限财务审计表具有较高的检索相关度，逐指标选择还会检查粒度与权限。各例的默认 K、两种方法的命中情况及操作步骤见[工程首页](../README.md)。
 
 ## 验证状态（如实说明）
 
